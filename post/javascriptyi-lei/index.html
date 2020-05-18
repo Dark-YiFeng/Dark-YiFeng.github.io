@@ -1,0 +1,358 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>JavaScript（一）：类 | Gridea</title>
+<link rel="shortcut icon" href="https://dark-yifeng.github.io/favicon.ico?v=1589771820441">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://dark-yifeng.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="JavaScript（一）：类 | Gridea - Atom Feed" href="https://dark-yifeng.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="ES5
+ECMAScript 2015 中引入的 JavaScript 类实质上是 JavaScript 现有的基于原型的继承的语法糖。类语法不会为JavaScript引入新的面向对象的继承模型。
+类实际上是个“特殊的函数”，就像你能够定义..." />
+    <meta name="keywords" content="" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://dark-yifeng.github.io">
+  <img class="avatar" src="https://dark-yifeng.github.io/images/avatar.png?v=1589771820441" alt="">
+  </a>
+  <h1 class="site-title">
+    Gridea
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              JavaScript（一）：类
+            </h2>
+            <div class="post-info">
+              <span>
+                2020-05-18
+              </span>
+              <span>
+                6 min read
+              </span>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h2 id="es5">ES5</h2>
+<p>ECMAScript 2015 中引入的 JavaScript 类实质上是 JavaScript 现有的基于原型的继承的语法糖。类语法不会为JavaScript引入新的面向对象的继承模型。</p>
+<p>类实际上是个“特殊的函数”，就像你能够定义的函数表达式和函数声明一样，类语法有两个组成部分：类表达式和类声明。</p>
+<p><strong>类声明</strong></p>
+<p>定义一个类的一种方法是使用一个类声明。要声明一个类，你可以使用带有class关键字的类名（这里是“Rectangle”）。</p>
+<pre><code class="language-csharp">class Rectangle {
+  constructor(height, width) {
+    this.height = height;
+    this.width = width;
+  }
+}
+</code></pre>
+<blockquote>
+<p>函数声明和类声明之间的一个重要区别是函数声明会提升，类声明不会。</p>
+</blockquote>
+<p><strong>类表达式</strong></p>
+<p>一个类表达式是定义一个类的另一种方式。类表达式可以是被命名的或匿名的。赋予一个命名类表达式的名称是类的主体的本地名称。</p>
+<pre><code class="language-csharp">/* 匿名类 */ 
+let Rectangle = class {
+  constructor(height, width) {
+    this.height = height;
+    this.width = width;
+  }
+};
+
+/* 命名的类 */ 
+let Rectangle = class Rectangle {
+  constructor(height, width) {
+    this.height = height;
+    this.width = width;
+  }
+};
+</code></pre>
+<blockquote>
+<p>类表达式也同样受到类声明中提到的提升问题的限制。</p>
+</blockquote>
+<h2 id="es6">ES6</h2>
+<p>在ES6中，class (类)作为对象的模板被引入，可以通过 class 关键字定义类。它可以被看作一个语法糖，让对象原型的写法更加清晰、更像面向对象编程的语法。</p>
+<h2 id="es5与es6对比">ES5与ES6对比</h2>
+<h2 id="一">一</h2>
+<p>在ES5中定义一个类：</p>
+<pre><code class="language-csharp">function Person(name) {
+ 
+    this.name = name;
+}
+ 
+Person.prototype.sayHello = function(){
+ 
+    return 'Hi, I am ' + this.name;
+}
+</code></pre>
+<p>而用ES6的写法重写一下，检测类型发现Person本质上仍然是函数：</p>
+<pre><code class="language-csharp">class Person {
+ 
+    constructor(name){
+        this.name = name;
+    }
+ 
+    sayHello(){
+        return 'Hi, I am ' + this.name;
+    }
+}
+ 
+typeof Person; //'function'
+</code></pre>
+<p>调用的方式都是一致的：</p>
+<pre><code class="language-csharp">var p1 = new Person('zhangsan');   
+</code></pre>
+<blockquote>
+<p>用ES6定义class中的方法，定义在原型对象上的。与ES5不同的是，这些定义在原型对象的方法是不可枚举的。</p>
+</blockquote>
+<h2 id="二">二</h2>
+<p>ES6类和模块是严格模式下的；不存在变量提升，保证子类父类的顺序；类的继承也有新的写法：</p>
+<pre><code class="language-csharp">class Female extends Person {
+ 
+    constructor(name){
+        super(name); //调用父类的，调用之后，子类才有this
+        this.sex = 'boy';
+    }
+ 
+    sayHello(){
+        return super.sayHello() + ', I am ' + this.sex;
+    }
+ 
+}
+</code></pre>
+<p>注意，子类必须在父类的构造函数中调用super()，这样才有this对象，因为this对象是从父类继承下来的。而要在子类中调用父类的方法，用super关键词可指代父类。</p>
+<p>ES5中类继承的关系是相反的，先有子类的this，然后用父类的方法应用在this上。</p>
+<p>ES6类继承子类的this是从父类继承下来的这个特性，使得在ES6中可以构造原生数据结构的子类，这是ES5无法做到的。</p>
+<h2 id="三">三</h2>
+<p>ES6也可以定义类的静态方法和静态属性，静态的意思是这些不会被实例继承，不需要实例化类，就可以直接拿来用。ES6中class内部只能定义方法，不能定义属性。在方法名前加上static就表示这个方式是静态方法，而属性还是按照ES5的方式来实现。</p>
+<pre><code class="language-csharp">function Person(name){
+ 
+    if(new.target === Person){
+        this.name = name;
+    }
+    else{
+        throw new Error('必须用new生成实例');
+    }
+}
+</code></pre>
+<h2 id="四">四</h2>
+<p>ES6中当函数用new关键词的时候，增加了new.target属性来判断当前调用的构造函数。这个有什么用处呢？可以限制函数的调用，比如一定要用new命令来调用，或者不能直接被实例化需要调用它的子类。</p>
+<pre><code class="language-csharp">function Person(name){
+ 
+    if(new.target === Person){
+        this.name = name;
+    }
+    else{
+        throw new Error('必须用new生成实例');
+    }
+}
+</code></pre>
+<h2 id="五">五</h2>
+<p><strong>ES5类中的 实例方法&amp;原型方法&amp;静态方法</strong></p>
+<p>1.实例方法只有实例可以调用</p>
+<p>2.实例方法可以调用静态方法，不能调用原型方法</p>
+<p>3.原型方法可以被实例和构造函数访问到</p>
+<p>4.原型方法只可以调用静态方法</p>
+<p>5.静态方法只有构造函数可以调用</p>
+<p><strong>ES5中定义三种方法及调用关系：</strong></p>
+<pre><code class="language-csharp">let Animal = function (type) {
+  this.type = type
+  // 实例方法
+  this.drink = function () {
+    // 实例方法可调用类的静态方法
+    Animal.walk()
+    console.log('drink')
+  }
+}
+
+// 原型方法
+Animal.prototype.eat = function () {
+  // 原型方法可调用类的静态方法
+  Animal.walk()
+  console.log('eat food')
+}
+
+// 静态方法
+Animal.walk = function () {
+  console.log('walking')
+}
+
+let dog = new Animal('dog')
+dog.drink() // walking drink
+dog.eat() // walking eat food
+Animal.walk() // walking静态方法只能由&lt;类自身&amp;实例方法&amp;原型方法&gt;调用，实例对象无法调用
+// dog.walk() // dog.walk is not a function  实例对象无法调用静态方法
+</code></pre>
+<p><strong>ES6类中的 实例方法&amp;原型方法&amp;静态方法</strong></p>
+<p>1.实例方法=原型方法 类中直接定义的实例方法默认就是ES5中的原型方法（语法糖）</p>
+<p>2.静态方法用static前缀定义</p>
+<p>3.静态方法只有构造函数可以调用，原型方法是实例和构造函数都可以调用，是共享的方法。</p>
+<p><strong>ES6中定义三种方法及调用关系：</strong></p>
+<pre><code class="language-csharp">class Animal {
+  constructor (type) {
+    this.type = type
+  }
+  // 定义实例对象的方法
+  eat () {
+    // 使用静态方法，以类形式访问，而非this访问
+    Animal.walk()
+    console.log('eat food')
+    console.log(this.type) // 类的例实例对象的方法可以获取到实例对象的信息，输出dog
+  }
+  // static 定义类的静态方法
+  static walk () {
+    console.log('walking')
+    console.log(this.type) // 类的静态方法无法获取到实例对象的信息，输出undefined
+  }
+}
+let dog = new Animal('dog')
+dog.eat() // walking ； undefined ； eat food ； dog
+Animal.walk() // walking ； undefined ；
+dog.walk() // dog.walk is not a function
+// 得出结论：需要访问实例对象的信息时用实例对象的方法，否则使用static静态方法
+// 实例方法就是只有实例可以调用，静态方法只有构造函数可以调用，原型方法是实例和构造函数都可以调用，是共享的方法。
+</code></pre>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#es5">ES5</a></li>
+<li><a href="#es6">ES6</a></li>
+<li><a href="#es5%E4%B8%8Ees6%E5%AF%B9%E6%AF%94">ES5与ES6对比</a></li>
+<li><a href="#%E4%B8%80">一</a></li>
+<li><a href="#%E4%BA%8C">二</a></li>
+<li><a href="#%E4%B8%89">三</a></li>
+<li><a href="#%E5%9B%9B">四</a></li>
+<li><a href="#%E4%BA%94">五</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://dark-yifeng.github.io/post/hello-gridea/">
+              <h3 class="post-title">
+                Hello Gridea
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://dark-yifeng.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>
