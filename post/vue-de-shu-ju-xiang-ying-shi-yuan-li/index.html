@@ -1,0 +1,273 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Vue的数据响应式原理 | Dark</title>
+<link rel="shortcut icon" href="https://dark-yifeng.github.io/favicon.ico?v=1589794449118">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://dark-yifeng.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Vue的数据响应式原理 | Dark - Atom Feed" href="https://dark-yifeng.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="什么是响应式
+“响应式”，是指当数据改变后，Vue 会通知到使用该数据的代码。例如，视图渲染中使用了数据，数据改变后，视图也会自动更新。
+举个简单的例子，对于模板：
+&lt;div id=&quot;root&quot;&gt;{{ nam..." />
+    <meta name="keywords" content="Vue" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://dark-yifeng.github.io">
+  <img class="avatar" src="https://dark-yifeng.github.io/images/avatar.png?v=1589794449118" alt="">
+  </a>
+  <h1 class="site-title">
+    Dark
+  </h1>
+  <p class="site-description">
+    克己，执着，努力，疯狂，谦卑
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://dark-yifeng.github.io" class="menu">
+          主页
+        </a>
+      
+    
+      
+        <a href="https://dark-yifeng.github.io/tags" class="menu">
+          分类
+        </a>
+      
+    
+      
+        <a href="https://dark-yifeng.github.io/archives" class="menu">
+          日期
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/Dark-YiFeng" target="_blank">
+          <i class="ri-github-line"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Vue的数据响应式原理
+            </h2>
+            <div class="post-info">
+              <span>
+                2020-05-18
+              </span>
+              <span>
+                6 min read
+              </span>
+              
+                <a href="https://dark-yifeng.github.io/tag/74z3KqTAN/" class="post-tag">
+                  # Vue
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h2 id="什么是响应式">什么是响应式</h2>
+<p>“响应式”，是指当数据改变后，Vue 会通知到使用该数据的代码。例如，视图渲染中使用了数据，数据改变后，视图也会自动更新。</p>
+<p>举个简单的例子，对于模板：</p>
+<pre><code class="language-c">&lt;div id=&quot;root&quot;&gt;{{ name }}&lt;/div&gt;
+</code></pre>
+<p>创建一个 Vue 组件：</p>
+<pre><code class="language-c">var vm = new Vue({
+  el: '#root',
+  data: {
+    name: 'luobo'
+  }
+})
+</code></pre>
+<p>代码执行后，页面上对应位置会显示：luobo。</p>
+<p>如果想改变显示的名字，只需要执行：</p>
+<pre><code class="language-c">vm.name = 'tang'
+</code></pre>
+<p>这样页面上就会显示修改后的名字了，并不需要去手动修改 DOM 更新数据。</p>
+<h2 id="响应式原理">响应式原理</h2>
+<p>Vue 的响应式原理是核心是通过 ES5 的保护对象的 Object.defindeProperty 中的访问器属性中的 get 和 set 方法，data 中声明的属性都被添加了访问器属性，当读取 data 中的数据时自动调用 get 方法，当修改 data 中的数据时，自动调用 set 方法，检测到数据的变化，会通知观察者 Wacher，观察者 Wacher自动触发重新render 当前组件（子组件不会重新渲染）,生成新的虚拟 DOM 树，Vue 框架会遍历并对比新虚拟 DOM 树和旧虚拟 DOM 树中每个节点的差别，并记录下来，最后，加载操作，将所有记录的不同点，局部修改到真实 DOM 树上。<img src="https://img-blog.csdnimg.cn/20200304201601974.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdXlpZmVuZzAwMDA=,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" loading="lazy"></p>
+<h2 id="响应式缺陷">响应式缺陷</h2>
+<p><strong>vue不能监听数组的变化</strong></p>
+<p>Object.defindProperty虽然能够实现双向绑定了，但是还是有缺点，只能对对象的属性进行数据劫持，所以会深度遍历整个对象，不管层级有多深，只要数组中嵌套有对象，就能监听到对象的数据变化无法监听到数组的变化，Proxy就没有这个问题，可以监听整个对象的数据变化，所以用vue3.0会用Proxy代替definedProperty。</p>
+<p><strong>Vue不能检测到对象属性的添加或删除</strong></p>
+<p>受现代JS的限制（以及废弃 Object.observe），Vue不能检测到对象属性的添加或删除，由于Vue会在初始化实例时对属性执行 getter/setter转化过程，所以属性必须在data对象上存在才能让Vue转换它，这样才能让它是响应的。</p>
+<pre><code class="language-c">var vm = new Vue({
+  data:{
+  　　a:1
+  }
+})
+// `vm.a` 是响应的
+vm.b = 2
+// `vm.b` 是非响应的
+</code></pre>
+<p>Vue不允许在已经创建的实例上动态添加新的根级响应式属性(root-level reactive property)，然而它可以使用 Vue.set(object, key, value) 方法将响应属性添加到嵌套的对象上。</p>
+<pre><code class="language-c">Vue.set(vm.someObject, 'b', 2)
+</code></pre>
+<p>也可以使用 vm.$set 实例方法，这也是全局 Vue.set 方法的别名。</p>
+<pre><code class="language-c">this.$set(this.someObject,'b',2)
+</code></pre>
+<p>有时想向已有对象上添加一些属性，例如使用Object.assign()或 _.extend()方法来添加属性。但是，添加到对象上的新属性不会触发更新。在这种情况下可以创建一个新的对象，让它包含原对象的属性和新的属性。</p>
+<pre><code class="language-c">// 代替 `Object.assign(this.someObject, { a: 1, b: 2 })`
+this.someObject = Object.assign({}, this.someObject, { a: 1, b: 2 })
+
+</code></pre>
+<h2 id="数据双向绑定原理">数据双向绑定原理</h2>
+<figure data-type="image" tabindex="1"><img src="https://img-blog.csdnimg.cn/20200304235249412.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdXlpZmVuZzAwMDA=,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" loading="lazy"></figure>
+<h2 id="vue30的响应式">Vue3.0的响应式</h2>
+<p>Vue.js 3.0的一些新特性，其中一个很重要的改变就是Vue3 将使用 ES6的Proxy 作为其观察者机制，取代之前使用的Object.defineProperty。</p>
+<p>Proxy 是ES6中新增的一个特性，可以理解成，在目标对象之前架设一层“拦截”，外界对该对象的访问，都必须先通过这层拦截，因此提供了一种机制，可以对外界的访问进行过滤和改写。Proxy 这个词的原意是代理，用在这里表示由它来“代理”某些操作，可以译为“代理器”。</p>
+<p><strong>基本用法：</strong></p>
+<pre><code class="language-c">//ES6 原生提供 Proxy 构造函数，用来生成 Proxy 实例。
+var proxy = new Proxy(target, handler);
+</code></pre>
+<p><strong>参数解释</strong><br>
+1、target: 是用Proxy包装的被代理对象（可以是任何类型的对象，包括原生数组，函数，甚至另一个代理）。<br>
+2、handler: 是一个对象，其声明了代理target 的一些操作，其属性是当执行一个操作时定义代理的行为的函数。</p>
+<p>Proxy 对象的所有用法，都是上面这种形式，不同的只是handler参数的写法</p>
+<p>Proxy 一共 支持13 种的拦截,相对Object.defineProperty更加丰富。</p>
+<p>1.get(target, propKey, receiver)：拦截对象属性的读取，比如proxy.foo和proxy['foo']。</p>
+<p>2.set(target, propKey, value, receiver)：拦截对象属性的设置，比如proxy.foo = v或proxy['foo'] = v，返回一个布尔值。</p>
+<p>3.has(target, propKey)：拦截propKey in proxy的操作，返回一个布尔值。</p>
+<p>4.deleteProperty(target, propKey)：拦截delete proxy[propKey]的操作，返回一个布尔值。</p>
+<p>5.ownKeys(target)：拦截Object.getOwnPropertyNames(proxy)、Object.getOwnPropertySymbols(proxy)、Object.keys(proxy)、for...in循环，返回一个数组。该方法返回目标对象所有自身的属性的属性名，而Object.keys()的返回结果仅包括目标对象自身的可遍历属性。</p>
+<p>6.getOwnPropertyDescriptor(target, propKey)：拦截Object.getOwnPropertyDescriptor(proxy, propKey)，返回属性的描述对象。</p>
+<p>7.defineProperty(target, propKey, propDesc)：拦截Object.defineProperty(proxy, propKey, propDesc）、<br>
+Object.defineProperties(proxy, propDescs)，返回一个布尔值。</p>
+<p>8.preventExtensions(target)：拦截Object.preventExtensions(proxy)，返回一个布尔值。</p>
+<p>9.getPrototypeOf(target)：拦截Object.getPrototypeOf(proxy)，返回一个对象。</p>
+<p>10.isExtensible(target)：拦截Object.isExtensible(proxy)，返回一个布尔值。</p>
+<p>11.setPrototypeOf(target, proto)：拦截Object.setPrototypeOf(proxy, proto)，返回一个布尔值。如果目标对象是函数，那么还有两种额外操作可以拦截。</p>
+<p>12.apply(target, object, args)：拦截 Proxy 实例作为函数调用的操作，比如proxy(...args)、<br>
+proxy.call(object, ...args)、proxy.apply(...)。</p>
+<p>13.construct(target, args)：拦截 Proxy 实例作为构造函数调用的操作，比如new proxy(...args)。</p>
+<h2 id="proxy实现数据劫持">Proxy实现数据劫持</h2>
+<pre><code class="language-c">observe(data) {
+  const that = this;
+  let handler = {
+   get(target, property) {
+      return target[property];
+    },
+    set(target, key, value) {
+      let res = Reflect.set(target, key, value);
+      that.subscribe[key].map(item =&gt; {
+        item.update();
+      });
+      return res;
+    }
+  }
+  this.$data = new Proxy(data, handler);
+}
+</code></pre>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%93%8D%E5%BA%94%E5%BC%8F">什么是响应式</a></li>
+<li><a href="#%E5%93%8D%E5%BA%94%E5%BC%8F%E5%8E%9F%E7%90%86">响应式原理</a></li>
+<li><a href="#%E5%93%8D%E5%BA%94%E5%BC%8F%E7%BC%BA%E9%99%B7">响应式缺陷</a></li>
+<li><a href="#%E6%95%B0%E6%8D%AE%E5%8F%8C%E5%90%91%E7%BB%91%E5%AE%9A%E5%8E%9F%E7%90%86">数据双向绑定原理</a></li>
+<li><a href="#vue30%E7%9A%84%E5%93%8D%E5%BA%94%E5%BC%8F">Vue3.0的响应式</a></li>
+<li><a href="#proxy%E5%AE%9E%E7%8E%B0%E6%95%B0%E6%8D%AE%E5%8A%AB%E6%8C%81">Proxy实现数据劫持</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://dark-yifeng.github.io/post/javascriptshi-yi-es7es8es9es10/">
+              <h3 class="post-title">
+                JavaScript（十一）：ES7/ES8/ES9/ES10
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  QQ:<a href="https://github.com/getgridea/gridea" target="_blank">1306045416</a>
+  <a class="rss" href="https://dark-yifeng.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>
