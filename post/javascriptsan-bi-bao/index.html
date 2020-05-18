@@ -1,96 +1,94 @@
-
-<!DOCTYPE html>
 <html>
   <head>
-    
-<meta charset="utf-8" >
-
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>JavaScript（三）：闭包 | Dark</title>
-<meta name="description" content="温故而知新">
-
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
-
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://dark-yifeng.github.io/favicon.ico?v=1589773312718">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="shortcut icon" href="https://dark-yifeng.github.io/favicon.ico?v=1589773923803">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="https://dark-yifeng.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="JavaScript（三）：闭包 | Dark - Atom Feed" href="https://dark-yifeng.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
 
 
 
-<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
-
-
-
+    <meta name="description" content="概念
+在JavaScript中，当一个内部函数被其外部函数之外的变量引用时，就形成了一个闭包。简单说，闭包就是能够读取其他函数内部变量的函数。
+由于在Javascript语言中，只有函数内部的子函数才能读取局部变量，因此可以把闭包简单理解成..." />
+    <meta name="keywords" content="JavaScript" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
   </head>
   <body>
-    <div id="app" class="main">
-      <div class="site-header-container">
-  <div class="site-header">
-    <div class="left">
-      <a href="https://dark-yifeng.github.io">
-        <img class="avatar" src="https://dark-yifeng.github.io/images/avatar.png?v=1589773312718" alt="" width="32px" height="32px">
-      </a>
-      <a href="https://dark-yifeng.github.io">
-        <h1 class="site-title">Dark</h1>
-      </a>
-    </div>
-    <div class="right">
-      <transition name="fade">
-        <i class="icon" :class="{ 'icon-close-outline': menuVisible, 'icon-menu-outline': !menuVisible }" @click="menuVisible = !menuVisible"></i>
-      </transition>
-    </div>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://dark-yifeng.github.io">
+  <img class="avatar" src="https://dark-yifeng.github.io/images/avatar.png?v=1589773923803" alt="">
+  </a>
+  <h1 class="site-title">
+    Dark
+  </h1>
+  <p class="site-description">
+    克己，执着，努力，疯狂，谦卑
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          JavaScript
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          Vue
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          React
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
   </div>
 </div>
 
-<transition name="fade">
-  <div class="menu-container" style="display: none;" v-show="menuVisible">
-    <div class="menu-list">
-      
-        
-          <a href="/" class="menu purple-link">
-            JavaScript
-          </a>
-        
-      
-        
-          <a href="/archives" class="menu purple-link">
-            Vue
-          </a>
-        
-      
-        
-          <a href="/tags" class="menu purple-link">
-            React
-          </a>
-        
-      
-    </div>
-  </div>
-</transition>
-
-
-      <div class="content-container">
         <div class="post-detail">
-          
-          <h2 class="post-title">JavaScript（三）：闭包</h2>
-          <div class="post-info post-detail-info">
-            <span><i class="icon-calendar-outline"></i> 2020-05-18</span>
-            
+          <article class="post">
+            <h2 class="post-title">
+              JavaScript（三）：闭包
+            </h2>
+            <div class="post-info">
               <span>
-                <i class="icon-pricetags-outline"></i>
-                
-                  <a href="https://dark-yifeng.github.io/tag/isDKrzlpX/">
-                    JavaScript
-                    
-                  </a>
-                
+                2020-05-18
               </span>
+              <span>
+                12 min read
+              </span>
+              
+                <a href="https://dark-yifeng.github.io/tag/isDKrzlpX/" class="post-tag">
+                  # JavaScript
+                </a>
+              
+            </div>
             
-          </div>
-          <div class="post-content">
-            <h2 id="概念">概念</h2>
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h2 id="概念">概念</h2>
 <p>在JavaScript中，当一个内部函数被其外部函数之外的变量引用时，就形成了一个闭包。简单说，闭包就是能够读取其他函数内部变量的函数。</p>
 <p>由于在Javascript语言中，只有函数内部的子函数才能读取局部变量，因此可以把闭包简单理解成&quot;定义在一个函数内部的函数&quot;。所以，在本质上，闭包就是将函数内部和函数外部连接起来的一座桥梁。</p>
 <p>闭包是一种保护私有变量的机制，在函数执行时形成私有的作用域，保护里面的私有变量不受外界干扰。</p>
@@ -288,57 +286,91 @@ compareNanies = null;
 <p>具体可以看：</p>
 <p>JavaScript进阶之路系列（四）：作用域链</p>
 
-          </div>
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E6%A6%82%E5%BF%B5">概念</a></li>
+<li><a href="#%E4%BD%9C%E7%94%A8">作用</a></li>
+<li><a href="#%E5%AE%9E%E4%BE%8B%E4%B8%80">实例一</a></li>
+<li><a href="#%E5%AE%9E%E4%BE%8B%E4%BA%8C">实例二</a></li>
+<li><a href="#%E5%AE%9E%E4%BE%8B%E4%B8%89">实例三</a></li>
+<li><a href="#%E5%AE%9E%E4%BE%8B%E5%9B%9B%E7%94%A8%E9%97%AD%E5%8C%85%E6%A8%A1%E6%8B%9F%E7%A7%81%E6%9C%89%E6%96%B9%E6%B3%95">实例四（用闭包模拟私有方法）</a></li>
+<li><a href="#%E5%8E%9F%E7%90%86">原理</a></li>
+<li><a href="#%E7%BC%BA%E7%82%B9">缺点</a></li>
+<li><a href="#%E6%89%A9%E5%B1%95">扩展</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
         </div>
 
         
           <div class="next-post">
-            <a class="purple-link" href="https://dark-yifeng.github.io/post/javascriptyi-lei/">
+            <div class="next">下一篇</div>
+            <a href="https://dark-yifeng.github.io/post/javascriptyi-lei/">
               <h3 class="post-title">
-                下一篇：JavaScript（二）：MV*
+                JavaScript（二）：MV*
               </h3>
             </a>
           </div>
-          
-      </div>
+        
 
-      
+        
 
-      <div class="site-footer">
-  <div class="slogan">温故而知新</div>
-  <div class="social-container">
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-  </div>
-  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">刘亦枫</a> | <a class="rss" href="https://dark-yifeng.github.io/atom.xml" target="_blank">RSS</a>
+        <div class="site-footer">
+  This is<a href="https://github.com/getgridea/gridea" target="_blank">刘亦枫</a>
+  <a class="rss" href="https://dark-yifeng.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
 </div>
 
-
+      </div>
     </div>
-    <script type="application/javascript">
 
-hljs.initHighlightingOnLoad()
+    <script>
+      hljs.initHighlightingOnLoad()
 
-var app = new Vue({
-  el: '#app',
-  data: {
-    menuVisible: false,
-  },
-})
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
 
-</script>
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
 
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
 
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
 
-
+    </script>
   </body>
 </html>

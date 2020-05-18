@@ -1,96 +1,95 @@
-
-<!DOCTYPE html>
 <html>
   <head>
-    
-<meta charset="utf-8" >
-
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>JavaScript（九）：async/await | Dark</title>
-<meta name="description" content="温故而知新">
-
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
-
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://dark-yifeng.github.io/favicon.ico?v=1589773312718">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="shortcut icon" href="https://dark-yifeng.github.io/favicon.ico?v=1589773923803">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="https://dark-yifeng.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="JavaScript（九）：async/await | Dark - Atom Feed" href="https://dark-yifeng.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
 
 
 
-<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
-
-
-
+    <meta name="description" content="
+1. async/await是什么？
+async 是一个修饰符，async 定义的函数会默认的返回一个Promise对象resolve的值，因此对async函数可以直接进行then操作,返回的值即为then方法的传入函数。
+await 也..." />
+    <meta name="keywords" content="JavaScript" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
   </head>
   <body>
-    <div id="app" class="main">
-      <div class="site-header-container">
-  <div class="site-header">
-    <div class="left">
-      <a href="https://dark-yifeng.github.io">
-        <img class="avatar" src="https://dark-yifeng.github.io/images/avatar.png?v=1589773312718" alt="" width="32px" height="32px">
-      </a>
-      <a href="https://dark-yifeng.github.io">
-        <h1 class="site-title">Dark</h1>
-      </a>
-    </div>
-    <div class="right">
-      <transition name="fade">
-        <i class="icon" :class="{ 'icon-close-outline': menuVisible, 'icon-menu-outline': !menuVisible }" @click="menuVisible = !menuVisible"></i>
-      </transition>
-    </div>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://dark-yifeng.github.io">
+  <img class="avatar" src="https://dark-yifeng.github.io/images/avatar.png?v=1589773923803" alt="">
+  </a>
+  <h1 class="site-title">
+    Dark
+  </h1>
+  <p class="site-description">
+    克己，执着，努力，疯狂，谦卑
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          JavaScript
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          Vue
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          React
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
   </div>
 </div>
 
-<transition name="fade">
-  <div class="menu-container" style="display: none;" v-show="menuVisible">
-    <div class="menu-list">
-      
-        
-          <a href="/" class="menu purple-link">
-            JavaScript
-          </a>
-        
-      
-        
-          <a href="/archives" class="menu purple-link">
-            Vue
-          </a>
-        
-      
-        
-          <a href="/tags" class="menu purple-link">
-            React
-          </a>
-        
-      
-    </div>
-  </div>
-</transition>
-
-
-      <div class="content-container">
         <div class="post-detail">
-          
-          <h2 class="post-title">JavaScript（九）：async/await</h2>
-          <div class="post-info post-detail-info">
-            <span><i class="icon-calendar-outline"></i> 2020-05-18</span>
-            
+          <article class="post">
+            <h2 class="post-title">
+              JavaScript（九）：async/await
+            </h2>
+            <div class="post-info">
               <span>
-                <i class="icon-pricetags-outline"></i>
-                
-                  <a href="https://dark-yifeng.github.io/tag/isDKrzlpX/">
-                    JavaScript
-                    
-                  </a>
-                
+                2020-05-18
               </span>
+              <span>
+                11 min read
+              </span>
+              
+                <a href="https://dark-yifeng.github.io/tag/isDKrzlpX/" class="post-tag">
+                  # JavaScript
+                </a>
+              
+            </div>
             
-          </div>
-          <div class="post-content">
-            <!-- more -->
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <!-- more -->
 <h2 id="1-asyncawait是什么">1. async/await是什么？</h2>
 <p>async 是一个修饰符，async 定义的函数会默认的返回一个Promise对象resolve的值，因此对async函数可以直接进行then操作,返回的值即为then方法的传入函数。</p>
 <p>await 也是一个修饰符，await 关键字 只能放在 async 函数内部， await关键字的作用 就是获取 Promise中返回的内容， 获取的是Promise函数中resolve或者reject的值。</p>
@@ -370,57 +369,90 @@ async function myFunction() {
 <h2 id="思考">思考：</h2>
 <p>Vue中，async created()这种写法有什么用呢？</p>
 
-          </div>
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#1-asyncawait%E6%98%AF%E4%BB%80%E4%B9%88">1. async/await是什么？</a></li>
+<li><a href="#2-%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3asyncawait">2. 深入理解async/await</a></li>
+<li><a href="#3-async%E5%92%8Cawait%E7%AE%80%E5%8D%95%E5%BA%94%E7%94%A8">3. async和await简单应用</a></li>
+<li><a href="#4-%E5%A4%84%E7%90%86then%E9%93%BE">4. 处理then链</a></li>
+<li><a href="#5-promise%E5%A4%84%E7%90%86%E7%BB%93%E6%9E%9C%E4%B8%BArejected">5. Promise处理结果为rejected</a></li>
+<li><a href="#6%E5%AE%9E%E4%BE%8B">6.实例</a></li>
+<li><a href="#%E6%B3%A8">注：</a></li>
+<li><a href="#%E6%80%9D%E8%80%83">思考：</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
         </div>
 
         
           <div class="next-post">
-            <a class="purple-link" href="https://dark-yifeng.github.io/post/javascriptba-jie-gou-fu-zhi/">
+            <div class="next">下一篇</div>
+            <a href="https://dark-yifeng.github.io/post/javascriptba-jie-gou-fu-zhi/">
               <h3 class="post-title">
-                下一篇：JavaScript（八）：解构赋值
+                JavaScript（八）：解构赋值
               </h3>
             </a>
           </div>
-          
-      </div>
+        
 
-      
+        
 
-      <div class="site-footer">
-  <div class="slogan">温故而知新</div>
-  <div class="social-container">
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-  </div>
-  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">刘亦枫</a> | <a class="rss" href="https://dark-yifeng.github.io/atom.xml" target="_blank">RSS</a>
+        <div class="site-footer">
+  This is<a href="https://github.com/getgridea/gridea" target="_blank">刘亦枫</a>
+  <a class="rss" href="https://dark-yifeng.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
 </div>
 
-
+      </div>
     </div>
-    <script type="application/javascript">
 
-hljs.initHighlightingOnLoad()
+    <script>
+      hljs.initHighlightingOnLoad()
 
-var app = new Vue({
-  el: '#app',
-  data: {
-    menuVisible: false,
-  },
-})
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
 
-</script>
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
 
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
 
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
 
-
+    </script>
   </body>
 </html>

@@ -1,96 +1,104 @@
-
-<!DOCTYPE html>
 <html>
   <head>
-    
-<meta charset="utf-8" >
-
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>JavaScript（七）：Generator | Dark</title>
-<meta name="description" content="温故而知新">
-
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
-
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://dark-yifeng.github.io/favicon.ico?v=1589773312718">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="shortcut icon" href="https://dark-yifeng.github.io/favicon.ico?v=1589773923803">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="https://dark-yifeng.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="JavaScript（七）：Generator | Dark - Atom Feed" href="https://dark-yifeng.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
 
 
 
-<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+    <meta name="description" content="
 
 
-
+1.为什么要引入Generator？
+2.基本用法
+3.yield
+4.yield*
+5.next()方法
+6.next()方法的参数
+7.throw方法()
+8.return()方法
+9.Generator中的this和他的原型
+1..." />
+    <meta name="keywords" content="JavaScript" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
   </head>
   <body>
-    <div id="app" class="main">
-      <div class="site-header-container">
-  <div class="site-header">
-    <div class="left">
-      <a href="https://dark-yifeng.github.io">
-        <img class="avatar" src="https://dark-yifeng.github.io/images/avatar.png?v=1589773312718" alt="" width="32px" height="32px">
-      </a>
-      <a href="https://dark-yifeng.github.io">
-        <h1 class="site-title">Dark</h1>
-      </a>
-    </div>
-    <div class="right">
-      <transition name="fade">
-        <i class="icon" :class="{ 'icon-close-outline': menuVisible, 'icon-menu-outline': !menuVisible }" @click="menuVisible = !menuVisible"></i>
-      </transition>
-    </div>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://dark-yifeng.github.io">
+  <img class="avatar" src="https://dark-yifeng.github.io/images/avatar.png?v=1589773923803" alt="">
+  </a>
+  <h1 class="site-title">
+    Dark
+  </h1>
+  <p class="site-description">
+    克己，执着，努力，疯狂，谦卑
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          JavaScript
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          Vue
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          React
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
   </div>
 </div>
 
-<transition name="fade">
-  <div class="menu-container" style="display: none;" v-show="menuVisible">
-    <div class="menu-list">
-      
-        
-          <a href="/" class="menu purple-link">
-            JavaScript
-          </a>
-        
-      
-        
-          <a href="/archives" class="menu purple-link">
-            Vue
-          </a>
-        
-      
-        
-          <a href="/tags" class="menu purple-link">
-            React
-          </a>
-        
-      
-    </div>
-  </div>
-</transition>
-
-
-      <div class="content-container">
         <div class="post-detail">
-          
-          <h2 class="post-title">JavaScript（七）：Generator</h2>
-          <div class="post-info post-detail-info">
-            <span><i class="icon-calendar-outline"></i> 2020-05-18</span>
-            
+          <article class="post">
+            <h2 class="post-title">
+              JavaScript（七）：Generator
+            </h2>
+            <div class="post-info">
               <span>
-                <i class="icon-pricetags-outline"></i>
-                
-                  <a href="https://dark-yifeng.github.io/tag/isDKrzlpX/">
-                    JavaScript
-                    
-                  </a>
-                
+                2020-05-18
               </span>
+              <span>
+                12 min read
+              </span>
+              
+                <a href="https://dark-yifeng.github.io/tag/isDKrzlpX/" class="post-tag">
+                  # JavaScript
+                </a>
+              
+            </div>
             
-          </div>
-          <div class="post-content">
-            <p><ul class="markdownIt-TOC">
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <p><ul class="markdownIt-TOC">
 <li>
 <ul>
 <li><a href="#1%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%BC%95%E5%85%A5generator">1.为什么要引入Generator？</a></li>
@@ -365,57 +373,94 @@ wait
 4.Promise 对象。</p>
 <p>Generator 函数将 JavaScript 异步编程带入了一个全新的阶段。</p>
 
-          </div>
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#1%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%BC%95%E5%85%A5generator">1.为什么要引入Generator？</a></li>
+<li><a href="#2%E5%9F%BA%E6%9C%AC%E7%94%A8%E6%B3%95">2.基本用法</a></li>
+<li><a href="#3yield">3.yield</a></li>
+<li><a href="#4yield">4.yield*</a></li>
+<li><a href="#5next%E6%96%B9%E6%B3%95">5.next()方法</a></li>
+<li><a href="#6next%E6%96%B9%E6%B3%95%E7%9A%84%E5%8F%82%E6%95%B0">6.next()方法的参数</a></li>
+<li><a href="#7throw%E6%96%B9%E6%B3%95">7.throw方法()</a></li>
+<li><a href="#8return%E6%96%B9%E6%B3%95">8.return()方法</a></li>
+<li><a href="#9generator%E4%B8%AD%E7%9A%84this%E5%92%8C%E4%BB%96%E7%9A%84%E5%8E%9F%E5%9E%8B">9.Generator中的this和他的原型</a></li>
+<li><a href="#10%E5%AE%9E%E9%99%85%E5%BA%94%E7%94%A8">10.实际应用</a></li>
+<li><a href="#11%E6%97%B6%E9%97%B4%E5%88%87%E7%89%87">11.时间切片</a></li>
+<li><a href="#%E6%B3%A8">注：</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
         </div>
 
         
           <div class="next-post">
-            <a class="purple-link" href="https://dark-yifeng.github.io/post/javascriptliu-promise/">
+            <div class="next">下一篇</div>
+            <a href="https://dark-yifeng.github.io/post/javascriptliu-promise/">
               <h3 class="post-title">
-                下一篇：JavaScript（六）：Promise
+                JavaScript（六）：Promise
               </h3>
             </a>
           </div>
-          
-      </div>
+        
 
-      
+        
 
-      <div class="site-footer">
-  <div class="slogan">温故而知新</div>
-  <div class="social-container">
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-  </div>
-  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">刘亦枫</a> | <a class="rss" href="https://dark-yifeng.github.io/atom.xml" target="_blank">RSS</a>
+        <div class="site-footer">
+  This is<a href="https://github.com/getgridea/gridea" target="_blank">刘亦枫</a>
+  <a class="rss" href="https://dark-yifeng.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
 </div>
 
-
+      </div>
     </div>
-    <script type="application/javascript">
 
-hljs.initHighlightingOnLoad()
+    <script>
+      hljs.initHighlightingOnLoad()
 
-var app = new Vue({
-  el: '#app',
-  data: {
-    menuVisible: false,
-  },
-})
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
 
-</script>
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
 
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
 
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
 
-
+    </script>
   </body>
 </html>

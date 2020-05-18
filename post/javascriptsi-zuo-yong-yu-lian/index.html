@@ -1,96 +1,115 @@
-
-<!DOCTYPE html>
 <html>
   <head>
-    
-<meta charset="utf-8" >
-
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>JavaScript（四）：作用域链 | Dark</title>
-<meta name="description" content="温故而知新">
-
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
-
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://dark-yifeng.github.io/favicon.ico?v=1589773312718">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="shortcut icon" href="https://dark-yifeng.github.io/favicon.ico?v=1589773923803">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="https://dark-yifeng.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="JavaScript（四）：作用域链 | Dark - Atom Feed" href="https://dark-yifeng.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
 
 
 
-<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+    <meta name="description" content="
+
+
+作用域(Scope)
+
+1. 作用域
+2. 全局作用域
+3.函数作用域
+4. 块级作用域
+
+
+作用域链
+
+1.自由变量
+2. 作用域链
+3. 自由变量的取值
+4.实例
 
 
 
+
+
+
+当你在if中创建了var了一个变量，你在if以外可以使..." />
+    <meta name="keywords" content="JavaScript" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
   </head>
   <body>
-    <div id="app" class="main">
-      <div class="site-header-container">
-  <div class="site-header">
-    <div class="left">
-      <a href="https://dark-yifeng.github.io">
-        <img class="avatar" src="https://dark-yifeng.github.io/images/avatar.png?v=1589773312718" alt="" width="32px" height="32px">
-      </a>
-      <a href="https://dark-yifeng.github.io">
-        <h1 class="site-title">Dark</h1>
-      </a>
-    </div>
-    <div class="right">
-      <transition name="fade">
-        <i class="icon" :class="{ 'icon-close-outline': menuVisible, 'icon-menu-outline': !menuVisible }" @click="menuVisible = !menuVisible"></i>
-      </transition>
-    </div>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://dark-yifeng.github.io">
+  <img class="avatar" src="https://dark-yifeng.github.io/images/avatar.png?v=1589773923803" alt="">
+  </a>
+  <h1 class="site-title">
+    Dark
+  </h1>
+  <p class="site-description">
+    克己，执着，努力，疯狂，谦卑
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          JavaScript
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          Vue
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          React
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
   </div>
 </div>
 
-<transition name="fade">
-  <div class="menu-container" style="display: none;" v-show="menuVisible">
-    <div class="menu-list">
-      
-        
-          <a href="/" class="menu purple-link">
-            JavaScript
-          </a>
-        
-      
-        
-          <a href="/archives" class="menu purple-link">
-            Vue
-          </a>
-        
-      
-        
-          <a href="/tags" class="menu purple-link">
-            React
-          </a>
-        
-      
-    </div>
-  </div>
-</transition>
-
-
-      <div class="content-container">
         <div class="post-detail">
-          
-          <h2 class="post-title">JavaScript（四）：作用域链</h2>
-          <div class="post-info post-detail-info">
-            <span><i class="icon-calendar-outline"></i> 2020-05-18</span>
-            
+          <article class="post">
+            <h2 class="post-title">
+              JavaScript（四）：作用域链
+            </h2>
+            <div class="post-info">
               <span>
-                <i class="icon-pricetags-outline"></i>
-                
-                  <a href="https://dark-yifeng.github.io/tag/isDKrzlpX/">
-                    JavaScript
-                    
-                  </a>
-                
+                2020-05-18
               </span>
+              <span>
+                11 min read
+              </span>
+              
+                <a href="https://dark-yifeng.github.io/tag/isDKrzlpX/" class="post-tag">
+                  # JavaScript
+                </a>
+              
+            </div>
             
-          </div>
-          <div class="post-content">
-            <p><ul class="markdownIt-TOC">
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <p><ul class="markdownIt-TOC">
 <li>
 <ul>
 <li><a href="#%E4%BD%9C%E7%94%A8%E5%9F%9Fscope">作用域(Scope)</a>
@@ -317,57 +336,98 @@ x() //bar()
 <p>定义的标识符的越深，那么读写的速度也就越慢，而全局变量总是处于作用域链的最末端，所以当变量解析的时候，查找全局变量是最慢的，所以在编写代码的时候要尽可能少的使用全局变量，尽可能使用局部变量。</p>
 </blockquote>
 
-          </div>
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E4%BD%9C%E7%94%A8%E5%9F%9Fscope">作用域(Scope)</a>
+<ul>
+<li><a href="#1-%E4%BD%9C%E7%94%A8%E5%9F%9F">1. 作用域</a></li>
+<li><a href="#2-%E5%85%A8%E5%B1%80%E4%BD%9C%E7%94%A8%E5%9F%9F">2. 全局作用域</a></li>
+<li><a href="#3%E5%87%BD%E6%95%B0%E4%BD%9C%E7%94%A8%E5%9F%9F">3.函数作用域</a></li>
+<li><a href="#4-%E5%9D%97%E7%BA%A7%E4%BD%9C%E7%94%A8%E5%9F%9F">4. 块级作用域</a></li>
+</ul>
+</li>
+<li><a href="#%E4%BD%9C%E7%94%A8%E5%9F%9F%E9%93%BE">作用域链</a>
+<ul>
+<li><a href="#1%E8%87%AA%E7%94%B1%E5%8F%98%E9%87%8F">1.自由变量</a></li>
+<li><a href="#2-%E4%BD%9C%E7%94%A8%E5%9F%9F%E9%93%BE">2. 作用域链</a></li>
+<li><a href="#3-%E8%87%AA%E7%94%B1%E5%8F%98%E9%87%8F%E7%9A%84%E5%8F%96%E5%80%BC">3. 自由变量的取值</a></li>
+<li><a href="#4%E5%AE%9E%E4%BE%8B">4.实例</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
         </div>
 
         
           <div class="next-post">
-            <a class="purple-link" href="https://dark-yifeng.github.io/post/javascriptsan-bi-bao/">
+            <div class="next">下一篇</div>
+            <a href="https://dark-yifeng.github.io/post/javascriptsan-bi-bao/">
               <h3 class="post-title">
-                下一篇：JavaScript（三）：闭包
+                JavaScript（三）：闭包
               </h3>
             </a>
           </div>
-          
-      </div>
+        
 
-      
+        
 
-      <div class="site-footer">
-  <div class="slogan">温故而知新</div>
-  <div class="social-container">
-    
-      
-    
-      
-    
-      
-    
-      
-    
-      
-    
-  </div>
-  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">刘亦枫</a> | <a class="rss" href="https://dark-yifeng.github.io/atom.xml" target="_blank">RSS</a>
+        <div class="site-footer">
+  This is<a href="https://github.com/getgridea/gridea" target="_blank">刘亦枫</a>
+  <a class="rss" href="https://dark-yifeng.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
 </div>
 
-
+      </div>
     </div>
-    <script type="application/javascript">
 
-hljs.initHighlightingOnLoad()
+    <script>
+      hljs.initHighlightingOnLoad()
 
-var app = new Vue({
-  el: '#app',
-  data: {
-    menuVisible: false,
-  },
-})
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
 
-</script>
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
 
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
 
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
 
-
+    </script>
   </body>
 </html>
