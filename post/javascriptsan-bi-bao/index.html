@@ -1,0 +1,334 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    
+<meta charset="utf-8" >
+
+<title>JavaScript（三）：闭包 | Dark</title>
+<meta name="description" content="温故而知新">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dark-yifeng.github.io/favicon.ico?v=1589772546635">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://dark-yifeng.github.io/styles/main.css">
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+  </head>
+  <body>
+    <div id="app" class="main">
+      <div class="site-header-container">
+  <div class="site-header">
+    <div class="left">
+      <a href="https://dark-yifeng.github.io">
+        <img class="avatar" src="https://dark-yifeng.github.io/images/avatar.png?v=1589772546635" alt="" width="32px" height="32px">
+      </a>
+      <a href="https://dark-yifeng.github.io">
+        <h1 class="site-title">Dark</h1>
+      </a>
+    </div>
+    <div class="right">
+      <transition name="fade">
+        <i class="icon" :class="{ 'icon-close-outline': menuVisible, 'icon-menu-outline': !menuVisible }" @click="menuVisible = !menuVisible"></i>
+      </transition>
+    </div>
+  </div>
+</div>
+
+<transition name="fade">
+  <div class="menu-container" style="display: none;" v-show="menuVisible">
+    <div class="menu-list">
+      
+        
+          <a href="/" class="menu purple-link">
+            JavaScript
+          </a>
+        
+      
+        
+          <a href="/archives" class="menu purple-link">
+            Vue
+          </a>
+        
+      
+        
+          <a href="/tags" class="menu purple-link">
+            React
+          </a>
+        
+      
+    </div>
+  </div>
+</transition>
+
+
+      <div class="content-container">
+        <div class="post-detail">
+          
+          <h2 class="post-title">JavaScript（三）：闭包</h2>
+          <div class="post-info post-detail-info">
+            <span><i class="icon-calendar-outline"></i> 2020-05-18</span>
+            
+          </div>
+          <div class="post-content">
+            <h2 id="概念">概念</h2>
+<p>在JavaScript中，当一个内部函数被其外部函数之外的变量引用时，就形成了一个闭包。简单说，闭包就是能够读取其他函数内部变量的函数。</p>
+<p>由于在Javascript语言中，只有函数内部的子函数才能读取局部变量，因此可以把闭包简单理解成&quot;定义在一个函数内部的函数&quot;。所以，在本质上，闭包就是将函数内部和函数外部连接起来的一座桥梁。</p>
+<p>闭包是一种保护私有变量的机制，在函数执行时形成私有的作用域，保护里面的私有变量不受外界干扰。</p>
+<p>直观的说就是形成一个不销毁的栈环境。</p>
+<h2 id="作用">作用</h2>
+<p>1 可以读取函数内部的变量。</p>
+<p>2 让这些变量始终保持在内存中。</p>
+<h2 id="实例一">实例一</h2>
+<pre><code class="language-csharp">function init() {
+    var name = &quot;Mozilla&quot;; // name 是一个被 init 创建的局部变量
+    function displayName() { // displayName() 是内部函数,一个闭包
+        alert(name); // 使用了父函数中声明的变量
+    }
+    displayName();
+}
+init();
+</code></pre>
+<p>这是一个简单的闭包函数，displayName函数内嵌在init函数里面，name变量是init函数内部的全局变量，因此displayName函数可以访问到那么变量。</p>
+<p>最后结果会alert出Mozilla。</p>
+<h2 id="实例二">实例二</h2>
+<pre><code class="language-csharp">function makeAdder(x) {
+  return function(y) {
+    return x + y;
+  };
+}
+
+var add5 = makeAdder(5);
+var add10 = makeAdder(10);
+
+console.log(add5(2));  // 7
+console.log(add10(2)); // 12
+</code></pre>
+<p>在这个实例中，我们定义了 makeAdder(x) 函数，它接受一个参数 x ，并返回一个新的函数。返回的函数接受一个参数 y，并返回x+y的值。</p>
+<p>从本质上讲，makeAdder 是一个函数工厂 — 他创建了将指定的值和它的参数相加求和的函数。在上面的实例中，我们使用函数工厂创建了两个新函数 — 一个将其参数和 5 求和，另一个和 10 求和。</p>
+<p>add5 和 add10 都是闭包。它们共享相同的函数定义，但是保存了不同的词法环境。在 add5 的环境中，x 为 5。而在 add10 中，x 则为 10。</p>
+<h2 id="实例三">实例三</h2>
+<p>闭包很有用，因为它允许将函数与其所操作的某些数据（环境）关联起来。这显然类似于面向对象编程。在面向对象编程中，对象允许我们将某些数据（对象的属性）与一个或者多个方法相关联。</p>
+<p>因此，通常你使用只有一个方法的对象的地方，都可以使用闭包。</p>
+<p>在 Web 中，你想要这样做的情况特别常见。大部分我们所写的 JavaScript 代码都是基于事件的 — 定义某种行为，然后将其添加到用户触发的事件之上（比如点击或者按键）。我们的代码通常作为回调：为响应事件而执行的函数。</p>
+<p>假如，我们想在页面上添加一些可以调整字号的按钮。一种方法是以像素为单位指定 body 元素的 font-size，然后通过相对的 em 单位设置页面中其它元素（例如header）的字号：</p>
+<pre><code class="language-csharp">body {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 12px;
+}
+
+h1 {
+  font-size: 1.5em;
+}
+
+h2 {
+  font-size: 1.2em;
+}
+</code></pre>
+<p>我们的文本尺寸调整按钮可以修改 body 元素的 font-size 属性，由于我们使用相对单位，页面中的其它元素也会相应地调整。</p>
+<p>以下是 JavaScript：</p>
+<pre><code class="language-csharp">function makeSizer(size) {
+  return function() {
+    document.body.style.fontSize = size + 'px';
+  };
+}
+
+var size12 = makeSizer(12);
+var size14 = makeSizer(14);
+var size16 = makeSizer(16);
+</code></pre>
+<p>size12，size14 和 size16 三个函数将分别把 body 文本调整为 12，14，16 像素。我们可以将它们分别添加到按钮的点击事件上。如下所示：</p>
+<pre><code class="language-csharp">document.getElementById('size-12').onclick = size12;
+document.getElementById('size-14').onclick = size14;
+document.getElementById('size-16').onclick = size16;
+</code></pre>
+<pre><code class="language-csharp">&lt;a href=&quot;#&quot; id=&quot;size-12&quot;&gt;12&lt;/a&gt;
+&lt;a href=&quot;#&quot; id=&quot;size-14&quot;&gt;14&lt;/a&gt;
+&lt;a href=&quot;#&quot; id=&quot;size-16&quot;&gt;16&lt;/a&gt; 
+</code></pre>
+<h2 id="实例四用闭包模拟私有方法">实例四（用闭包模拟私有方法）</h2>
+<p>编程语言中，比如 Java，是支持将方法声明为私有的，即它们只能被同一个类中的其它方法所调用。</p>
+<p>而 JavaScript 没有这种原生支持，但我们可以使用闭包来模拟私有方法。私有方法不仅仅有利于限制对代码的访问：还提供了管理全局命名空间的强大能力，避免非核心的方法弄乱了代码的公共接口部分。</p>
+<p>下面的示例展现了如何使用闭包来定义公共函数，并令其可以访问私有函数和变量。这个方式也称为 模块模式（module pattern）：</p>
+<pre><code class="language-csharp">var Counter = (function() {
+  var privateCounter = 0;
+  function changeBy(val) {
+    privateCounter += val;
+  }
+  return {
+    increment: function() {
+      changeBy(1);
+    },
+    decrement: function() {
+      changeBy(-1);
+    },
+    value: function() {
+      return privateCounter;
+    }
+  }   
+})();
+
+console.log(Counter.value()); /* logs 0 */
+Counter.increment();
+Counter.increment();
+console.log(Counter.value()); /* logs 2 */
+Counter.decrement();
+console.log(Counter.value()); /* logs 1 */
+</code></pre>
+<p>在之前的示例中，每个闭包都有它自己的词法环境；而这次我们只创建了一个词法环境，为三个函数所共享：Counter.increment，Counter.decrement 和 Counter.value。</p>
+<p>该共享环境创建于一个立即执行的匿名函数体内。这个环境中包含两个私有项：名为 privateCounter 的变量和名为 changeBy 的函数。这两项都无法在这个匿名函数外部直接访问。必须通过匿名函数返回的三个公共函数访问。</p>
+<p>这三个公共函数是共享同一个环境的闭包。多亏 JavaScript 的词法作用域，它们都可以访问 privateCounter 变量和 changeBy 函数。</p>
+<pre><code class="language-csharp">var makeCounter = function() {
+  var privateCounter = 0;
+  function changeBy(val) {
+    privateCounter += val;
+  }
+  return {
+    increment: function() {
+      changeBy(1);
+    },
+    decrement: function() {
+      changeBy(-1);
+    },
+    value: function() {
+      return privateCounter;
+    }
+  }  
+};
+
+var Counter1 = makeCounter();
+var Counter2 = makeCounter();
+console.log(Counter1.value()); /* logs 0 */
+Counter1.increment();
+Counter1.increment();
+console.log(Counter1.value()); /* logs 2 */
+Counter1.decrement();
+console.log(Counter1.value()); /* logs 1 */
+console.log(Counter2.value()); /* logs 0 */
+</code></pre>
+<p>请注意两个计数器 Counter1 和 Counter2 是如何维护它们各自的独立性的。每个闭包都是引用自己词法作用域内的变量 privateCounter 。</p>
+<p>每次调用其中一个计数器时，通过改变这个变量的值，会改变这个闭包的词法环境。然而在一个闭包内对变量的修改，不会影响到另外一个闭包中的变量。</p>
+<h2 id="原理">原理</h2>
+<p>当某个函数第一次被调用时，会创建一个执行环境（execution context)及相应的作用域链，并把作用域链赋值给一个特殊的内部属性（即[[Scope]]）。然后，使用this、arguncmts 和其他命名参数的值来初始化函数的活动对象（activation object)。但在作用域链中，外部函数的活动对象始终处于第二位，外部函数的外部函数的活动对象处于第三位，……直至作为作用域链终点的全局执行环境。</p>
+<p>在函数执行过程中，为读取和写入变量的值，就需要在作用域链中查找变量。来看下面的例子:</p>
+<pre><code class="language-csharp">function compare(valael, value2){ 
+    if (valuel &lt; value2){ 
+       return -1;
+    } else if (vaiuel &gt; value2){ 
+       return 1；
+     } else {
+       return 0;
+    }
+}
+
+var result = compare(5, 10);
+</code></pre>
+<p>以上代码先定义了compare()函数，然后又在全局作用域中调用了它。当第一次调用compare()时，会创建一个包含this、arguments、valuel和value2的活动对象。全局执行环境的变量对象 (包含this、result和compare)在compare()执行环境的作用域链中则处于第二位。图展示了包含上述关系的compare()函数执行时的作用域链。<br>
+<img src="https://img-blog.csdnimg.cn/2020022311071310.png" alt="在这里插入图片描述" loading="lazy"><br>
+后台的每个执行环境都有一个表示变量的对象——变量对象。全局环境的变量对象始终存在，而像compare()函数这样的局部环境的变量对象，则只在函数执行的过程中存在。在创建compare()函数时，会创建一个预先包含全局变童对象的作用域链，这个作用域链被保存在内部的[[Scope]]属性中。当调用compare()函数时，会为函数创建一个执行环境，然后通过复制函数的[[Scope]]属性中的对象构建起执行环境的作用域链。此后，又有一个活动对象（在此作为变量对象使用）被创建并被推入执行环境作用域链的前端。对于这个例子中compare()函数的执行环境而言，其作用域链中包含两个变量对象：本地活动对象和全局变量对象。显然，作用域链本质上是一个指向变量对象的指针列表，它只引用但不实际包含变量对象。</p>
+<p>无论什么时候在函数中访问一个变量时，就会从作用域链中搜索具有相应名字的变量。一般来讲，当函数执行完毕后，局部活动对象就会被销毁，内存中仅保存全局作用域（全局执行环境的变量对象)。 但是，闭包的情况又有所不同。</p>
+<pre><code class="language-csharp">
+function createComparisonFunction(propertyName) {
+  return function(object1, object2){
+    var valuel = objectl[propertyName]; 
+    var value2 = object2[propertyName]; 
+    if (valuel &lt; value2){ 
+       return -1;
+    } else if (valuel &gt; value2){ 
+       return 1;
+    } else {
+       return 0；
+     }
+  }；
+}
+</code></pre>
+<p>在另一个函数内部定义的函数会将包含函数（即外部函数）的活动对象添加到它的作用域链中。因此，在createComparisonFunction()涵数内部定义的匿名函数的作用域链中，实际上将会包含外部函数createComparisonFunction()的活动对象。图展示了当下列代码执行时，包含函数与内部匿名函数的作用域链。</p>
+<pre><code class="language-csharp">var compare = createComparisonFunction(&quot;name&quot;);
+
+var result = compare({ name: &quot;Nicholas&quot; }, { naine： BGreg&quot; })；
+</code></pre>
+<p>在匿名函数从createComparisonFunction()中被返冋后，它的作用域链被初始化为包含createComparisonFunction()函数的活动对象和全局变量对象。这样，匿名函数就可以访问在createComparisonFunction()中定义的所有变量。更重要的是，createCoir.parisonFunction() 函数在执行完毕后，其活动对象也不会被销毁，因为匿名函数的作用域链仍然在引用这个活动对象。换句话说，当createComparisonFunction()函数返回后，其执行环境的作用域链会被销毁，但它的活动对象仍然会留在内存中；直到匿名函数被销毁后，createComparisonFunction()的活动对象才会被销毁，例如：</p>
+<pre><code class="language-csharp">var compareNames = createComparisonFunction(&quot;name&quot;);
+
+//调用函数
+var result = compareNames({ name: &quot;Nicholas&quot; ), { name：&quot;Greg&quot; });
+
+//解除对匿名函数的引用（以便释放内存)
+compareNanies = null;
+</code></pre>
+<p>首先，创建的比较函数被保存在变量coinpareNames中。而通过将compareNames设置为等于null解除该函数的引用，就等于通知垃圾问收例程将其清除。随着匿名函数的作用域链被销毁，其他作用域 (除r全局作用域）也都可以安全地销毁了。图 展示了调用conpareNamesO的过程中产生的作用域链之间的关系。<br>
+<img src="https://img-blog.csdnimg.cn/20200223110856171.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdXlpZmVuZzAwMDA=,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" loading="lazy"></p>
+<h2 id="缺点">缺点</h2>
+<p>1.由于闭包会使得函数中的变量都被保存在内存中，内存消耗很大，所以不能滥用闭包，否则会造成网页的性能问题，在IE中可能导致内存泄露。解决方法是，在退出函数之前，将不使用的局部变量全部删除。</p>
+<p>2.闭包会在父函数外部，改变父函数内部变量的值。所以，如果把父函数当作对象（object）使用，把闭包当作它的公用方法（Public Method），把内部变量当作它的私有属性（private value），这时一定要小心，不要随便改变父函数内部变量的值。</p>
+<h2 id="扩展">扩展</h2>
+<p><strong>作用域规则</strong></p>
+<p>1.{}不产生一个作用域，定义函数才会产生一个函数作用域。</p>
+<p>2.函数在执行的过程中，先从自己内部找变量。</p>
+<p>3.如果找不到，再从创建当前函数所在的作用域去找, 以此往上。</p>
+<p>具体可以看：</p>
+<p>JavaScript进阶之路系列（四）：作用域链</p>
+
+          </div>
+        </div>
+
+        
+          <div class="next-post">
+            <a class="purple-link" href="https://dark-yifeng.github.io/post/javascriptyi-lei/">
+              <h3 class="post-title">
+                下一篇：JavaScript（一）：类
+              </h3>
+            </a>
+          </div>
+          
+      </div>
+
+      
+
+      <div class="site-footer">
+  <div class="slogan">温故而知新</div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">刘亦枫</a> | <a class="rss" href="https://dark-yifeng.github.io/atom.xml" target="_blank">RSS</a>
+</div>
+
+
+    </div>
+    <script type="application/javascript">
+
+hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+  </body>
+</html>
