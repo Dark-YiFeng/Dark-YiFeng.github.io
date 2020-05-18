@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://dark-yifeng.github.io</id>
     <title>Dark</title>
-    <updated>2020-05-18T03:36:39.282Z</updated>
+    <updated>2020-05-18T03:41:59.307Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://dark-yifeng.github.io"/>
     <link rel="self" href="https://dark-yifeng.github.io/atom.xml"/>
@@ -831,7 +831,8 @@ console.log(student.name + student.age + student.grade);//小明21大三
         <link href="https://dark-yifeng.github.io/post/javascriptjiu-asyncawait/">
         </link>
         <updated>2020-05-18T03:33:50.000Z</updated>
-        <content type="html"><![CDATA[<h2 id="1-asyncawait是什么">1. async/await是什么？</h2>
+        <content type="html"><![CDATA[<!-- more -->
+<h2 id="1-asyncawait是什么">1. async/await是什么？</h2>
 <p>async 是一个修饰符，async 定义的函数会默认的返回一个Promise对象resolve的值，因此对async函数可以直接进行then操作,返回的值即为then方法的传入函数。</p>
 <p>await 也是一个修饰符，await 关键字 只能放在 async 函数内部， await关键字的作用 就是获取 Promise中返回的内容， 获取的是Promise函数中resolve或者reject的值。</p>
 <p><strong>那么async/await到底是干嘛的呢？</strong></p>
@@ -1212,7 +1213,7 @@ console.log(e); //o
 let { length : len} = 'yahooa';
 console.log(len); //5,类似数组的对象都有一个length属性，还可以对这个属性解构赋值
 </code></pre>
-<ol start="5">
+<ol>
 <li>数值和布尔值的解构赋值<br>
 解构赋值时，如果等号右边是数值和布尔值，则会先转为对象，但是等号右边为undefined 和 null时无法转为对象，所以对他们进行解构赋值时，都会报错</li>
 </ol>
