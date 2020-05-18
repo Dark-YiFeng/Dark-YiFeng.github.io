@@ -1,0 +1,411 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    
+<meta charset="utf-8" >
+
+<title>JavaScript（七）：Generator | Dark</title>
+<meta name="description" content="温故而知新">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dark-yifeng.github.io/favicon.ico?v=1589772957703">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://dark-yifeng.github.io/styles/main.css">
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+  </head>
+  <body>
+    <div id="app" class="main">
+      <div class="site-header-container">
+  <div class="site-header">
+    <div class="left">
+      <a href="https://dark-yifeng.github.io">
+        <img class="avatar" src="https://dark-yifeng.github.io/images/avatar.png?v=1589772957703" alt="" width="32px" height="32px">
+      </a>
+      <a href="https://dark-yifeng.github.io">
+        <h1 class="site-title">Dark</h1>
+      </a>
+    </div>
+    <div class="right">
+      <transition name="fade">
+        <i class="icon" :class="{ 'icon-close-outline': menuVisible, 'icon-menu-outline': !menuVisible }" @click="menuVisible = !menuVisible"></i>
+      </transition>
+    </div>
+  </div>
+</div>
+
+<transition name="fade">
+  <div class="menu-container" style="display: none;" v-show="menuVisible">
+    <div class="menu-list">
+      
+        
+          <a href="/" class="menu purple-link">
+            JavaScript
+          </a>
+        
+      
+        
+          <a href="/archives" class="menu purple-link">
+            Vue
+          </a>
+        
+      
+        
+          <a href="/tags" class="menu purple-link">
+            React
+          </a>
+        
+      
+    </div>
+  </div>
+</transition>
+
+
+      <div class="content-container">
+        <div class="post-detail">
+          
+          <h2 class="post-title">JavaScript（七）：Generator</h2>
+          <div class="post-info post-detail-info">
+            <span><i class="icon-calendar-outline"></i> 2020-05-18</span>
+            
+          </div>
+          <div class="post-content">
+            <p><ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#1%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%BC%95%E5%85%A5generator">1.为什么要引入Generator？</a></li>
+<li><a href="#2%E5%9F%BA%E6%9C%AC%E7%94%A8%E6%B3%95">2.基本用法</a></li>
+<li><a href="#3yield">3.yield</a></li>
+<li><a href="#4yield">4.yield*</a></li>
+<li><a href="#5next%E6%96%B9%E6%B3%95">5.next()方法</a></li>
+<li><a href="#6next%E6%96%B9%E6%B3%95%E7%9A%84%E5%8F%82%E6%95%B0">6.next()方法的参数</a></li>
+<li><a href="#7throw%E6%96%B9%E6%B3%95">7.throw方法()</a></li>
+<li><a href="#8return%E6%96%B9%E6%B3%95">8.return()方法</a></li>
+<li><a href="#9generator%E4%B8%AD%E7%9A%84this%E5%92%8C%E4%BB%96%E7%9A%84%E5%8E%9F%E5%9E%8B">9.Generator中的this和他的原型</a></li>
+<li><a href="#10%E5%AE%9E%E9%99%85%E5%BA%94%E7%94%A8">10.实际应用</a></li>
+<li><a href="#11%E6%97%B6%E9%97%B4%E5%88%87%E7%89%87">11.时间切片</a></li>
+<li><a href="#%E6%B3%A8">注：</a></li>
+</ul>
+</li>
+</ul>
+</p>
+<h2 id="1为什么要引入generator">1.为什么要引入Generator？</h2>
+<p>众所周知，传统的JavaScript异步的实现是通过回调函数来实现的，但是这种方式有两个明显的缺陷：</p>
+<p>1.缺乏可信任性。例如我们发起ajax请求的时候是把回调函数交给第三方进行处理，期待它能执行我们的回调函数，实现正确的功能<br>
+2.缺乏顺序性。众多回调函数嵌套使用，执行的顺序不符合我们大脑常规的思维逻辑，回调逻辑嵌套比较深的话调试代码时可能会难以定位。</p>
+<p>Promise恢复了异步回调的可信任性，而Generator正是以一种看似顺序、同步的方式实现了异步控制流程，增强了代码可读性。</p>
+<p>generator是ES6提供的一种异步编程解决方案，在语法上，可以把它理解为一个状态机，内部封装了多种状态。执行generator，会生成返回一个遍历器对象。返回的遍历器对象，可以依次遍历generator函数的每一个状态。同时ES6规定这个遍历器是Generator函数的实例，也继承了Genarator函数的prototype对象上的方法。</p>
+<p><strong>Generator 函数是一个普通函数，但是有两个特征。</strong></p>
+<p>一是，function关键字与函数名之间有一个星号；<br>
+二是，函数体内部使用yield表达式，定义不同的内部状态（yield在英语里的意思就是“产出”）。</p>
+<h2 id="2基本用法">2.基本用法</h2>
+<p>Generator(生成器)是一类特殊的函数，跟普通函数声明时的区别是加了一个*号。</p>
+<p>Iterator(迭代器)：当我们实例化一个生成器函数之后，这个实例就是一个迭代器。可以通过next()方法去启动生成器以及控制生成器的是否往下执行。</p>
+<p>yield/next：这是控制代码执行顺序的一对好基友。通过yield语句可以在生成器函数内部暂停代码的执行使其挂起，此时生成器函数仍然是运行并且是活跃的，其内部资源都会保留下来，只不过是处在暂停状态。在迭代器上调用next()方法可以使代码从暂停的位置开始继续往下执行。</p>
+<pre><code class="language-c">function* helloWorldGenerator() {
+  yield 'hello';
+  yield 'world';
+  return 'ending';
+}
+
+var hw = helloWorldGenerator();
+
+hw.next()
+// { value: 'hello', done: false }
+
+hw.next()
+// { value: 'world', done: false }
+
+hw.next()
+// { value: 'ending', done: true }
+
+hw.next()
+// { value: undefined, done: true }
+</code></pre>
+<p>上面的程序执行了四次next：</p>
+<p>第一次调用，Generator 函数开始执行，直到遇到第一个yield表达式为止。next方法返回一个对象，它的value属性就是当前yield表达式的值hello，done属性的值false，表示遍历还没有结束。</p>
+<p>第二次调用，Generator 函数从上次yield表达式停下的地方，一直执行到下一个yield表达式。next方法返回的对象的value属性就是当前yield表达式的值world，done属性的值false，表示遍历还没有结束。</p>
+<p>第三次调用，Generator 函数从上次yield表达式停下的地方，一直执行到return语句（如果没有return语句，就执行到函数结束）。next方法返回的对象的value属性，就是紧跟在return语句后面的表达式的值（如果没有return语句，则value属性的值为undefined），done属性的值true，表示遍历已经结束。</p>
+<p>第四次调用，此时 Generator 函数已经运行完毕，next方法返回对象的value属性为undefined，done属性为true。以后再调用next方法，返回的都是这个值。</p>
+<h2 id="3yield">3.yield</h2>
+<p>由于 Generator 函数返回的遍历器对象，只有调用next方法才会遍历下一个内部状态，所以其实提供了一种可以暂停执行的函数。yield表达式就是暂停标志。</p>
+<p>（1）遇到yield表达式，就暂停执行后面的操作，并将紧跟在yield后面的那个表达式的值，作为返回的对象的value属性值。</p>
+<p>（2）下一次调用next方法时，再继续往下执行，直到遇到下一个yield表达式。</p>
+<p>（3）如果没有再遇到新的yield表达式，就一直运行到函数结束，直到return语句为止，并将return语句后面的表达式的值，作为返回的对象的value属性值。</p>
+<p>（4）如果该函数没有return语句或者执行完return之后再运行next的时候，则返回的对象的value属性值为undefined,done为true。</p>
+<p><strong>注意：</strong><br>
+需要注意，yield表达式只能用在 Generator 函数里面，用在其他地方都会报错。<br>
+yield表达式如果用在另一个表达式之中，必须放在圆括号里面<br>
+yield表达式用作函数参数或放在赋值表达式的右边，可以不加括号。<br>
+yield放在表达式中的时候，let s =（yield 1+2），s其值将会是undefined，而1+2这个等于3的值将会作为next返回对象的value的值</p>
+<p>Generator函数返回的Iterator运行的过程中，如果碰到了yield， 就会把yield后面的值返回， 此时函数相当于停止了， 下次再执行next()方法的时候， 函数又会从上次退出去的地方重新开始执行；</p>
+<p>如果把yield和return一起使用的话， 那么return的值也会作为最后的返回值， 如果return语句后面还有yield， 那么这些yield不生效：</p>
+<pre><code class="language-c">function* gen() {
+    yield 0;
+    yield 1;
+    return 2;
+    yield 3;
+};
+let g = gen();
+console.log(g.next(),g.next(),g.next(),g.next());
+//输出：{ value: 0, done: false } { value: 1, done: false } { value: 2, done: true } { value: undefined, done: true }
+</code></pre>
+<h2 id="4yield">4.yield*</h2>
+<p>yield<em>这种语句让我们可以在Generator函数里面再套一个Generator， 当然你要在一个Generator里面调用另外的Generator需要使用: yield</em> 函数() 这种语法， 都是套路啊：</p>
+<pre><code class="language-c">function* foo() {
+    yield 0;
+    yield 1;
+}
+function* bar() {
+    yield 'x';
+    yield* foo();
+    yield 'y';
+}
+for (let v of bar()){
+    console.log(v);
+};
+//依次输出x，0，1，y
+</code></pre>
+<h2 id="5next方法">5.next()方法</h2>
+<p>yield表达式本身没有返回值，或者说总是返回undefined。next方法可以带一个参数，该参数就会被当作上一个yield表达式的返回值。</p>
+<p>这个参数就是解决了上面说的注意事项的最后一个，yield的返回值总是undefined，</p>
+<p>由于next方法的参数表示上一个yield表达式的返回值，所以在第一次使用next方法时，传递参数是无效的。V8 引擎直接忽略第一次使用next方法时的参数，只有从第二次使用next方法开始，参数才是有效的。从语义上讲，第一个next方法用来启动遍历器对象，所以不用带有参数。</p>
+<p>Generator函数返回的Iterator执行next()方法以后， 返回值的结构为：</p>
+<pre><code class="language-c">{
+    value : &quot;value&quot;, //value为返回的值
+    done : false //done的值为一个布尔值， 如果Interator未遍历完毕， 他会返回false， 否则返回true；
+}
+ 
+</code></pre>
+<p>所以我们可以模拟一个Generator生成器， 利用闭包保存变量， 每一次执行next()方法， 都模拟生成一个{value:value,done:false}的键值对：</p>
+<pre><code class="language-c">function gen(array){
+    var nextIndex = 0;
+    return {
+        next: function(){
+            return nextIndex &lt; array.length ?
+            {value: array[nextIndex++], done: false} :
+            {value: undefined, done: true};
+        }
+    };
+};
+
+var it = gen([&quot;arr0&quot;, &quot;arr1&quot;, &quot;arr2&quot;, &quot;arr3&quot;]);
+console.log( it.next() );
+console.log( it.next() );
+console.log( it.next() );
+console.log( it.next() );
+console.log( it.next() );　
+</code></pre>
+<h2 id="6next方法的参数">6.next()方法的参数</h2>
+<p>如果给next方法传参数， 那么这个参数将会作为上一次yield语句的返回值 ，这个特性在异步处理中是非常重要的， 因为在执行异步代码以后， 有时候需要上一个异步的结果， 作为下次异步的参数， 如此循环：：</p>
+<pre><code class="language-c">&lt;script&gt;
+function* foo(x) {
+    var y = 2 * (yield (x + 1));
+    var z = yield (y / 3);
+    return (x + y + z);
+}
+
+var a = foo(5);
+a.next() // Object{value:6, done:false}
+a.next() // Object{value:NaN, done:false}
+a.next() // Object{value:NaN, done:true}
+
+var b = foo(5);
+b.next() // { value:6, done:false }
+b.next(12) // { value:8, done:false }
+b.next(13) // { value:42, done:true }
+&lt;/script&gt;
+</code></pre>
+<h2 id="7throw方法">7.throw方法()</h2>
+<p>如果执行Generator生成器的throw()方法， 如果在Iterator执行到的yield语句写在try{}语句块中， 那么这个错误会被内部的try{}catch(){}捕获 ：</p>
+<pre><code class="language-c">&lt;script&gt;
+var g = function* () {
+    try {
+        yield;
+    } catch (e) {
+        console.log('内部捕获0', e);
+    }
+};
+
+var i = g();
+i.next(); //让代码执行到yield处；
+try {
+    i.throw('a');
+} catch (e) {
+    console.log('外部捕获', e);
+}
+&lt;/script&gt;
+</code></pre>
+<h2 id="8return方法">8.return()方法</h2>
+<p>如果执行Iterator的return()方法， 那么这个迭代器的返回会被强制设置为迭代完毕， 执行return()方法的参数就是这个Iterator的返回值，此时done的状态也为true：</p>
+<pre><code class="language-c">&lt;script&gt;
+function* gen() {
+    yield 0;
+    yield 1;
+    yield 2;
+    yield 3;
+};
+let g = gen();
+console.log(g.return(&quot;heheda&quot;)); //输出：{ value: 'heheda', done: true }
+&lt;/script&gt;
+</code></pre>
+<h2 id="9generator中的this和他的原型">9.Generator中的this和他的原型</h2>
+<p>Generator中的this就是谁调用它，那么this就是谁， 我们利用Reflect.apply可以改变Generator的上下文：</p>
+<pre><code class="language-c">function* gen() {
+    console.log(this);
+    yield 0;
+};
+console.log(gen().next());
+console.log(Reflect.apply(gen,&quot;heheda&quot;).next());
+</code></pre>
+<h2 id="10实际应用">10.实际应用</h2>
+<p><strong>1.比如抽奖环节，当前用户还可以抽奖5次。点击后次数减1。</strong></p>
+<p>若采用ES5的方式，不使用Generator，则需要将count存入全局变量中，但是这样非常不安全，如果别人知道变量是什么，就可以修改变量；另外存入全局变量也会影响性能。</p>
+<pre><code class="language-c">{
+    let draw=function(count){
+        //具体抽奖逻辑，跟次数的校验是分开的
+        //输出剩余次数
+        console.log(`剩余${count}次`)
+    }
+　　 //利用Generator控制次数
+    let residue=function*(count){
+        while(count&gt;0){
+            count--
+            yield draw(count)
+        }
+    }
+　　//将Generator实例化，通过按钮绑定，点击执行next，进行抽奖
+    let star=residue(5)
+    let btn=document.createElement('button')
+    btn.id='start'
+    btn.textContent='抽奖'
+    document.body.appendChild(btn)
+    document.getElementById('start').addEventListener('click',function(){
+        star.next()
+    },false)
+}
+</code></pre>
+<p><strong>2.长轮询</strong></p>
+<p>场景：服务端的某一个数据状态定期变化，前端需要定时的去服务端取这个状态</p>
+<p>对于这种场景，有两种解决方案</p>
+<p>1）长轮询（定时器，定时访问接口）</p>
+<p>2）websocket（浏览器兼容性不好）</p>
+<pre><code class="language-c">{
+	let ajax=function* (){
+		yield new Promise(function(resolve,reject){
+			setTimeout(function(){
+				resolve({code:0})
+			},200)
+		})
+	}
+ 
+	let pull=function(){
+		let generator=ajax()
+		let step=generator.next()
+		step.value.then(function(d){
+			if(d.code!=0){
+				setTimeout(function(){
+					console.log('wait')
+					pull()
+				},1000)
+			}else{
+				console.log(d)
+			}
+		})
+	}
+ 
+	pull()
+}
+</code></pre>
+<p>输出结果为</p>
+<pre><code class="language-c">{code: 0}
+</code></pre>
+<p>将resolve({code:0})中code改成1,会一直轮询，输出结果为</p>
+<pre><code class="language-c">wait
+wait
+wait
+...
+　　
+</code></pre>
+<h2 id="11时间切片">11.时间切片</h2>
+<p>时间切片的核心思想是：如果任务不能在50毫秒内执行完，那么为了不阻塞主线程，这个任务应该让出主线程的控制权，使浏览器可以处理其他任务。让出控制权意味着停止执行当前任务，让浏览器去执行其他任务，随后再回来继续执行没有执行完的任务。</p>
+<p>所以时间切片的目的是不阻塞主线程，而实现目的的技术手段是将一个长任务拆分成很多个不超过50ms的小任务分散在宏任务队列中执行。</p>
+<pre><code class="language-JavaScript">btn.onclick = ts(function* () {
+  someThing(); // 执行了50毫秒
+  yield;
+  otherThing(); // 执行了50毫秒
+});
+
+</code></pre>
+<h2 id="注">注：</h2>
+<p>ES6 诞生以前，异步编程的方法，大概有下面四种。</p>
+<p>1.回调函数。<br>
+2.事件监听。<br>
+3.发布/订阅。<br>
+4.Promise 对象。</p>
+<p>Generator 函数将 JavaScript 异步编程带入了一个全新的阶段。</p>
+
+          </div>
+        </div>
+
+        
+          <div class="next-post">
+            <a class="purple-link" href="https://dark-yifeng.github.io/post/javascriptliu-promise/">
+              <h3 class="post-title">
+                下一篇：JavaScript（六）：Promise
+              </h3>
+            </a>
+          </div>
+          
+      </div>
+
+      
+
+      <div class="site-footer">
+  <div class="slogan">温故而知新</div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">刘亦枫</a> | <a class="rss" href="https://dark-yifeng.github.io/atom.xml" target="_blank">RSS</a>
+</div>
+
+
+    </div>
+    <script type="application/javascript">
+
+hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+  </body>
+</html>

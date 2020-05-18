@@ -1,0 +1,296 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    
+<meta charset="utf-8" >
+
+<title>JavaScript（五）： 事件循环 | Dark</title>
+<meta name="description" content="温故而知新">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dark-yifeng.github.io/favicon.ico?v=1589772957703">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://dark-yifeng.github.io/styles/main.css">
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+  </head>
+  <body>
+    <div id="app" class="main">
+      <div class="site-header-container">
+  <div class="site-header">
+    <div class="left">
+      <a href="https://dark-yifeng.github.io">
+        <img class="avatar" src="https://dark-yifeng.github.io/images/avatar.png?v=1589772957703" alt="" width="32px" height="32px">
+      </a>
+      <a href="https://dark-yifeng.github.io">
+        <h1 class="site-title">Dark</h1>
+      </a>
+    </div>
+    <div class="right">
+      <transition name="fade">
+        <i class="icon" :class="{ 'icon-close-outline': menuVisible, 'icon-menu-outline': !menuVisible }" @click="menuVisible = !menuVisible"></i>
+      </transition>
+    </div>
+  </div>
+</div>
+
+<transition name="fade">
+  <div class="menu-container" style="display: none;" v-show="menuVisible">
+    <div class="menu-list">
+      
+        
+          <a href="/" class="menu purple-link">
+            JavaScript
+          </a>
+        
+      
+        
+          <a href="/archives" class="menu purple-link">
+            Vue
+          </a>
+        
+      
+        
+          <a href="/tags" class="menu purple-link">
+            React
+          </a>
+        
+      
+    </div>
+  </div>
+</transition>
+
+
+      <div class="content-container">
+        <div class="post-detail">
+          
+          <h2 class="post-title">JavaScript（五）： 事件循环</h2>
+          <div class="post-info post-detail-info">
+            <span><i class="icon-calendar-outline"></i> 2020-05-18</span>
+            
+          </div>
+          <div class="post-content">
+            <p><ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#1%E4%B8%BA%E4%BB%80%E4%B9%88js%E6%98%AF%E5%8D%95%E7%BA%BF%E7%A8%8B">1.为什么js是单线程？</a></li>
+<li><a href="#2%E5%90%8C%E6%AD%A5%E5%92%8C%E5%BC%82%E6%AD%A5">2.同步和异步</a></li>
+<li><a href="#3%E5%AE%8F%E4%BB%BB%E5%8A%A1%E4%B8%8E%E5%BE%AE%E4%BB%BB%E5%8A%A1">3.宏任务与微任务</a></li>
+<li><a href="#4event-loop%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF">4.Event Loop(事件循环)</a></li>
+<li><a href="#5%E5%AE%9E%E4%BE%8B">5.实例</a></li>
+<li><a href="#%E4%BE%8B%E9%A2%98-%E4%BE%9D%E6%AC%A1%E8%BE%93%E5%87%BA%E4%BB%80%E4%B9%88">例题： 依次输出什么？</a></li>
+</ul>
+</li>
+</ul>
+<br>
+我们面试的时候经常会问到事件循环，也就是event loop。很多时候我们都是一脸懵，我们通常会背关于事件循环的面试题，讲给面试官的时候自己都不知道自己在讲什么，可能面试官也不太了解事件循环，只是看别人都这么问。那么，仔细了解一下事件循环吧，对以后的编程真的会有帮助的。</p>
+<h2 id="1为什么js是单线程">1.为什么js是单线程？</h2>
+<p>js作为主要运行在浏览器的脚本语言，js主要用途之一是操作DOM。</p>
+<p>举一个例子，如果js同时有两个线程，同时对同一个dom进行操作，这时浏览器应该听哪个线程的，如何判断优先级？</p>
+<p>为了避免这种问题，js必须是一门单线程语言，并且在未来这个特点也不会改变。</p>
+<p>单线程就意味着，所有任务需要排队，前一个任务结束，才会执行后一个任务。如果前一个任务耗时很长，后一个任务就不得不一直等着。</p>
+<pre><code class="language-csharp">var i, t = Date.now()
+for (i = 0; i &lt; 100000000; i++) {}
+console.log(Date.now() - t) // 238
+</code></pre>
+<p>像上面这样，如果排队是因为计算量大，CPU忙不过来，但是，如果是网络请求就不合适。因为一个网络请求的资源什么时候返回是不可预知的，这种情况再排队等待就不明智了。</p>
+<p>所以出现了同步与异步。</p>
+<h2 id="2同步和异步">2.同步和异步</h2>
+<p><strong>同步</strong></p>
+<p>同步任务是指在主线程上排队执行的任务，只有前一个任务执行完毕，才能继续执行下一个任务。</p>
+<pre><code class="language-csharp">// 同步代码
+function fun1() {
+  console.log(1);
+}
+function fun2() {
+  console.log(2);
+}
+fun1();
+fun2();
+</code></pre>
+<p>输出会依次输入1,2，因为代码是从上到下依次执行，执行完fun1()，才继续执行fun2()。</p>
+<p><strong>异步</strong></p>
+<p>异步任务是指不进入主线程，而进入任务队列的任务，只有任务队列通知主线程，某个异步任务可以执行了，该任务才会进入主线程。</p>
+<pre><code class="language-csharp">function fun1() {
+  console.log(1);
+}
+function fun2() {
+  console.log(2);
+}
+function fun3() {
+  console.log(3);
+}
+fun1();
+setTimeout(function(){
+  fun2();
+},0);
+fun3();
+</code></pre>
+<p>依次输出1，3，2，因为我们会优先执行同步函数，然后在执行异步函数。</p>
+<p>正是由于JavaScript是单线程的，而异步容易实现非阻塞，所以在JavaScript中对于耗时的操作或者时间不确定的操作，使用异步就成了必然的选择。<br>
+　　<br>
+<strong>JavaScript的执行顺序：（重点）</strong></p>
+<p>1.先同步后异步。<br>
+2.异步中任务队列的执行顺序： 先微任务microtask队列，再宏任务macrotask队列。<br>
+3.调用Promise 中的resolve，reject属于微任务队列，setTimeout属于宏任务队列。</p>
+<p>那什么是微任务和宏任务？</p>
+<h2 id="3宏任务与微任务">3.宏任务与微任务</h2>
+<p>异步任务分为 宏任务（macrotask） 与 微任务 (microtask)，不同的API注册的任务会依次进入自身对应的队列中，然后等待 Event Loop 将它们依次压入执行栈中执行。</p>
+<p><strong>宏任务</strong></p>
+<p>macrotask，可以理解是每次执行栈执行的代码就是一个宏任务（包括每次从事件队列中获取一个事件回调并放到执行栈中执行）。</p>
+<p>浏览器为了能够使得JS内部(macro)task与DOM任务能够有序的执行，会在一个macrotask执行结束后，在下一个macrotask 执行开始前，对页面进行重新渲染，流程如下：</p>
+<pre><code class="language-csharp">macrotask-&gt;渲染-&gt;macrotask-&gt;...
+</code></pre>
+<p><strong>宏任务包含：</strong></p>
+<p>script(整体代码)<br>
+setTimeout<br>
+setInterval<br>
+I/O<br>
+UI交互事件<br>
+postMessage<br>
+MessageChannel<br>
+setImmediate(Node.js 环境)</p>
+<p><strong>微任务</strong></p>
+<p>microtask,可以理解是在当前 task 执行结束后立即执行的任务。也就是说，在当前task任务后，下一个task之前，在渲染之前。</p>
+<p>所以它的响应速度相比setTimeout（setTimeout是task）会更快，因为无需等渲染。也就是说，在某一个macrotask执行完后，就会将在它执行期间产生的所有microtask都执行完毕（在渲染前）。</p>
+<p><strong>微任务包含：</strong></p>
+<p>Promise.then<br>
+Object.observe<br>
+MutaionObserver<br>
+process.nextTick(Node.js 环境)</p>
+<h2 id="4event-loop事件循环">4.Event Loop(事件循环)</h2>
+<p>Event Loop(事件循环)中，每一次循环称为 tick, 每一次tick的任务如下：</p>
+<p>1.执行栈选择最先进入队列的宏任务(通常是script整体代码)，如果有则执行。<br>
+2.检查是否存在 Microtask，如果存在则不停的执行，直至清空 microtask 队列。<br>
+3.更新render(每一次事件循环，浏览器都可能会去更新渲染)。<br>
+4.重复以上步骤。</p>
+<p>宏任务 &gt; 所有微任务 &gt; 宏任务，如下图所示：</p>
+<figure data-type="image" tabindex="1"><img src="https://img-blog.csdnimg.cn/20200220214654929.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdXlpZmVuZzAwMDA=,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" loading="lazy"></figure>
+<p>从代码执行顺序的角度来看，程序最开始是按代码顺序执行代码的，遇到同步任务，立刻执行；遇到异步任务，则只是调用异步函数发起异步请求。此时，异步任务开始执行异步操作，执行完成后到消息队列中排队。程序按照代码顺序执行完毕后，查询消息队列中是否有等待的消息。如果有，则按照次序从消息队列中把消息放到执行栈中执行。执行完毕后，再从消息队列中获取消息，再执行，不断重复。</p>
+<p>由于主线程不断的重复获得消息、执行消息、再取消息、再执行。所以，这种机制被称为事件循环。<br>
+　　<br>
+　　<strong>用代码表示：</strong></p>
+<pre><code class="language-csharp">while (queue.waitForMessage()) {
+  queue.processNextMessage();
+}
+</code></pre>
+<p>如果当前没有任何消息queue.waitForMessage 会等待同步消息到达。</p>
+<h2 id="5实例">5.实例</h2>
+<p>下面以一个实例来解释事件循环机制：</p>
+<pre><code class="language-csharp">console.log(1)
+div.onclick = () =&gt; {console.log('click')}
+console.log(2)
+setTimeout(() =&gt; {console.log('timeout')},1000)
+</code></pre>
+<p>1、执行第一行代码，第一行是一个同步任务，控制台显示1</p>
+<p>2、执行第二行代码，第二行是一个异步任务，发起异步请求，可以在任意时刻执行鼠标点击的异步操作</p>
+<p>3、执行第三行代码，第三行是一个同步任务，控制台显示2</p>
+<p>4、执行第四行代码，第四行是一个异步任务，发起异步请求，1s后执行定时器任务</p>
+<p>5、假设从执行第四行代码的1s内，执行了鼠标点击，则鼠标任务在消息队列中排到首位</p>
+<p>6、从执行第四行代码1s后，定时器任务到消息队列中排到第二位</p>
+<p>7、现在同步任务已经执行完毕，则从消息队列中按照次序把异步任务放到执行栈中执行</p>
+<p>8、则控制台依次显示'click‘、'timeout'</p>
+<p>9、过了一段时间后，又执行了一次鼠标点击，由于消息队列中已经空了，则鼠标任务在消息队列中排到首位</p>
+<p>10、同步任务执行完毕后，再从消息队列中按照次序把异步任务放到执行栈中执行</p>
+<p>11、 则控制台显示'click'</p>
+<p><strong>异步过程</strong></p>
+<p>下面以一个实例来解释一次完整的异步过程：</p>
+<pre><code class="language-csharp">div.onclick = function fn(){console.log('click')}
+</code></pre>
+<p>1、主线程通过调用异步函数div.onclick发起异步请求</p>
+<p>2、在某一时刻，执行异步操作，即鼠标点击</p>
+<p>3、接着，回调函数fn到消息队列中排队</p>
+<p>4、主线程从消息队列中读取fn到执行栈中</p>
+<p>5、然后在执行栈中执行fn里面的代码console.log('click')</p>
+<p>6、于是，控制台显示'click'</p>
+<h2 id="例题-依次输出什么">例题： 依次输出什么？</h2>
+<pre><code class="language-csharp">    function fun1() {
+        console.log(&quot;1&quot;)
+    }
+
+    fun1()
+
+    setTimeout(function () {
+        console.log('2')
+    });
+
+    function fun3() {
+        console.log(&quot;3&quot;)
+    }
+    fun3()
+    var l4 = new Promise(function (resolve) {
+        for (var i = 0; i &lt; 10000; i++) {
+            i == 99 &amp;&amp; resolve();
+        }
+    }).then(function () {
+        console.log('4')
+    });
+
+    console.log('5');
+
+</code></pre>
+
+          </div>
+        </div>
+
+        
+          <div class="next-post">
+            <a class="purple-link" href="https://dark-yifeng.github.io/post/javascriptsi-zuo-yong-yu-lian/">
+              <h3 class="post-title">
+                下一篇：JavaScript（四）：作用域链
+              </h3>
+            </a>
+          </div>
+          
+      </div>
+
+      
+
+      <div class="site-footer">
+  <div class="slogan">温故而知新</div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">刘亦枫</a> | <a class="rss" href="https://dark-yifeng.github.io/atom.xml" target="_blank">RSS</a>
+</div>
+
+
+    </div>
+    <script type="application/javascript">
+
+hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+  </body>
+</html>

@@ -1,0 +1,415 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    
+<meta charset="utf-8" >
+
+<title>JavaScript（九）：async/await | Dark</title>
+<meta name="description" content="温故而知新">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dark-yifeng.github.io/favicon.ico?v=1589772957703">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://dark-yifeng.github.io/styles/main.css">
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+  </head>
+  <body>
+    <div id="app" class="main">
+      <div class="site-header-container">
+  <div class="site-header">
+    <div class="left">
+      <a href="https://dark-yifeng.github.io">
+        <img class="avatar" src="https://dark-yifeng.github.io/images/avatar.png?v=1589772957703" alt="" width="32px" height="32px">
+      </a>
+      <a href="https://dark-yifeng.github.io">
+        <h1 class="site-title">Dark</h1>
+      </a>
+    </div>
+    <div class="right">
+      <transition name="fade">
+        <i class="icon" :class="{ 'icon-close-outline': menuVisible, 'icon-menu-outline': !menuVisible }" @click="menuVisible = !menuVisible"></i>
+      </transition>
+    </div>
+  </div>
+</div>
+
+<transition name="fade">
+  <div class="menu-container" style="display: none;" v-show="menuVisible">
+    <div class="menu-list">
+      
+        
+          <a href="/" class="menu purple-link">
+            JavaScript
+          </a>
+        
+      
+        
+          <a href="/archives" class="menu purple-link">
+            Vue
+          </a>
+        
+      
+        
+          <a href="/tags" class="menu purple-link">
+            React
+          </a>
+        
+      
+    </div>
+  </div>
+</transition>
+
+
+      <div class="content-container">
+        <div class="post-detail">
+          
+          <h2 class="post-title">JavaScript（九）：async/await</h2>
+          <div class="post-info post-detail-info">
+            <span><i class="icon-calendar-outline"></i> 2020-05-18</span>
+            
+          </div>
+          <div class="post-content">
+            <h2 id="1-asyncawait是什么">1. async/await是什么？</h2>
+<p>async 是一个修饰符，async 定义的函数会默认的返回一个Promise对象resolve的值，因此对async函数可以直接进行then操作,返回的值即为then方法的传入函数。</p>
+<p>await 也是一个修饰符，await 关键字 只能放在 async 函数内部， await关键字的作用 就是获取 Promise中返回的内容， 获取的是Promise函数中resolve或者reject的值。</p>
+<p><strong>那么async/await到底是干嘛的呢？</strong></p>
+<p>1.async/await 是一种编写异步代码的新方法。之前异步代码的方案是回调和 promise。<br>
+2.async/await 是建立在 promise 的基础上。（如果对Promise不熟悉，我已经着手在写Promise的文章了）<br>
+3.async/await 像 promise 一样，也是非阻塞的。<br>
+4.async/await 让异步代码看起来、表现起来更像同步代码。这正是其威力所在。</p>
+<p>async/await其实是Promise的语法糖，它能实现的效果都能用then链来实现，这也和我们之前提到的一样，它是为优化then链而开发出来的。从字面上来看，async是“异步”的简写，await译为等待，所以我们很好理解async声明function是异步的，await等待某个操作完成。当然语法上强制规定await只能出现在asnyc函数中，我们先来看看async函数返回了什么：</p>
+<pre><code class="language-c">async function testAsy(){
+   return 'hello world';
+}
+let result = testAsy(); 
+console.log(result)
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/20200310002218223.png" alt="在这里插入图片描述" loading="lazy"><br>
+这个async声明的异步函数把return后面直接量通过Promise.resolve()返回Promise对象，所以如果这个最外层没有用await调用的话，是可以用原来then链的方式来调用的：</p>
+<pre><code class="language-c">async function testAsy(){
+   return 'hello world'
+}
+let result = testAsy() 
+console.log(result)
+result.then(v=&gt;{
+    console.log(v)   //hello world
+})
+</code></pre>
+<p>联想一下Promise特点——异步无等待，所以当没有await语句执行async函数，它就会立即执行，返回一个Promise对象，非阻塞，与普通的Promise对象函数一致。</p>
+<p>以下是一个promise在1s之后resolve的例子：</p>
+<pre><code class="language-c">async function f() {
+    let promise = new Promise((resolve, reject) =&gt; {
+        setTimeout(() =&gt; resolve('done!'), 1000)
+    })
+    let result = await promise // 直到promise返回一个resolve值（*）
+    console.log(result) 
+}
+f()
+</code></pre>
+<p>函数执行到（*）行会‘暂停’，当promise处理完成后重新恢复运行， resolve的值成了最终的result，所以上面的代码会在1s后输出'done!'</p>
+<p>我们强调一下：await字面上使得JavaScript等待，直到promise处理完成，</p>
+<p>然后将结果继续下去。这并不会花费任何的cpu资源，因为引擎能够同时做其他工作：执行其他脚本，处理事件等等。</p>
+<p>这只是一个更优雅的得到promise值的语句，它比promise更加容易阅读和书写。</p>
+<p>如果去掉await，我们获得的就是一个promise对象。</p>
+<pre><code class="language-c">//加上await
+done!
+
+//没有await
+Promise {&lt;pending&gt;}
+__proto__: Promise
+[[PromiseStatus]]: &quot;resolved&quot;
+[[PromiseValue]]: &quot;done!&quot;
+</code></pre>
+<p><strong>重点就在await，它等待什么呢？</strong></p>
+<p>按照语法说明，await等待的是一个Promise对象，或者是其他值（也就是说可以等待任何值），如果等待的是Promise对象，则返回Promise的处理结果；如果是其他值，则返回该值本身。并且await会暂停当前async function的执行，等待Promise的处理完成。若Promise正常处理（fulfillded），其将回调的resolve函数参数作为await表达式的值，继续执行async function；若Promise处理异常（rejected），await表达式会把Promise异常原因抛出；另外如果await操作符后面的表达式不是一个Promise对象，则返回该值本身。</p>
+<h2 id="2-深入理解asyncawait">2. 深入理解async/await</h2>
+<p>我们来详细说明一下async/await的作用。await操作符后面可以是任意值，当是Promise对象的时候，会暂停async function执行。也就是说，必须得等待await后面的Promise处理完成才能继续：</p>
+<pre><code class="language-c"> function testAsy(x){
+   return new Promise(resolve=&gt;{setTimeout(() =&gt; {
+       resolve(x);
+     }, 3000)
+    }
+   )
+}
+async function testAwt(){    
+  let result =  await testAsy('hello world');
+  console.log(result);    // 3秒钟之后出现hello world
+}
+testAwt();
+</code></pre>
+<p>await 表达式的运算结果取决于它等的东西。</p>
+<p>如果它等到的不是一个 Promise 对象，那 await 表达式的运算结果就是它等到的东西。</p>
+<p>如果它等到的是一个 Promise 对象，await 就忙起来了，它会阻塞后面的代码，等着 Promise 对象 resolve，然后得到 resolve 的值，作为 await 表达式的运算结果。</p>
+<p>我们再把上面的代码修改一下，好好体会“阻塞”这个词</p>
+<pre><code class="language-c"> function testAsy(x){
+   return new Promise(resolve=&gt;{setTimeout(() =&gt; {
+       resolve(x);
+     }, 3000)
+    }
+   )
+}
+async function testAwt(){    
+  let result =  await testAsy('hello world');
+  console.log(result);    // 3秒钟之后出现hello world
+  console.log('Y')   // 3秒钟之后出现Y
+}
+testAwt();
+console.log('L')  //立即输出L
+</code></pre>
+<p>这就是 await 必须用在 async 函数中的原因。async 函数调用不会造成阻塞，它内部所有的阻塞都被封装在一个 Promise 对象中异步执行。await暂停当前async的执行，所以'tangSir''最先输出，hello world'和‘tangj’是3秒钟后同时出现的。</p>
+<blockquote>
+<p>为什么会立即输出L，这就涉及到了JS中的事件循环了，我写了一篇关于事件循环的博客，看了应该会明白，总的来说，异步函数会在非异步函数之后运行。</p>
+</blockquote>
+<h2 id="3-async和await简单应用">3. async和await简单应用</h2>
+<p>上面已经说明了 async 会将其后的函数（函数表达式或 Lambda）的返回值封装成一个 Promise 对象，而 await 会等待这个 Promise 完成，并将其 resolve 的结果返回出来。</p>
+<p>现在举例，用 setTimeout模拟耗时的异步操作，先来看看不用 async/await 会怎么写</p>
+<pre><code class="language-c">function takeLongTime() {
+    return new Promise(resolve =&gt; {
+        setTimeout(() =&gt; resolve(&quot;long_time_value&quot;), 1000);
+    });
+}
+
+takeLongTime().then(v =&gt; {
+    console.log(&quot;got&quot;, v); //一秒钟后输出got long_time_value
+});
+</code></pre>
+<p>如果改用 async/await 呢，会是这样</p>
+<pre><code class="language-c">function takeLongTime() {
+    return new Promise(resolve =&gt; {
+        setTimeout(() =&gt; resolve(&quot;long_time_value&quot;), 1000);
+    });
+}
+
+async function test() {
+    const v = await takeLongTime();
+    console.log(v);  // 一秒钟后输出long_time_value
+}
+
+test();
+</code></pre>
+<p>tankLongTime()本身就是返回的 Promise 对象，所以加不加 async结果都一样。</p>
+<h2 id="4-处理then链">4. 处理then链</h2>
+<p>前面我们说了，async和await是处理then链的语法糖，现在我们来看看具体是怎么实现的：</p>
+<p>假设一个业务，分多个步骤完成，每个步骤都是异步的，而且依赖于上一个步骤的结果。我们仍然用setTimeout来模拟异步操作：</p>
+<pre><code class="language-c">/**
+ * 传入参数 n，表示这个函数执行的时间（毫秒）
+ * 执行的结果是 n + 200，这个值将用于下一步骤
+ */
+function takeLongTime(n) {
+    return new Promise(resolve =&gt; {
+        setTimeout(() =&gt; resolve(n + 200), n);
+    });
+}
+
+function step1(n) {
+    console.log(`step1 with ${n}`);
+    return takeLongTime(n);
+}
+
+function step2(n) {
+    console.log(`step2 with ${n}`);
+    return takeLongTime(n);
+}
+
+function step3(n) {
+    console.log(`step3 with ${n}`);
+    return takeLongTime(n);
+}
+</code></pre>
+<p>现在用 Promise 方式来实现这三个步骤的处理。</p>
+<pre><code class="language-c">function doIt(){
+    console.time('doIt');
+    let time1 = 300;
+    step1(time1)
+        .then((time2) =&gt; step2(time2))
+        .then((time3) =&gt; step3(time3))　　
+        .then((result) =&gt; {
+            console.log(`result is ${result}`);
+            console.timeEnd(&quot;doIt&quot;);
+        })
+}
+
+doIt();
+
+//执行结果为:
+//step1 with 300
+//step2 with 500
+//step3 with 700
+//result is 900
+//doIt: 1510.2490234375ms
+</code></pre>
+<p>输出结果 result 是 step3() 的参数 700 + 200 = 900。doIt() 顺序执行了三个步骤，一共用了 300 + 500 + 700 = 1500 毫秒，和 console.time()/console.timeEnd() 计算的结果一致。</p>
+<p>如果用 async/await 来实现呢，会是这样：</p>
+<pre><code class="language-c">async function doIt() {
+    console.time('doIt');
+    let time1 = 300;
+    let time2 = await step1(time1);//将Promise对象resolve(n+200)的值赋给time2
+    let time3 = await step1(time2);
+    let result = await step1(time3);
+    console.log(`result is ${result}`);
+    console.timeEnd('doIt');
+}
+
+doIt();
+
+//执行结果为:
+//step1 with 300
+//step2 with 500
+//step3 with 700
+//result is 900
+//doIt: 1512.904296875ms
+</code></pre>
+<p>显然我们用async/await简单多了。</p>
+<h2 id="5-promise处理结果为rejected">5. Promise处理结果为rejected</h2>
+<p>await 命令后面的 Promise 对象，运行结果可能是 rejected，所以最好把 await 命令放在 try...catch 代码块中。</p>
+<pre><code class="language-c">async function myFunction() {
+    try {
+        await somethingThatReturnAPromise();
+    } catch (err){
+        console.log(err);
+    }
+}
+
+//另一种写法
+async function myFunction() {
+    await somethingThatReturnAPromise().catch(function(err) {
+        console.log(err);
+    })
+}
+</code></pre>
+<h2 id="6实例">6.实例</h2>
+<p><strong>Vue普通写法：</strong></p>
+<pre><code class="language-c">methods: {
+     getLocation(phoneNum) {
+         return axios.post('/mm接口', {
+             phoneNum
+         })
+     },    
+     getFaceList(province, city) {
+         return axios.post('/nn接口', {
+             province,
+             city
+         })
+     },  
+     getFaceResult () {
+          this.getLocation(this.phoneNum).then(res =&gt; {
+              if (res.status === 200 &amp;&amp; res.data.success) {
+              let province = res.data.obj.province;
+              let city = res.data.obj.city;
+                  this.getFaceList(province, city).then(res =&gt; {
+                        if(res.status === 200 &amp;&amp; res.data.success) {
+                             this.faceList = res.data.obj
+                        }
+                  })
+              }
+         }).catch(err =&gt; {
+             console.log(err)
+         })     
+     }
+}
+</code></pre>
+<p>这时你看到了then 的链式写法，有一点回调地域的感觉。现在我们在有async/ await 来改造一下。</p>
+<p><strong>加入async/ await：</strong></p>
+<p>首先把 getFaceResult 转化成一个async 函数，就是在其前面加async， 因为它的调用方法和普通函数的调用方法是一致，所以没有什么问题。然后就把 getLocation 和getFaceList 放到await 后面，等待执行， getFaceResult  函数修改如下：</p>
+<pre><code class="language-c">async getFaceResult () {
+                let location = await this.getLocation(this.phoneNum);
+                if (location.data.success) {
+                    let province = location.data.obj.province;
+                    let city = location.data.obj.city;
+                    let result = await this.getFaceList(province, city);
+                    if (result.data.success) {
+                        this.faceList = result.data.obj;
+                    }
+                }
+            }
+</code></pre>
+<p>现在代码的书写方式，就像写同步代码一样，没有回调的感觉，非常舒服。</p>
+<p>现在就还差一点需要说明，那就是怎么处理异常，如果请求发生异常，怎么处理？ 它用的是try/catch 来捕获异常，把await 放到 try 中进行执行，如有异常，就使用catch 进行处理。</p>
+<pre><code class="language-c">async getFaceResult () {
+                try {
+                    let location = await this.getLocation(this.phoneNum);
+                    if (location.data.success) {
+                        let province = location.data.obj.province;
+                        let city = location.data.obj.city;
+                        let result = await this.getFaceList(province, city);
+                        if (result.data.success) {
+                            this.faceList = result.data.obj;
+                        }
+                    }
+                } catch(err) {
+                    console.log(err);
+                }
+            }
+</code></pre>
+<h2 id="注">注：</h2>
+<blockquote>
+<p>ES7引入的关键字async/await是对JavaScript异步编程的改进。它可以使代码更容易阅读和调试。然而，为了正确使用它们，必须完全理解promise，因为它们只不过是语法糖，而潜在的技术仍然是promise。</p>
+</blockquote>
+<h2 id="思考">思考：</h2>
+<p>Vue中，async created()这种写法有什么用呢？</p>
+
+          </div>
+        </div>
+
+        
+          <div class="next-post">
+            <a class="purple-link" href="https://dark-yifeng.github.io/post/javascriptba-jie-gou-fu-zhi/">
+              <h3 class="post-title">
+                下一篇：JavaScript（八）：解构赋值
+              </h3>
+            </a>
+          </div>
+          
+      </div>
+
+      
+
+      <div class="site-footer">
+  <div class="slogan">温故而知新</div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">刘亦枫</a> | <a class="rss" href="https://dark-yifeng.github.io/atom.xml" target="_blank">RSS</a>
+</div>
+
+
+    </div>
+    <script type="application/javascript">
+
+hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+  </body>
+</html>

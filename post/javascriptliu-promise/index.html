@@ -1,0 +1,309 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    
+<meta charset="utf-8" >
+
+<title>JavaScript（六）：Promise | Dark</title>
+<meta name="description" content="温故而知新">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dark-yifeng.github.io/favicon.ico?v=1589772957703">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://dark-yifeng.github.io/styles/main.css">
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+  </head>
+  <body>
+    <div id="app" class="main">
+      <div class="site-header-container">
+  <div class="site-header">
+    <div class="left">
+      <a href="https://dark-yifeng.github.io">
+        <img class="avatar" src="https://dark-yifeng.github.io/images/avatar.png?v=1589772957703" alt="" width="32px" height="32px">
+      </a>
+      <a href="https://dark-yifeng.github.io">
+        <h1 class="site-title">Dark</h1>
+      </a>
+    </div>
+    <div class="right">
+      <transition name="fade">
+        <i class="icon" :class="{ 'icon-close-outline': menuVisible, 'icon-menu-outline': !menuVisible }" @click="menuVisible = !menuVisible"></i>
+      </transition>
+    </div>
+  </div>
+</div>
+
+<transition name="fade">
+  <div class="menu-container" style="display: none;" v-show="menuVisible">
+    <div class="menu-list">
+      
+        
+          <a href="/" class="menu purple-link">
+            JavaScript
+          </a>
+        
+      
+        
+          <a href="/archives" class="menu purple-link">
+            Vue
+          </a>
+        
+      
+        
+          <a href="/tags" class="menu purple-link">
+            React
+          </a>
+        
+      
+    </div>
+  </div>
+</transition>
+
+
+      <div class="content-container">
+        <div class="post-detail">
+          
+          <h2 class="post-title">JavaScript（六）：Promise</h2>
+          <div class="post-info post-detail-info">
+            <span><i class="icon-calendar-outline"></i> 2020-05-18</span>
+            
+          </div>
+          <div class="post-content">
+            <p><ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#1%E5%AE%9A%E4%B9%89">1.定义</a></li>
+<li><a href="#2%E4%BD%9C%E7%94%A8">2.作用</a></li>
+<li><a href="#3%E8%AF%AD%E6%B3%95">3.语法</a></li>
+<li><a href="#4%E7%8A%B6%E6%80%81">4.状态</a></li>
+<li><a href="#5%E6%96%B9%E6%B3%95">5.方法</a></li>
+<li><a href="#6%E5%8E%9F%E5%9E%8B%E6%96%B9%E6%B3%95">6.原型方法</a></li>
+<li><a href="#7catch%E6%96%B9%E6%B3%95">7.catch()方法</a></li>
+<li><a href="#8%E5%AE%9E%E4%BE%8B">8.实例</a></li>
+</ul>
+</li>
+</ul>
+</p>
+<h2 id="1定义">1.定义</h2>
+<p>Promise 对象是一个代理对象（代理一个值），被代理的值在Promise对象创建时可能是未知的。它允许你为异步操作的成功和失败分别绑定相应的处理方法（handlers）。 这让异步方法可以像同步方法那样返回值，但并不是立即返回最终执行结果，而是一个能代表未来出现的结果的promise对象</p>
+<h2 id="2作用">2.作用</h2>
+<p>1、主要用于异步计算。<br>
+2、可以将异步操作队列化，按照期望的顺序执行，返回符合预期的结果。<br>
+3、可以在对象之间传递和操作promise，帮助我们处理队列。</p>
+<h2 id="3语法">3.语法</h2>
+<pre><code class="language-c">new Promise( function(resolve, reject) {...} /* executor */  );
+</code></pre>
+<h2 id="4状态">4.状态</h2>
+<p>一个 Promise有以下几种状态:</p>
+<p>1.pending: 初始状态，既不是成功，也不是失败状态。<br>
+2.fulfilled: 意味着操作成功完成。<br>
+3.rejected: 意味着操作失败。</p>
+<p>Promise对象的状态改变，只有两种可能：</p>
+<p>1.从pending变为fulfilled<br>
+2.从pending变为rejected。</p>
+<p>这两种情况只要发生，状态就凝固了，不会再变了。</p>
+<pre><code class="language-c">new Promise(
+  function (resolve, reject) {
+    // 一段耗时的异步操作
+    resolve('成功') // 数据处理完成
+    // reject('失败') // 数据处理出错
+  }
+).then(
+  (res) =&gt; {console.log(res)},  // 成功
+  (err) =&gt; {console.log(err)} // 失败
+)
+</code></pre>
+<p>pending 状态的 Promise 对象可能会变为fulfilled 状态并传递一个值给相应的状态处理方法，也可能变为失败状态（rejected）并传递失败信息。当其中任一种情况出现时，Promise 对象的 then 方法绑定的处理方法（handlers ）就会被调用（then方法包含两个参数：onfulfilled 和 onrejected，它们都是 Function 类型。当Promise状态为fulfilled时，调用 then 的 onfulfilled 方法，当Promise状态为rejected时，调用 then 的 onrejected 方法， 所以在异步操作的完成和绑定处理方法之间不存在竞争）。</p>
+<p>因为 Promise.prototype.then 和  Promise.prototype.catch 方法返回promise 对象， 所以它们可以被链式调用。<br>
+<img src="https://img-blog.csdnimg.cn/2020031122192174.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdXlpZmVuZzAwMDA=,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" loading="lazy"></p>
+<p><strong>示例一：</strong></p>
+<pre><code class="language-c">new Promise(resolve =&gt; {
+  setTimeout(() =&gt; {
+    resolve('hello')
+  }, 2000)
+}).then(res =&gt; {
+  console.log(res) //hello
+})
+</code></pre>
+<p><strong>示例二：</strong></p>
+<pre><code class="language-c">new Promise(resolve =&gt; {
+    setTimeout(() =&gt; {
+      resolve('hello')
+    }, 2000)
+  }).then(val =&gt; {
+    console.log(val) //  参数val = 'hello'
+    return new Promise(resolve =&gt; {
+      setTimeout(() =&gt; {
+        resolve('world')
+      }, 2000)
+    })
+  }).then(val =&gt; {
+    console.log(val) // 参数val = 'world'
+  })
+</code></pre>
+<p><strong>示例三：</strong></p>
+<pre><code class="language-c">let pro = new Promise(resolve =&gt; {
+   setTimeout(() =&gt; {
+     resolve('hello world')
+   }, 2000)
+ })
+ setTimeout(() =&gt; {
+   pro.then(value =&gt; {
+   console.log(value) // hello world
+ })
+ }, 2000)
+</code></pre>
+<blockquote>
+<p>promise作为队列最为重要的特性，我们在任何一个地方生成了一个promise队列之后，我们可以把他作为一个变量传递到其他地方。</p>
+</blockquote>
+<h2 id="5方法">5.方法</h2>
+<p><strong>1.Promise.all(iterable)</strong><br>
+这个方法返回一个新的promise对象，该promise对象在iterable参数对象里所有的promise对象都成功的时候才会触发成功，一旦有任何一个iterable里面的promise对象失败则立即触发该promise对象的失败。这个新的promise对象在触发成功状态以后，会把一个包含iterable里所有promise返回值的数组作为成功回调的返回值，顺序跟iterable的顺序保持一致；如果这个新的promise对象触发了失败状态，它会把iterable里第一个触发失败的promise对象的错误信息作为它的失败错误信息。Promise.all方法常被用于处理多个promise对象的状态集合。</p>
+<p><strong>2.Promise.race(iterable)</strong><br>
+当iterable参数里的任意一个子promise被成功或失败后，父promise马上也会用子promise的成功返回值或失败详情作为参数调用父promise绑定的相应句柄，并返回该promise对象。</p>
+<p><strong>3.Promise.reject(reason)</strong><br>
+返回一个状态为失败的Promise对象，并将给定的失败信息传递给对应的处理方法。</p>
+<p><strong>4.Promise.resolve(value)</strong><br>
+返回一个状态由给定value决定的Promise对象。如果该值是thenable(即，带有then方法的对象)，返回的Promise对象的最终状态由then方法执行决定；否则的话(该value为空，基本类型或者不带then方法的对象),返回的Promise对象状态为fulfilled，并且将该value传递给对应的then方法。通常而言，如果你不知道一个值是否是Promise对象，使用Promise.resolve(value) 来返回一个Promise对象,这样就能将该value以Promise对象形式使用。</p>
+<h2 id="6原型方法">6.原型方法</h2>
+<p><strong>1.Promise.prototype.catch(onRejected)</strong><br>
+添加一个拒绝(rejection) 回调到当前 promise, 返回一个新的promise。当这个回调函数被调用，新 promise 将以它的返回值来resolve，否则如果当前promise 进入fulfilled状态，则以当前promise的完成结果作为新promise的完成结果。</p>
+<p><strong>2.Promise.prototype.then(onFulfilled, onRejected)</strong><br>
+添加解决(fulfillment)和拒绝(rejection)回调到当前 promise, 返回一个新的 promise, 将以回调的返回值来resolve.</p>
+<p><strong>3.Promise.prototype.finally(onFinally)</strong><br>
+添加一个事件处理回调于当前promise对象，并且在原promise对象解析完毕后，返回一个新的promise对象。回调会在当前promise运行完毕后被调用，无论当前promise的状态是完成(fulfilled)还是失败(rejected)</p>
+<h2 id="7catch方法">7.catch()方法</h2>
+<p>Promise.prototype.catch 方法是 .then(null, rejection) 或是 .then(undefined, rejection)的别名，用于指定发生错误时的回调函数。</p>
+<p>如果Promise 对象状态变为resolved，则会调用then方法指定的回调函数；如果异步操作抛出错误，状态就会变为rejected，就会调用catch方法指定的回调函数，处理这个错误。另外，then方法指定的回调函数，如果运行中抛出错误，也会被catch方法捕获。</p>
+<pre><code class="language-c">p.then((val) =&gt; console.log('fulfilled:', val))
+  .catch((err) =&gt; console.log('rejected', err));
+
+// 等同于
+p.then((val) =&gt; console.log('fulfilled:', val))
+  .then(null, (err) =&gt; console.log(&quot;rejected:&quot;, err));
+  
+</code></pre>
+<h2 id="8实例">8.实例</h2>
+<p>本例展示了 Promise 的一些机制。 testPromise() 方法在每次点击 <button> 按钮时被调用，该方法会创建一个promise 对象，使用 window.setTimeout() 让Promise等待 1-3 秒不等的时间来填充数据（通过Math.random()方法）。</p>
+<p>Promise 的值的填充过程都被日志记录（logged）下来，这些日志信息展示了方法中的同步代码和异步代码是如何通过Promise完成解耦的。</p>
+<pre><code class="language-c">&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;亦枫&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;button onclick=&quot; testPromise()&quot; id=&quot;log&quot;&gt;0.0&lt;/button&gt;
+&lt;/body&gt;
+&lt;script&gt;
+    var promiseCount = 0;
+    function testPromise() {
+        let thisPromiseCount = ++promiseCount;
+
+        let log = document.getElementById('log');
+        log.insertAdjacentHTML('beforeend', thisPromiseCount +
+            ') 开始 (&lt;small&gt;同步代码开始&lt;/small&gt;)&lt;br/&gt;');
+
+        // 新构建一个 Promise 实例：使用Promise实现每过一段时间给计数器加一的过程，每段时间间隔为1~3秒不等
+        let p1 = new Promise(
+            // resolver 函数在 Promise 成功或失败时都可能被调用
+            (resolve, reject) =&gt; {
+                log.insertAdjacentHTML('beforeend', thisPromiseCount +
+                    ') Promise 开始 (&lt;small&gt;异步代码开始&lt;/small&gt;)&lt;br/&gt;');
+                // 创建一个异步调用
+                window.setTimeout(
+                    function () {
+                        // 填充 Promise
+                        resolve(thisPromiseCount);
+                    }, Math.random() * 2000 + 1000);
+            }
+        );
+
+        // Promise 不论成功或失败都会调用 then
+        // catch() 只有当 promise 失败时才会调用
+        p1.then(
+                // 记录填充值
+                function (val) {
+                    log.insertAdjacentHTML('beforeend', val +
+                        ') Promise 已填充完毕 (&lt;small&gt;异步代码结束&lt;/small&gt;)&lt;br/&gt;');
+                })
+            .catch(
+                // 记录失败原因
+                (reason) =&gt; {
+                    console.log('处理失败的 promise (' + reason + ')');
+                });
+
+        log.insertAdjacentHTML('beforeend', thisPromiseCount +
+            ') Promise made (&lt;small&gt;同步代码结束&lt;/small&gt;)&lt;br/&gt;');
+    }
+&lt;/script&gt;
+&lt;/html&gt;
+</code></pre>
+<p><strong>效果：</strong><br>
+<img src="https://img-blog.csdnimg.cn/20200311224346441.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdXlpZmVuZzAwMDA=,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" loading="lazy"></p>
+<p>刨析promise的内部机构，这篇文章写得不错：</p>
+<p>https://github.com/xieranmaya/blog/issues/3</p>
+
+          </div>
+        </div>
+
+        
+          <div class="next-post">
+            <a class="purple-link" href="https://dark-yifeng.github.io/post/javascriptwu-shi-jian-xun-huan/">
+              <h3 class="post-title">
+                下一篇：JavaScript（五）： 事件循环
+              </h3>
+            </a>
+          </div>
+          
+      </div>
+
+      
+
+      <div class="site-footer">
+  <div class="slogan">温故而知新</div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">刘亦枫</a> | <a class="rss" href="https://dark-yifeng.github.io/atom.xml" target="_blank">RSS</a>
+</div>
+
+
+    </div>
+    <script type="application/javascript">
+
+hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+  </body>
+</html>

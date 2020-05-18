@@ -1,0 +1,308 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    
+<meta charset="utf-8" >
+
+<title>JavaScript（十）：this/call/apply/bind | Dark</title>
+<meta name="description" content="温故而知新">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dark-yifeng.github.io/favicon.ico?v=1589772957703">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://dark-yifeng.github.io/styles/main.css">
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+  </head>
+  <body>
+    <div id="app" class="main">
+      <div class="site-header-container">
+  <div class="site-header">
+    <div class="left">
+      <a href="https://dark-yifeng.github.io">
+        <img class="avatar" src="https://dark-yifeng.github.io/images/avatar.png?v=1589772957703" alt="" width="32px" height="32px">
+      </a>
+      <a href="https://dark-yifeng.github.io">
+        <h1 class="site-title">Dark</h1>
+      </a>
+    </div>
+    <div class="right">
+      <transition name="fade">
+        <i class="icon" :class="{ 'icon-close-outline': menuVisible, 'icon-menu-outline': !menuVisible }" @click="menuVisible = !menuVisible"></i>
+      </transition>
+    </div>
+  </div>
+</div>
+
+<transition name="fade">
+  <div class="menu-container" style="display: none;" v-show="menuVisible">
+    <div class="menu-list">
+      
+        
+          <a href="/" class="menu purple-link">
+            JavaScript
+          </a>
+        
+      
+        
+          <a href="/archives" class="menu purple-link">
+            Vue
+          </a>
+        
+      
+        
+          <a href="/tags" class="menu purple-link">
+            React
+          </a>
+        
+      
+    </div>
+  </div>
+</transition>
+
+
+      <div class="content-container">
+        <div class="post-detail">
+          
+          <h2 class="post-title">JavaScript（十）：this/call/apply/bind</h2>
+          <div class="post-info post-detail-info">
+            <span><i class="icon-calendar-outline"></i> 2020-05-18</span>
+            
+          </div>
+          <div class="post-content">
+            <p><ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E4%B8%80-this">一、this</a>
+<ul>
+<li><a href="#1%E4%BB%80%E4%B9%88%E6%98%AFthis">1.什么是this</a></li>
+<li><a href="#2this-%E4%BB%A3%E8%A1%A8%E4%BB%80%E4%B9%88">2.this 代表什么</a></li>
+<li><a href="#3%E7%BB%91%E5%AE%9A-this-%E7%9A%84%E6%96%B9%E6%B3%95">3.绑定 this 的方法</a></li>
+<li><a href="#4this%E7%9A%84%E6%8C%87%E5%90%91">4.this的指向</a></li>
+<li><a href="#5%E6%94%B9%E5%8F%98%E6%8C%87%E5%90%91">5.改变指向</a></li>
+</ul>
+</li>
+<li><a href="#%E4%BA%8C-functionprototypebind">二、Function.prototype.bind()</a></li>
+<li><a href="#%E4%B8%89-callapply">三、call/apply</a>
+<ul>
+<li><a href="#1%E5%AE%9A%E4%B9%89">1.定义</a></li>
+<li><a href="#2%E8%AF%AD%E6%B3%95">2.语法</a></li>
+<li><a href="#3%E5%BC%82%E5%90%8C">3.异同</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</p>
+<h2 id="一-this">一、this</h2>
+<h3 id="1什么是this">1.什么是this</h3>
+<p>this 关键字在大部分语言中都是一个重要的存在，JS中自然不例外，其表达的意义丰富多样甚至有些复杂，深刻理解this是学习JS、面向对象编程非常重要的一环。</p>
+<h3 id="2this-代表什么">2.this 代表什么</h3>
+<p>this代表函数（方法）执行的上下文环境（上下文，类似与你要了解一篇文章，了解文章的上下文你才能清晰的了解各种关系）。</p>
+<p>但在 JavaScript 中 this 不是固定不变的，它会随着执行环境的改变而改变。</p>
+<p>1.在方法中，this 表示该方法所属的对象。</p>
+<p>2.如果单独使用，this 表示全局对象。</p>
+<p>3.在函数中，this 表示全局对象。</p>
+<p>4.在函数中，在严格模式下，this 是未定义的(undefined)。</p>
+<p>5.在事件中，this 表示接收事件的元素。</p>
+<p>6.类似 call() 和 apply() 方法可以将 this 引用到任何对象。</p>
+<h3 id="3绑定-this-的方法">3.绑定 this 的方法</h3>
+<p>this的动态切换，固然为 JavaScript 创造了巨大的灵活性，但也使得编程变得困难和模糊。有时，需要把this固定下来，避免出现意想不到的情况。JavaScript 提供了call、apply、bind这三个方法，来切换/固定this的指向。</p>
+<h3 id="4this的指向">4.this的指向</h3>
+<p><strong>1.在一般函数方法中使用 this 指代全局对象</strong></p>
+<pre><code class="language-csharp">function test(){
+　　　　this.x = 1;  //这里this就是window
+　　　　console.log(this.x);
+　　}
+　　test(); // 1
+</code></pre>
+<p>JS规定，函数中的this，在函数被调用时确定，它指函数当前运行的环境。</p>
+<p><strong>2.作为对象方法调用，this 指代上级对象</strong></p>
+<pre><code class="language-csharp">var x =3;
+function test(){
+　　alert(this.x);
+}
+var o = {
+  x:1,
+  m:test 
+};
+o.m(); // 1
+</code></pre>
+<p>如果函数作为对象的方法时，方法中的 this 指向该对象。</p>
+<p><strong>3.作为构造函数调用，this 指代new 出的对象</strong></p>
+<pre><code class="language-csharp">function test(){
+　　　　console.log(this);
+　　}
+　　var o = new test();
+       test();
+//可以看出o代表的不是全局对象
+</code></pre>
+<p>new关键词的作用是调用某个函数并拿到其中的返回值，只是调用过程稍特殊。在上面的代码实例中。test函数被new关键词调用时，内部依次执行了以下步骤:</p>
+<p>（1）创建一个空对象。</p>
+<p>（2）将这个空对象的原型，指向这个构造函数的prototype。</p>
+<p>（3）将空对象的值赋给函数内部的this（this就是个空对象了）。</p>
+<p>（4）执行函数体代码，为this这个对象绑定键值对。</p>
+<p>（5）返回this，将其作为new关键词调用oop函数的返回值。</p>
+<p>所以构造函数中的this，依旧是在构造函数被new关键词调用时确定其指向，指向的是当前被实例化的那个对象。</p>
+<p><strong>4.箭头函数中的this</strong><br>
+箭头函数是ES6的新特性，最重要的特点是它会捕获其所在上下文的this作为自己的this，或者说，箭头函数本身并没有this，它会沿用外部环境的this。也就是说，箭头函数内部与其外部的this是保持一致的。</p>
+<pre><code class="language-csharp">this.a=20
+var test={
+    a:40，
+    init:()=&gt;{
+        console.log(this.a)
+        function go(){
+            this.a=60
+            console.log(this.a)
+        }
+        go.prototype.a=50
+        return go
+    }   
+}
+
+var p=test.init()
+p()
+new (test.init())()
+//输出 20 60 60 60
+</code></pre>
+<h3 id="5改变指向">5.改变指向</h3>
+<p>this的动态切换，固然为 JavaScript 创造了巨大的灵活性，但也使得编程变得困难和模糊。有时，需要把this固定下来，避免出现意想不到的情况。JavaScript 提供了call、apply、bind这三个方法，来切换/固定this的指向。</p>
+<p>bind方法和apply、call稍有不同，bind方法返回一个新函数，以后调用了才会执行，但apply、call会立即执行。</p>
+<h2 id="二-functionprototypebind">二、Function.prototype.bind()</h2>
+<p>bind()方法主要就是将函数绑定到某个对象，bind()会创建一个函数，函数体内的this对象的值会被绑定到传入bind()中的第一个参数的值，例如：f.bind(obj)，实际上可以理解为obj.f()，这时f函数体内的this自然指向的是obj；</p>
+<p><strong>示例：</strong></p>
+<pre><code class="language-csharp">function f(y, z){
+    return this.x + y + z;
+}
+var m = f.bind({x : 1}, 2);
+console.log(m(3));
+//6
+</code></pre>
+<p>这里bind方法会把它的第一个实参绑定给f函数体内的this，所以这里的this即指向{x : 1}对象，从第二个参数起，会依次传递给原始函数，这里的第二个参数2，即是f函数的y参数，最后调用m(3)的时候，这里的3便是最后一个参数z了，所以执行结果为1 + 2 + 3 = 6分步处理参数的过程其实是一个典型的函数柯里化的过程（Curry）。</p>
+<h2 id="三-callapply">三、call/apply</h2>
+<h3 id="1定义">1.定义</h3>
+<p>每个函数都包含两个非继承而来的方法：call()方法和apply()方法。</p>
+<p>call和apply可以用来重新定义函数的执行环境，也就是this的指向；call和apply都是为了改变某个函数运行时的context，即上下文而存在的，换句话说，就是为了改变函数体内部this的指向。</p>
+<h3 id="2语法">2.语法</h3>
+<p><strong>call()</strong></p>
+<p>调用一个对象的方法，用另一个对象替换当前对象，可以继承另外一个对象的属性，它的语法是：</p>
+<pre><code class="language-csharp">Function.call(obj[, param1[, param2[, [,...paramN]]]]);
+</code></pre>
+<p>obj：这个对象将代替Function类里this对象<br>
+params：一串参数列表</p>
+<p>说明：call方法可以用来代替另一个对象调用一个方法，call方法可以将一个函数的对象上下文从初始的上下文改变为obj指定的新对象，如果没有提供obj参数，那么Global对象被用于obj。</p>
+<p><strong>apply()</strong></p>
+<p>和call()方法一样，只是参数列表不同，语法：</p>
+<p><strong>Function.apply(obj[, argArray]);</strong></p>
+<p>obj：这个对象将代替Function类里this对象<br>
+argArray：这个是数组，它将作为参数传给Function</p>
+<p>说明：如果argArray不是一个有效数组或不是arguments对象，那么将导致一个TypeError，如果没有提供argArray和obj任何一个参数，那么Global对象将用作obj。</p>
+<h3 id="3异同">3.异同</h3>
+<p><strong>相同点</strong></p>
+<p>call()和apply()方法的相同点就是这两个方法的作用是一样的。都是在特定的作用域中调用函数，等于设置函数体内this对象的值，以扩充函数赖以运行的作用域。</p>
+<p>一般来说，this总是指向调用某个方法的对象，但是使用call()和apply()方法时，就会改变this的指向，看个例子：</p>
+<pre><code class="language-csharp">function add(a, b) {
+    return a + b;
+}
+
+function sub(a, b) {
+    return a - b;
+}
+
+console.log(add.call(sub, 2, 1));//3
+</code></pre>
+<p>为什么add.call(sub, 2, 1)的执行结果是3呢，因为call()方法改变了this的指向，使得sub可以调用add的方法，也就是用sub去执行add中的内容，再来看一个例子：</p>
+<pre><code class="language-csharp">function People(name, age) {
+    this.name = name;
+    this.age = age;
+}
+
+function Student(name, age, grade) {
+    People.call(this, name, age);
+    this.grade = grade;
+}
+
+var student = new Student('小明', 21, '大三');
+console.log(student.name + student.age + student.grade);//小明21大三
+</code></pre>
+<p>在这个例子中，我们并没有给Student的name和age赋值，但是存在这两个属性的值，这还是要归功于call()方法，它可以改变this的指向。<br>
+在这个例子里，People.call(this, name, age);中的this代表的是Student，这也就是之前说的，使得Student可以调用People中的方法，因为People中有this.name = name;等语句，这样就将name和age属性创建到了Student中。</p>
+<p>总结一句话就是call()可以让括号里的对象来继承括号外函数的属性。</p>
+<p>至于apply()方法作用也和call()方法一样，可以这么写：</p>
+<pre><code class="language-csharp">People.apply(this, [name, age]);
+</code></pre>
+<p>或者这么写：</p>
+<pre><code class="language-csharp">People.apply(this, arguments);
+</code></pre>
+<p>在这里arguments和[name, age]是等价的。</p>
+<p><strong>不同点</strong></p>
+<p>从定义中也可以看出来，call()和apply()的不同点就是接收参数的方式不同。</p>
+<p>1.apply()方法接收两个参数，一个是函数运行的作用域（this），另一个是参数数组。<br>
+2.call()方法不一定接受两个参数，第一个参数也是函数运行的作用域（this），但是传递给函数的参数必须列举出来。</p>
+<p>在给对象参数的情况下,如果参数的形式是数组的时候,比如之前apply()方法示例里面传递了参数arguments,这个参数是数组类型,并且在调用Person的时候参数的列表是对应一致的(也就是Person和Student的参数列表前两位是一致的)就可以采用apply()方法。</p>
+<p>但是如果Person的参数列表是这样的(age,name)，而Student的参数列表是(name,age,grade)，这样就可以用call()方法来实现了,也就是直接指定参数列表对应值的位置Person.call(this,age,name)。</p>
+
+          </div>
+        </div>
+
+        
+          <div class="next-post">
+            <a class="purple-link" href="https://dark-yifeng.github.io/post/javascriptjiu-asyncawait/">
+              <h3 class="post-title">
+                下一篇：JavaScript（九）：async/await
+              </h3>
+            </a>
+          </div>
+          
+      </div>
+
+      
+
+      <div class="site-footer">
+  <div class="slogan">温故而知新</div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">刘亦枫</a> | <a class="rss" href="https://dark-yifeng.github.io/atom.xml" target="_blank">RSS</a>
+</div>
+
+
+    </div>
+    <script type="application/javascript">
+
+hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+  </body>
+</html>

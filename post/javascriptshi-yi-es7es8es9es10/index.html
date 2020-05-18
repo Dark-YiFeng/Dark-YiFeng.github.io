@@ -1,0 +1,765 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    
+<meta charset="utf-8" >
+
+<title>JavaScript（十一）：ES7/ES8/ES9/ES10 | Dark</title>
+<meta name="description" content="温故而知新">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dark-yifeng.github.io/favicon.ico?v=1589772957703">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link rel="stylesheet" href="https://dark-yifeng.github.io/styles/main.css">
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+  </head>
+  <body>
+    <div id="app" class="main">
+      <div class="site-header-container">
+  <div class="site-header">
+    <div class="left">
+      <a href="https://dark-yifeng.github.io">
+        <img class="avatar" src="https://dark-yifeng.github.io/images/avatar.png?v=1589772957703" alt="" width="32px" height="32px">
+      </a>
+      <a href="https://dark-yifeng.github.io">
+        <h1 class="site-title">Dark</h1>
+      </a>
+    </div>
+    <div class="right">
+      <transition name="fade">
+        <i class="icon" :class="{ 'icon-close-outline': menuVisible, 'icon-menu-outline': !menuVisible }" @click="menuVisible = !menuVisible"></i>
+      </transition>
+    </div>
+  </div>
+</div>
+
+<transition name="fade">
+  <div class="menu-container" style="display: none;" v-show="menuVisible">
+    <div class="menu-list">
+      
+        
+          <a href="/" class="menu purple-link">
+            JavaScript
+          </a>
+        
+      
+        
+          <a href="/archives" class="menu purple-link">
+            Vue
+          </a>
+        
+      
+        
+          <a href="/tags" class="menu purple-link">
+            React
+          </a>
+        
+      
+    </div>
+  </div>
+</transition>
+
+
+      <div class="content-container">
+        <div class="post-detail">
+          
+          <h2 class="post-title">JavaScript（十一）：ES7/ES8/ES9/ES10</h2>
+          <div class="post-info post-detail-info">
+            <span><i class="icon-calendar-outline"></i> 2020-05-18</span>
+            
+          </div>
+          <div class="post-content">
+            <p><ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E5%BA%8F%E8%A8%80">序言</a></li>
+<li><a href="#es7">ES7</a>
+<ul>
+<li><a href="#1arrayprototypeincludes%E6%96%B9%E6%B3%95">1.Array.prototype.includes()方法</a></li>
+<li><a href="#2%E6%B1%82%E5%B9%82%E8%BF%90%E7%AE%97%E7%AC%A6">2.求幂运算符</a></li>
+</ul>
+</li>
+<li><a href="#es8">ES8</a>
+<ul>
+<li><a href="#1async-functions">1.Async Functions</a></li>
+<li><a href="#2sharedarraybuffer%E5%92%8Catomics">2.SharedArrayBuffer和Atomics</a></li>
+<li><a href="#3objectvalues-and-objectentries">3.Object.values and Object.entries</a></li>
+<li><a href="#4string-padding">4.String padding</a></li>
+<li><a href="#5objectgetownpropertydescriptors">5.Object.getOwnPropertyDescriptors</a></li>
+<li><a href="#6%E7%BB%93%E5%B0%BE%E9%80%97%E5%8F%B7">6.结尾逗号</a></li>
+</ul>
+</li>
+<li><a href="#es9">ES9</a>
+<ul>
+<li><a href="#1%E5%BC%82%E6%AD%A5%E8%BF%AD%E4%BB%A3">1.异步迭代</a></li>
+<li><a href="#2restspread-%E5%B1%9E%E6%80%A7">2.Rest/Spread 属性</a></li>
+<li><a href="#3%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%91%BD%E5%90%8D%E6%8D%95%E8%8E%B7%E7%BB%84-%E7%BC%96%E5%8F%B7%E7%9A%84%E6%8D%95%E8%8E%B7%E7%BB%84">3.正则表达式命名捕获组 编号的捕获组</a></li>
+</ul>
+</li>
+<li><a href="#es10">ES10</a>
+<ul>
+<li><a href="#1-arrayflat-arrayflatmap">1. Array.flat() &amp; Array.flatMap()</a></li>
+<li><a href="#2objectfromentries">2.Object.fromEntries()</a></li>
+<li><a href="#3stringtrimstart-stringtrimend">3.String.trimStart() &amp; String.trimEnd()</a></li>
+<li><a href="#4symboldescription">4.Symbol.Description</a></li>
+<li><a href="#6%E5%8F%AF%E9%80%89%E7%9A%84-catch-%E5%8F%82%E6%95%B0%E5%8F%98%E9%87%8F">6.可选的 Catch 参数变量</a></li>
+<li><a href="#6jsonecmascript">6.JSON⊂ECMAScript</a></li>
+<li><a href="#7%E6%A0%BC%E5%BC%8F%E8%89%AF%E5%A5%BD%E7%9A%84-jsonstringify">7.格式良好的 JSON.stringify()</a></li>
+<li><a href="#8arrayprototypesort">8.Array.prototype.sort()</a></li>
+<li><a href="#9%E6%96%B0%E7%89%88-functiontostring">9.新版 Function.toString()</a></li>
+<li><a href="#10bigint-%E4%BB%BB%E6%84%8F%E7%B2%BE%E5%BA%A6%E7%9A%84%E6%95%B4%E6%95%B0">10.BigInt — 任意精度的整数</a></li>
+<li><a href="#11%E5%8A%A8%E6%80%81%E5%BC%95%E5%85%A5">11.动态引入</a></li>
+<li><a href="#12%E6%A0%87%E5%87%86-globalthis-%E5%AF%B9%E8%B1%A1">12.标准 globalThis 对象</a></li>
+<li><a href="#13es10-class-private-static-public-%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E5%87%BD%E6%95%B0">13.ES10 Class: private, static &amp; public 成员变量，函数</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</p>
+<h2 id="序言">序言</h2>
+<p>自从前端开发流行起来，前端的各类技术如雨后春笋般出现，让人应接不暇，几年前还是jq一把梭，现在除了三大主流框架var，何种混合开发也接踵而至，还有可能取代JS的TS出现，我们要跟上时代的步伐，了解最新的技术，走在技术的前沿。</p>
+<p>别停留在ES6了，ES10都要出来了。</p>
+<h2 id="es7">ES7</h2>
+<p>ES7在ES6的基础上主要添加了两项内容：</p>
+<p>1.Array.prototype.includes()方法</p>
+<p>2.求幂运算符（**）</p>
+<h3 id="1arrayprototypeincludes方法">1.Array.prototype.includes()方法</h3>
+<p>includes() 方法用来判断一个数组是否包含一个指定的值，根据情况，如果包含则返回 true，否则返回false。</p>
+<pre><code class="language-csharp">var array = [1, 2, 3];
+
+console.log(array.includes(2));
+// expected output: true
+
+var pets = ['cat', 'dog', 'bat'];
+
+console.log(pets.includes('cat'));
+// expected output: true
+
+console.log(pets.includes('at'));
+// expected output: false
+</code></pre>
+<p>Array.prototype.includes()方法接收两个参数：</p>
+<p>1.要搜索的值</p>
+<p>2.搜索的开始索引。</p>
+<p>当第二个参数被传入时，该方法会从索引处开始往后搜索（默认索引值为0）。若搜索值在数组中存在则返回true，否则返回false。 且看下面示例：</p>
+<pre><code class="language-csharp">['a', 'b', 'c', 'd'].includes('b')         // true
+['a', 'b', 'c', 'd'].includes('b', 1)      // true
+['a', 'b', 'c', 'd'].includes('b', 2)      // false
+</code></pre>
+<p>乍一看，includes的作用跟数组的indexOf重叠，为什么要特意增加这么一个api呢？主要区别有以下几点：</p>
+<p>返回值。看一个函数，先看他们的返回值。indexOf的返回数是值型的，includes的返回值是布尔型，所以在if条件判断的时候includes要简单得多，而indexOf 需要多写一个条件进行判断。</p>
+<pre><code class="language-csharp">var ary = [1];
+if (ary.indexOf(1) !== -1) {
+    console.log(&quot;数组存在1&quot;)
+}
+if (ary.includes(1)) {
+    console.log(&quot;数组存在1&quot;)
+}
+</code></pre>
+<p>NaN的判断。如果数组中有NaN，你又正好需要判断数组是否有存在NaN，这时你使用indexOf是无法判断的，你必须使用includes这个方法。</p>
+<pre><code class="language-csharp">var ary1 = [NaN];
+console.log(ary1.indexOf(NaN))//-1
+console.log(ary1.includes(NaN))//true
+</code></pre>
+<p>当数组的有空的值的时候，includes会认为空的值是undefined，而indexOf不会。</p>
+<pre><code class="language-csharp">var ary1 = new Array(3);
+console.log(ary1.indexOf(undefined));//-1
+console.log(ary1.includes(undefined))//true
+</code></pre>
+<h3 id="2求幂运算符">2.求幂运算符</h3>
+<p>加/减法我们通常都是用其中缀形式，直观易懂。在ECMAScript2016中，我们可以使用**来替代Math.pow。</p>
+<p>4 ** 3           // 64<br>
+效果等同于</p>
+<p>Math.pow(4,3)<br>
+值得一提的是，作为中缀运算符，**还支持以下操作</p>
+<pre><code class="language-csharp">let n = 4;
+n **= 3;
+// 64
+</code></pre>
+<h2 id="es8">ES8</h2>
+<p>主要新功能：</p>
+<p>1.异步函数 Async Functions（Brian Terlson）</p>
+<p>2.共享内存和Atomics（Lars T. Hansen）</p>
+<p>次要新功能：</p>
+<p>1.Object.values / Object.entries（Jordan Harband）</p>
+<p>2.String padding（Jordan Harband，Rick Waldron）</p>
+<p>3.Object.getOwnPropertyDescriptors() （Jordan Harband，Andrea Giammarchi）</p>
+<p>4.函数参数列表和调用中的尾逗号（Jeff Morrison）</p>
+<h3 id="1async-functions">1.Async Functions</h3>
+<p>Async Functions也就是我们常说的Async/Await，相信大家对于这个概念都已经不陌生了。Async/Await是一种用于处理JS异步操作的语法糖，可以帮助我们摆脱回调地狱，编写更加优雅的代码。</p>
+<p>通俗的理解，async关键字的作用是告诉编译器对于标定的函数要区别对待。当编译器遇到标定的函数中的await关键字时，要暂时停止运行，带到await标定的函数处理完毕后，再进行相应操作。如果该函数fulfiled了，则返回值是fulfillment value，否则得到的就是reject value。</p>
+<p>下面通过拿普通的promise写法来对比，就很好理解了：</p>
+<pre><code class="language-csharp">async function asyncFunc() {
+    const result = await otherAsyncFunc();
+    console.log(result);
+}
+
+// Equivalent to:
+function asyncFunc() {
+    return otherAsyncFunc()
+    .then(result =&gt; {
+        console.log(result);
+    });
+}
+</code></pre>
+<p>按顺序处理多个异步函数的时候优势更为明显：</p>
+<pre><code class="language-csharp">async function asyncFunc() {
+    const result1 = await otherAsyncFunc1();
+    console.log(result1);
+    const result2 = await otherAsyncFunc2();
+    console.log(result2);
+}
+
+// Equivalent to:
+function asyncFunc() {
+    return otherAsyncFunc1()
+    .then(result1 =&gt; {
+        console.log(result1);
+        return otherAsyncFunc2();
+    })
+    .then(result2 =&gt; {
+        console.log(result2);
+    });
+}
+</code></pre>
+<p>并行处理多个异步函数：</p>
+<pre><code class="language-csharp">async function asyncFunc() {
+    const [result1, result2] = await Promise.all([
+        otherAsyncFunc1(),
+        otherAsyncFunc2(),
+    ]);
+    console.log(result1, result2);
+}
+
+// Equivalent to:
+function asyncFunc() {
+    return Promise.all([
+        otherAsyncFunc1(),
+        otherAsyncFunc2(),
+    ])
+    .then([result1, result2] =&gt; {
+        console.log(result1, result2);
+    });
+}
+</code></pre>
+<p>处理错误：</p>
+<pre><code class="language-csharp">async function asyncFunc() {
+    try {
+        await otherAsyncFunc();
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+// Equivalent to:
+function asyncFunc() {
+    return otherAsyncFunc()
+    .catch(err =&gt; {
+        console.error(err);
+    });
+}
+</code></pre>
+<h3 id="2sharedarraybuffer和atomics">2.SharedArrayBuffer和Atomics</h3>
+<p>ECMAScript 2017 特性 SharedArrayBuffer 和 atomics”，由Lars T. Hansen设计。它引入了一个新的构造函数 SharedArrayBuffer 和 具有辅助函数的命名空间对象 Atomics。</p>
+<p>在我们开始之前，让我们澄清两个相似但截然不同的术语：并行(Parallelism) 和 并发(Concurrency) 。他们存在许多定义，我使用的定义如下</p>
+<p>并行(Parallelism) (parallel 并行 vs. serial 串行)：同时执行多个任务；</p>
+<p>并发(Concurrency) (concurrent 并发 vs. sequential 连续)：在重叠的时间段内（而不是一个接一个）执行几个任务。</p>
+<p><strong>JS并行的历史</strong></p>
+<p>JavaScript 在单线程中执行。某些任务可以异步执行：浏览器通常会在单线程中运行这些任务，然后通过回调将结果重新加入到单线程中。</p>
+<p>Web workers 将任务并行引入了 JavaScript ：这些是相对重量级的进程。每个 workers 都有自己的全局环境。默认情况下，不共享任何内容。 workers 之间的通信（或在 workers 和主线程之间的通信）发展：</p>
+<p>起初，你只能发送和接收字符串。</p>
+<p>然后，引入结构化克隆：可以发送和接收数据副本。结构化克隆适用于大多数数据（JSON 数据，TypedArray，正则表达式，Blob对象，ImageData对象等）。它甚至可以正确处理对象之间的循环引用。但是，不能克隆 error 对象，function 对象和 DOM 节点。</p>
+<p>可在 workers 之间的转移数据:当接收方获得数据时，发送方失去访问权限。</p>
+<p>通过 WebGL 使用 GPU 计算(它倾向于数据并行处理)</p>
+<p><strong>共享数组缓冲区（Shared Array Buffers）</strong></p>
+<p>共享阵列缓冲区是更高并发抽象的基本构建块。它们允许您在多个 workers 和主线程之间共享 SharedArrayBuffer 对象的字节(该缓冲区是共享的，用于访问字节，将其封装在一个 TypedArray 中)这种共享有两个好处：</p>
+<p>你可以更快地在 workers 之间共享数据。<br>
+workers 之间的协调变得更简单和更快（与 postMessage() 相比）。</p>
+<pre><code class="language-csharp">// main.js
+const worker = new Worker('worker.js');
+
+// 要分享的buffer
+const sharedBuffer = new SharedArrayBuffer( // (A)
+    10 * Int32Array.BYTES_PER_ELEMENT); // 10 elements
+
+// 使用Worker共用sharedBuffer
+worker.postMessage({sharedBuffer}); // clone
+
+// 仅限本地使用
+const sharedArray = new Int32Array(sharedBuffer); // (B)
+</code></pre>
+<p>创建一个共享数组缓冲区（Shared Array Buffers）的方法与创建普通的数组缓冲区(Array Buffer)类似：通过调用构造函数，并以字节的形式指定缓冲区的大小(行A)。你与 workers 共享的是 缓冲区（buffer） 。对于你自己的本地使用，你通常将共享数组缓冲区封装在 TypedArray 中(行B)。</p>
+<p>workers的实现如下所列。</p>
+<pre><code class="language-csharp">// worker.js
+self.addEventListener('message', function (event) {
+    const {sharedBuffer} = event.data;
+    const sharedArray = new Int32Array(sharedBuffer); // (A)
+    // ···
+});
+</code></pre>
+<p><strong>sharedArrayBuffer 的 API</strong></p>
+<p>构造函数：</p>
+<p>new SharedArrayBuffer(length)</p>
+<p>创建一个 length 字节的 buffer(缓冲区)。</p>
+<p>静态属性：</p>
+<p>get SharedArrayBuffer[Symbol.species]</p>
+<p>默认情况下返回 this。 覆盖以控制 slice() 的返回。</p>
+<p>实例属性：</p>
+<p>get SharedArrayBuffer.prototype.byteLength()</p>
+<p>返回 buffer(缓冲区) 的字节长度。</p>
+<p>SharedArrayBuffer.prototype.slice(start, end)</p>
+<p>创建一个新的 this.constructor[Symbol.species] 实例，并用字节填充从（包括）开始到（不包括）结束的索引。</p>
+<p>Atomics: 安全访问共享数据<br>
+举一个例子</p>
+<pre><code class="language-csharp">// main.js
+sharedArray[1] = 11;
+sharedArray[2] = 22;
+</code></pre>
+<p>在单线程中，您可以重新排列这些写入操作，因为在中间没有读到任何内容。 对于多线程，当你期望以特定顺序执行写入操作时，就会遇到麻烦：</p>
+<pre><code class="language-csharp">// worker.js
+while (sharedArray[2] !== 22) ;
+console.log(sharedArray[1]); // 0 or 11
+Atomics 方法可以用来与其他 workers 进行同步。例如，以下两个操作可以让你读取和写入数据，并且不会被编译器重新排列：
+
+Atomics.load(ta : TypedArray, index)
+
+Atomics.store(ta : TypedArray, index, value : T)
+</code></pre>
+<p>这个想法是使用常规操作读取和写入大多数数据，而 Atomics 操作（load ，store 和其他操作）可确保读取和写入安全。通常，您将使用自定义同步机制，例如锁，其实现基于Atomics。</p>
+<p>这是一个非常简单的例子，它总是有效的：</p>
+<pre><code class="language-csharp">// main.js
+console.log('notifying...');
+Atomics.store(sharedArray, 0, 123);
+
+// worker.js
+while (Atomics.load(sharedArray, 0) !== 123) ;
+console.log('notified');
+</code></pre>
+<p><strong>Atomics 的 API</strong></p>
+<p>Atomic 函数的主要操作数必须是 Int8Array ，Uint8Array ，Int16Array ，Uint16Array ，Int32Array 或 Uint32Array 的一个实例。它必须包裹一个 SharedArrayBuffer 。</p>
+<p>所有函数都以 atomically 方式进行操作。存储操作的顺序是固定的并且不能由编译器或 CPU 重新排序。</p>
+<p>加载和存储</p>
+<p>Atomics.load(ta : TypedArray<T>, index) : T</p>
+<p>读取和返回 ta[index] 上的元素，返回数组指定位置上的值。</p>
+<p>Atomics.store(ta : TypedArray<T>, index, value : T) : T</p>
+<p>在 ta[index] 上写入 value，并且返回 value。</p>
+<p>Atomics.exchange(ta : TypedArray<T>, index, value : T) : T</p>
+<p>将 ta[index] 上的元素设置为 value ，并且返回索引 index 原先的值。</p>
+<p>Atomics.compareExchange(ta : TypedArray<T>, index, expectedValue, replacementValue) : T</p>
+<p>如果 ta[index] 上的当前元素为 expectedValue , 那么使用 replacementValue 替换。并且返回索引 index 原先（或者未改变）的值。</p>
+<p>简单修改 TypeArray 元素</p>
+<p>以下每个函数都会在给定索引处更改 TypeArray 元素：它将一个操作符应用于元素和参数，并将结果写回元素。它返回元素的原始值。</p>
+<p>Atomics.add(ta : TypedArray<T>, index, value) : T</p>
+<p>执行 ta[index] += value 并返回 ta[index] 的原始值。</p>
+<p>Atomics.sub(ta : TypedArray<T>, index, value) : T</p>
+<p>执行 ta[index] -= value 并返回 ta[index] 的原始值。</p>
+<p>Atomics.and(ta : TypedArray<T>, index, value) : T</p>
+<p>执行 ta[index] &amp;= value 并返回 ta[index] 的原始值。</p>
+<p>Atomics.or(ta : TypedArray<T>, index, value) : T</p>
+<p>执行 ta[index] |= value 并返回 ta[index] 的原始值。</p>
+<p>Atomics.xor(ta : TypedArray<T>, index, value) : T</p>
+<p>执行 ta[index] ^= value 并返回 ta[index] 的原始值。</p>
+<p>等待和唤醒</p>
+<p>Atomics.wait(ta: Int32Array, index, value, timeout=Number.POSITIVE_INFINITY) : ('not-equal' | 'ok' | 'timed-out')</p>
+<p>如果 ta[index] 的当前值不是 value ，则返回 'not-equal'。否则继续等待，直到我们通过 Atomics.wake() 唤醒或直到等待超时。 在前一种情况下，返回 'ok'。在后一种情况下，返回'timed-out'。timeout 以毫秒为单位。记住此函数执行的操作：“如果 ta[index] 为 value，那么继续等待” 。</p>
+<p>Atomics.wake(ta : Int32Array, index, count)</p>
+<p>唤醒等待在 ta[index] 上的 count workers。</p>
+<h3 id="3objectvalues-and-objectentries">3.Object.values and Object.entries</h3>
+<p>Object.values() 方法返回一个给定对象自己的所有可枚举属性值的数组，值的顺序与使用for...in循环的顺序相同 ( 区别在于for-in循环枚举原型链中的属性 )。</p>
+<p>obj参数是需要待操作的对象。可以是一个对象，或者一个数组（是一个带有数字下标的对象，[10,20,30] -&gt; {0: 10,1: 20,2: 30})。</p>
+<pre><code class="language-csharp">const obj = { x: 'xxx', y: 1 };
+Object.values(obj); // ['xxx', 1]
+
+const obj = ['e', 's', '8']; // 相当于 { 0: 'e', 1: 's', 2: '8' };
+Object.values(obj); // ['e', 's', '8']
+
+// 当我们使用数字键值时，返回的是数字排序
+// 根据键值排序
+const obj = { 10: 'xxx', 1: 'yyy', 3: 'zzz' };
+Object.values(obj); // ['yyy', 'zzz', 'xxx']
+
+Object.values('es8'); // ['e', 's', '8']
+</code></pre>
+<p>Object.entries 方法返回一个给定对象自身可遍历属性 [key, value] 的数组， 排序规则和 Object.values 一样。这个方法的声明比较琐碎:</p>
+<pre><code class="language-csharp">const obj = { x: 'xxx', y: 1 };
+Object.entries(obj); // [['x', 'xxx'], ['y', 1]]
+
+const obj = ['e', 's', '8'];
+Object.entries(obj); // [['0', 'e'], ['1', 's'], ['2', '8']]
+
+const obj = { 10: 'xxx', 1: 'yyy', 3: 'zzz' };
+Object.entries(obj); // [['1', 'yyy'], ['3', 'zzz'], ['10': 'xxx']]
+
+Object.entries('es8'); // [['0', 'e'], ['1', 's'], ['2', '8']]
+</code></pre>
+<h3 id="4string-padding">4.String padding</h3>
+<p>为 String 对象增加了 2 个函数：padStart 和 padEnd。</p>
+<p>像它们名字那样，这几个函数的主要目的就是填补字符串的首部和尾部，为了使得到的结果字符串的长度能达到给定的长度。你可以通过特定的字符，或者字符串，或者默认的空格填充它。下面是函数的声明：</p>
+<pre><code class="language-csharp">str.padStart(targetLength [, padString])
+str.padEnd(targetLength [, padString])
+</code></pre>
+<p>这些函数的第一个参数是 targetLength（目标长度），这个是结果字符串的长度。第二个参数是可选的 padString（填充字符），一个用于填充到源字符串的字符串。默认值是空格。</p>
+<pre><code class="language-csharp">'es8'.padStart(2);          // 'es8'
+'es8'.padStart(5);          // '  es8'
+'es8'.padStart(6, 'woof');  // 'wooes8'
+'es8'.padStart(14, 'wow');  // 'wowwowwowwoes8'
+'es8'.padStart(7, '0');     // '0000es8'
+
+'es8'.padEnd(2);            // 'es8'
+'es8'.padEnd(5);            // 'es8  '
+'es8'.padEnd(6, 'woof');    // 'es8woo'
+'es8'.padEnd(14, 'wow');    // 'es8wowwowwowwo'
+'es8'.padEnd(7, '6');       // 'es86666'
+</code></pre>
+<h3 id="5objectgetownpropertydescriptors">5.Object.getOwnPropertyDescriptors</h3>
+<p>getOwnPropertyDescriptors 方法返回指定对象所有自身属性的描述对象。属性描述对象是直接在对象上定义的，而不是继承于对象的原型。ES2017加入这个函数的主要动机在于方便将一个对象深度拷贝给另一个对象，同时可以将getter/setter拷贝。声明如下：</p>
+<pre><code class="language-csharp">Object.getOwnPropertyDescriptors(obj)
+</code></pre>
+<p>obj 是待操作对象。返回的描述对象键值有：configurable, enumerable, writable, get, set and value。</p>
+<pre><code class="language-csharp">const obj = { 
+  get es7() { return 777; },
+  get es8() { return 888; }
+};
+Object.getOwnPropertyDescriptor(obj);
+// {
+//   es7: {
+//     configurable: true,
+//     enumerable: true,
+//     get: function es7(){}, //the getter function
+//     set: undefined
+//   },
+//   es8: {
+//     configurable: true,
+//     enumerable: true,
+//     get: function es8(){}, //the getter function
+//     set: undefined
+//   }
+// }
+</code></pre>
+<h3 id="6结尾逗号">6.结尾逗号</h3>
+<p>结尾逗号用代码展示非常明了：</p>
+<pre><code class="language-csharp">// 参数定义时
+function foo(
+    param1,
+    param2,
+) {}
+
+// 函数调用时
+foo(
+    'abc',
+    'def',
+);
+
+// 对象中
+let obj = {
+    first: 'Jane',
+    last: 'Doe',
+};
+
+// 数组中
+let arr = [
+    'red',
+    'green',
+    'blue',
+];
+</code></pre>
+<p>这个改动有什么好处呢？</p>
+<p>首先，重新排列项目更简单，因为如果最后一项更改其位置，则不必添加和删除逗号。</p>
+<p>其次，它可以帮助版本控制系统跟踪实际发生的变化。例如，从：</p>
+<pre><code class="language-csharp">[
+    'foo'
+]
+修改为
+
+[
+    'foo',
+    'bar'
+]
+</code></pre>
+<p>导致线条'foo'和线条'bar'被标记为已更改，即使唯一真正的变化是后一条线被添加。</p>
+<p>结尾逗号用代码展示非常明了：</p>
+<p>// 参数定义时<br>
+function foo(<br>
+param1,<br>
+param2,<br>
+) {}</p>
+<p>// 函数调用时<br>
+foo(<br>
+'abc',<br>
+'def',<br>
+);</p>
+<p>// 对象中<br>
+let obj = {<br>
+first: 'Jane',<br>
+last: 'Doe',<br>
+};</p>
+<p>// 数组中<br>
+let arr = [<br>
+'red',<br>
+'green',<br>
+'blue',<br>
+];<br>
+这个改动有什么好处呢？</p>
+<p>首先，重新排列项目更简单，因为如果最后一项更改其位置，则不必添加和删除逗号。</p>
+<p>其次，它可以帮助版本控制系统跟踪实际发生的变化。例如，从：</p>
+<p>[<br>
+'foo'<br>
+]<br>
+修改为</p>
+<p>[<br>
+'foo',<br>
+'bar'<br>
+]<br>
+导致线条'foo'和线条'bar'被标记为已更改，即使唯一真正的变化是后一条线被添加。</p>
+<h2 id="es9">ES9</h2>
+<p>ES9的新特性索引如下：</p>
+<p>主要新功能：</p>
+<p>1.异步迭代（Domenic Denicola，Kevin Smith）</p>
+<p>2.Rest/Spread 属性（SebastianMarkbåge）</p>
+<p>新的正则表达式功能：</p>
+<p>1.RegExp named capture groups（Gorkem Yakin，Daniel Ehrenberg）</p>
+<p>2.RegExp Unicode Property Escapes（Mathias Bynens）</p>
+<p>3.RegExp Lookbehind Assertions（Gorkem Yakin，NozomuKatō，Daniel Ehrenberg）</p>
+<p>4.s (dotAll) flag for regular expressions（Mathias Bynens）</p>
+<p>其他新功能：</p>
+<p>1.Promise.prototype.finally() （Jordan Harband）</p>
+<p>2.模板字符串修改（Tim Disney）</p>
+<h3 id="1异步迭代">1.异步迭代</h3>
+<p>首先来回顾一下同步迭代器：<br>
+ES6引入了同步迭代器，其工作原理如下：</p>
+<p>Iterable：一个对象，表示可以通过Symbol.iterator方法进行迭代。</p>
+<p>Iterator：通过调用iterable [Symbol.iterator] ()返回的对象。它将每个迭代元素包装在一个对象中，并通过其next()方法一次返回一个。</p>
+<p>IteratorResult：返回的对象next()。属性value包含一个迭代的元素，属性done是true 后最后一个元素。</p>
+<p>示例：</p>
+<pre><code class="language-csharp">const iterable = ['a', 'b'];
+const iterator = iterable[Symbol.iterator]();
+iterator.next()
+// { value: 'a', done: false }
+iterator.next()
+// { value: 'b', done: false }
+iterator.next()
+// { value: undefined, done: true }
+</code></pre>
+<p><strong>异步迭代器</strong></p>
+<p>先前的迭代方式是同步的，并不适用于异步数据源。例如，在以下代码中，readLinesFromFile()无法通过同步迭代传递其异步数据：</p>
+<p>for (const line of readLinesFromFile(fileName)) {<br>
+console.log(line);<br>
+}<br>
+异步迭代器和常规迭代器的工作方式非常相似，但是异步迭代器涉及promise:</p>
+<pre><code class="language-csharp">async function example() {
+  // 普通迭代器:
+  const iterator = createNumberIterator();
+  iterator.next(); // Object {value: 1, done: false}
+  iterator.next(); // Object {value: 2, done: false}
+  iterator.next(); // Object {value: 3, done: false}
+  iterator.next(); // Object {value: undefined, done: true}
+
+  // 异步迭代器:
+  const asyncIterator = createAsyncNumberIterator();
+  const p = asyncIterator.next(); // Promise
+  await p;// Object {value: 1, done: false}
+  await asyncIterator.next(); // Object {value: 2, done: false}
+  await asyncIterator.next(); // Object {value: 3, done: false}
+  await asyncIterator.next(); // Object {value: undefined, done: true}
+}
+异步迭代器对象的next()方法返回了一个Promise，解析后的值跟普通的迭代器类似。
+用法：iterator.next().then(({ value, done })=&gt; {//{value: ‘some val’, done: false}}
+
+const promises = [
+    new Promise(resolve =&gt; resolve(1)),
+    new Promise(resolve =&gt; resolve(2)),
+    new Promise(resolve =&gt; resolve(3)),
+];
+
+async function test() {
+    for await (const p of promises) {
+        console.log(p);
+    }
+}
+test(); //1 ,2 3
+</code></pre>
+<h3 id="2restspread-属性">2.Rest/Spread 属性</h3>
+<p>这个就是我们通常所说的rest参数和扩展运算符，这项特性在ES6中已经引入，但是ES6中的作用对象仅限于数组：</p>
+<pre><code class="language-csharp">restParam(1, 2, 3, 4, 5);
+
+function restParam(p1, p2, ...p3) {
+  // p1 = 1
+  // p2 = 2
+  // p3 = [3, 4, 5]
+}
+
+const values = [99, 100, -1, 48, 16];
+console.log( Math.max(...values) ); // 100
+</code></pre>
+<p>在ES9中，为对象提供了像数组一样的rest参数和扩展运算符：</p>
+<pre><code class="language-csharp">const obj = {
+  a: 1,
+  b: 2,
+  c: 3
+}
+const { a, ...param } = obj;
+  console.log(a)     //1
+  console.log(param) //{b: 2, c: 3}
+
+function foo({a, ...param}) {
+  console.log(a);    //1
+  console.log(param) //{b: 2, c: 3}
+}
+</code></pre>
+<h3 id="3正则表达式命名捕获组-编号的捕获组">3.正则表达式命名捕获组 编号的捕获组</h3>
+<pre><code class="language-csharp">//正则表达式命名捕获组
+const RE_DATE = /([0-9]{4})-([0-9]{2})-([0-9]{2})/;
+
+const matchObj = RE_DATE.exec('1999-12-31');
+const year = matchObj[1]; // 1999
+const month = matchObj[2]; // 12
+const day = matchObj[3]; // 31
+</code></pre>
+<p>通过数字引用捕获组有几个缺点：</p>
+<p>1.找到捕获组的数量是一件麻烦事：必须使用括号。</p>
+<p>2.如果要了解组的用途，则需要查看正则表达式。</p>
+<p>3.如果更改捕获组的顺序，则还必须更改匹配代码。</p>
+<p><strong>命名的捕获组</strong></p>
+<p>ES9中可以通过名称来识别捕获组：(?<year>[0-9]{4})</p>
+<p>在这里，我们用名称标记了前一个捕获组year。该名称必须是合法的JavaScript标识符（认为变量名称或属性名称）。匹配后，您可以通过访问捕获的字符串matchObj.groups.year来访问。</p>
+<p>让我们重写前面的代码：</p>
+<pre><code class="language-csharp">const RE_DATE = /(?&lt;year&gt;[0-9]{4})-(?&lt;month&gt;[0-9]{2})-(?&lt;day&gt;[0-9]{2})/;
+
+const matchObj = RE_DATE.exec('1999-12-31');
+const year = matchObj.groups.year; // 1999
+const month = matchObj.groups.month; // 12
+const day = matchObj.groups.day; // 31
+
+// 使用解构语法更为简便
+const {groups: {day, year}} = RE_DATE.exec('1999-12-31');
+console.log(year); // 1999
+console.log(day); // 31
+</code></pre>
+<p>可以发现，命名捕获组有以下优点：</p>
+<p>找到捕获组的“ID”更容易。</p>
+<p>匹配代码变为自描述性的，因为捕获组的ID描述了正在捕获的内容。</p>
+<p>如果更改捕获组的顺序，则无需更改匹配代码。</p>
+<p>捕获组的名称也使正则表达式更容易理解，因为您可以直接看到每个组的用途。</p>
+<p><strong>正则表达式 Unicode 转义</strong></p>
+<p>该特性允许您使用\p{}通过提及大括号内的Unicode字符属性来匹配字符,在正则表达式中使用标记 u (unicode) 设置。</p>
+<pre><code class="language-csharp">/^\p{White_Space}+$/u.test('\t \n\r')
+// true
+/^\p{Script=Greek}+$/u.test('μετά')
+// true
+</code></pre>
+<h2 id="es10">ES10</h2>
+<p><strong>ES10还在草案，所以这里只有介绍。</strong></p>
+<p>ES2019中的JavaScript新功能包括：</p>
+<p>1.Array#{flat,flatMap}</p>
+<p>2.Object.fromEntries</p>
+<p>3.String#{trimStart,trimEnd}</p>
+<p>4.Symbol#description</p>
+<p>5.try { } catch {} // 可选的错误参数绑定</p>
+<p>6.JSON ⊂ ECMAScript</p>
+<p>7.格式良好的 JSON.stringify</p>
+<p>8.稳定的排序 Array#sort</p>
+<p>9.新版 Function#toString</p>
+<p>10.新增 BigInt 原始类型 (stage 3).</p>
+<p>11.动态引入模块(stage 3).</p>
+<p>12.标准的 globalThis 对象 (stage 3).</p>
+<p>13.ES10 Class: private, static &amp; public (stage 3).</p>
+<h3 id="1-arrayflat-arrayflatmap">1. Array.flat() &amp; Array.flatMap()</h3>
+<p>两个新的数组方法：</p>
+<p>Array.flat() 方法创建一个新数组，所有子数组元素都以递归方式合并到该数组中，直至达到指定深度。</p>
+<p>Array.flatMap() 方法首先使用map函数转换每个元素，然后将结果展平为新数组。它与map()后再调用深度为1的flat() 效果相同，但是flatMap()将两者合并为一种方法，效率更高。</p>
+<h3 id="2objectfromentries">2.Object.fromEntries()</h3>
+<p>把键值对数组为元素的二维数组转换为一个对象。</p>
+<h3 id="3stringtrimstart-stringtrimend">3.String.trimStart() &amp; String.trimEnd()</h3>
+<p>有两种新的String方法可从字符串中删除空格：</p>
+<p>trimStart() 方法从字符串的开头删除空格。<br>
+trimEnd() 方法从字符串末尾删除空格。</p>
+<h3 id="4symboldescription">4.Symbol.Description</h3>
+<p>当创建符号时，可以提供一个字符串作为描述。在ES10中，有一个获取描述的访问器。</p>
+<h3 id="6可选的-catch-参数变量">6.可选的 Catch 参数变量</h3>
+<p>过去，try / catch语句中的catch子句需要一个变量。现在，它允许开发人员使用try / catch而不创建未使用的error变量绑定。</p>
+<h3 id="6jsonecmascript">6.JSON⊂ECMAScript</h3>
+<p>在ES10之前的版本中，不接受非转义的行分隔符U+2028和段落分隔符U+2029。</p>
+<p>U+2028是段落分隔符。<br>
+U+2029是行分隔符。</p>
+<h3 id="7格式良好的-jsonstringify">7.格式良好的 JSON.stringify()</h3>
+<p>JSON.stringify() 可能返回U+D800和U+DFFF之间的字符，来作为没有等效UTF-8字符的值。但是，JSON格式需要UTF-8编码。解决方案是，将未配对的替代代码点表示为JSON转义序列，而不是将其作为单个UTF-16代码单元返回。</p>
+<h3 id="8arrayprototypesort">8.Array.prototype.sort()</h3>
+<p>V8的先前实现，对包含10个以上项的数组使用了不稳定的快速排序算法。</p>
+<p>一种稳定的排序算法是，当两个具有相同键的对象在排序输出中出现的顺序，与未排序输入中出现的顺序相同。</p>
+<h3 id="9新版-functiontostring">9.新版 Function.toString()</h3>
+<p>toString() 方法返回一个表示函数源代码的字符串。在ES6中，当在函数上调用toString时，它将根据ECMAScript引擎返回该函数的字符串表示形式。如果可能，它将返回源代码，否则-一个标准化的占位符。</p>
+<h3 id="10bigint-任意精度的整数">10.BigInt — 任意精度的整数</h3>
+<p>BigInt是第7个原始类型，它是一个任意精度的整数。而不仅仅是在9007199254740992处的最大值。</p>
+<h3 id="11动态引入">11.动态引入</h3>
+<p>动态import()返回所请求模块的Promise。因此，可以使用async/await 将导入的模块分配给变量。</p>
+<h3 id="12标准-globalthis-对象">12.标准 globalThis 对象</h3>
+<p>全局 this 在ES10之前尚未标准化。在生产代码中，您可以通过编写下边代码来“标准化”它：</p>
+<h3 id="13es10-class-private-static-public-成员变量函数">13.ES10 Class: private, static &amp; public 成员变量，函数</h3>
+<p>现在，新的语法字符＃（哈希标签）用于直接在类中定义变量，函数，getter和setter，以及构造函数和类方法。</p>
+
+          </div>
+        </div>
+
+        
+          <div class="next-post">
+            <a class="purple-link" href="https://dark-yifeng.github.io/post/javascriptshi-thiscallapplybind/">
+              <h3 class="post-title">
+                下一篇：JavaScript（十）：this/call/apply/bind
+              </h3>
+            </a>
+          </div>
+          
+      </div>
+
+      
+
+      <div class="site-footer">
+  <div class="slogan">温故而知新</div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">刘亦枫</a> | <a class="rss" href="https://dark-yifeng.github.io/atom.xml" target="_blank">RSS</a>
+</div>
+
+
+    </div>
+    <script type="application/javascript">
+
+hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+  </body>
+</html>

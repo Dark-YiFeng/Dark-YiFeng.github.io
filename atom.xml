@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://dark-yifeng.github.io</id>
     <title>Dark</title>
-    <updated>2020-05-18T03:29:14.613Z</updated>
+    <updated>2020-05-18T03:36:39.282Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://dark-yifeng.github.io"/>
     <link rel="self" href="https://dark-yifeng.github.io/atom.xml"/>
@@ -10,6 +10,2204 @@
     <logo>https://dark-yifeng.github.io/images/avatar.png</logo>
     <icon>https://dark-yifeng.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, Dark</rights>
+    <entry>
+        <title type="html"><![CDATA[JavaScript（十一）：ES7/ES8/ES9/ES10]]></title>
+        <id>https://dark-yifeng.github.io/post/javascriptshi-yi-es7es8es9es10/</id>
+        <link href="https://dark-yifeng.github.io/post/javascriptshi-yi-es7es8es9es10/">
+        </link>
+        <updated>2020-05-18T03:35:31.000Z</updated>
+        <content type="html"><![CDATA[<p><ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E5%BA%8F%E8%A8%80">序言</a></li>
+<li><a href="#es7">ES7</a>
+<ul>
+<li><a href="#1arrayprototypeincludes%E6%96%B9%E6%B3%95">1.Array.prototype.includes()方法</a></li>
+<li><a href="#2%E6%B1%82%E5%B9%82%E8%BF%90%E7%AE%97%E7%AC%A6">2.求幂运算符</a></li>
+</ul>
+</li>
+<li><a href="#es8">ES8</a>
+<ul>
+<li><a href="#1async-functions">1.Async Functions</a></li>
+<li><a href="#2sharedarraybuffer%E5%92%8Catomics">2.SharedArrayBuffer和Atomics</a></li>
+<li><a href="#3objectvalues-and-objectentries">3.Object.values and Object.entries</a></li>
+<li><a href="#4string-padding">4.String padding</a></li>
+<li><a href="#5objectgetownpropertydescriptors">5.Object.getOwnPropertyDescriptors</a></li>
+<li><a href="#6%E7%BB%93%E5%B0%BE%E9%80%97%E5%8F%B7">6.结尾逗号</a></li>
+</ul>
+</li>
+<li><a href="#es9">ES9</a>
+<ul>
+<li><a href="#1%E5%BC%82%E6%AD%A5%E8%BF%AD%E4%BB%A3">1.异步迭代</a></li>
+<li><a href="#2restspread-%E5%B1%9E%E6%80%A7">2.Rest/Spread 属性</a></li>
+<li><a href="#3%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%91%BD%E5%90%8D%E6%8D%95%E8%8E%B7%E7%BB%84-%E7%BC%96%E5%8F%B7%E7%9A%84%E6%8D%95%E8%8E%B7%E7%BB%84">3.正则表达式命名捕获组 编号的捕获组</a></li>
+</ul>
+</li>
+<li><a href="#es10">ES10</a>
+<ul>
+<li><a href="#1-arrayflat-arrayflatmap">1. Array.flat() &amp; Array.flatMap()</a></li>
+<li><a href="#2objectfromentries">2.Object.fromEntries()</a></li>
+<li><a href="#3stringtrimstart-stringtrimend">3.String.trimStart() &amp; String.trimEnd()</a></li>
+<li><a href="#4symboldescription">4.Symbol.Description</a></li>
+<li><a href="#6%E5%8F%AF%E9%80%89%E7%9A%84-catch-%E5%8F%82%E6%95%B0%E5%8F%98%E9%87%8F">6.可选的 Catch 参数变量</a></li>
+<li><a href="#6jsonecmascript">6.JSON⊂ECMAScript</a></li>
+<li><a href="#7%E6%A0%BC%E5%BC%8F%E8%89%AF%E5%A5%BD%E7%9A%84-jsonstringify">7.格式良好的 JSON.stringify()</a></li>
+<li><a href="#8arrayprototypesort">8.Array.prototype.sort()</a></li>
+<li><a href="#9%E6%96%B0%E7%89%88-functiontostring">9.新版 Function.toString()</a></li>
+<li><a href="#10bigint-%E4%BB%BB%E6%84%8F%E7%B2%BE%E5%BA%A6%E7%9A%84%E6%95%B4%E6%95%B0">10.BigInt — 任意精度的整数</a></li>
+<li><a href="#11%E5%8A%A8%E6%80%81%E5%BC%95%E5%85%A5">11.动态引入</a></li>
+<li><a href="#12%E6%A0%87%E5%87%86-globalthis-%E5%AF%B9%E8%B1%A1">12.标准 globalThis 对象</a></li>
+<li><a href="#13es10-class-private-static-public-%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E5%87%BD%E6%95%B0">13.ES10 Class: private, static &amp; public 成员变量，函数</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</p>
+<h2 id="序言">序言</h2>
+<p>自从前端开发流行起来，前端的各类技术如雨后春笋般出现，让人应接不暇，几年前还是jq一把梭，现在除了三大主流框架var，何种混合开发也接踵而至，还有可能取代JS的TS出现，我们要跟上时代的步伐，了解最新的技术，走在技术的前沿。</p>
+<p>别停留在ES6了，ES10都要出来了。</p>
+<h2 id="es7">ES7</h2>
+<p>ES7在ES6的基础上主要添加了两项内容：</p>
+<p>1.Array.prototype.includes()方法</p>
+<p>2.求幂运算符（**）</p>
+<h3 id="1arrayprototypeincludes方法">1.Array.prototype.includes()方法</h3>
+<p>includes() 方法用来判断一个数组是否包含一个指定的值，根据情况，如果包含则返回 true，否则返回false。</p>
+<pre><code class="language-csharp">var array = [1, 2, 3];
+
+console.log(array.includes(2));
+// expected output: true
+
+var pets = ['cat', 'dog', 'bat'];
+
+console.log(pets.includes('cat'));
+// expected output: true
+
+console.log(pets.includes('at'));
+// expected output: false
+</code></pre>
+<p>Array.prototype.includes()方法接收两个参数：</p>
+<p>1.要搜索的值</p>
+<p>2.搜索的开始索引。</p>
+<p>当第二个参数被传入时，该方法会从索引处开始往后搜索（默认索引值为0）。若搜索值在数组中存在则返回true，否则返回false。 且看下面示例：</p>
+<pre><code class="language-csharp">['a', 'b', 'c', 'd'].includes('b')         // true
+['a', 'b', 'c', 'd'].includes('b', 1)      // true
+['a', 'b', 'c', 'd'].includes('b', 2)      // false
+</code></pre>
+<p>乍一看，includes的作用跟数组的indexOf重叠，为什么要特意增加这么一个api呢？主要区别有以下几点：</p>
+<p>返回值。看一个函数，先看他们的返回值。indexOf的返回数是值型的，includes的返回值是布尔型，所以在if条件判断的时候includes要简单得多，而indexOf 需要多写一个条件进行判断。</p>
+<pre><code class="language-csharp">var ary = [1];
+if (ary.indexOf(1) !== -1) {
+    console.log(&quot;数组存在1&quot;)
+}
+if (ary.includes(1)) {
+    console.log(&quot;数组存在1&quot;)
+}
+</code></pre>
+<p>NaN的判断。如果数组中有NaN，你又正好需要判断数组是否有存在NaN，这时你使用indexOf是无法判断的，你必须使用includes这个方法。</p>
+<pre><code class="language-csharp">var ary1 = [NaN];
+console.log(ary1.indexOf(NaN))//-1
+console.log(ary1.includes(NaN))//true
+</code></pre>
+<p>当数组的有空的值的时候，includes会认为空的值是undefined，而indexOf不会。</p>
+<pre><code class="language-csharp">var ary1 = new Array(3);
+console.log(ary1.indexOf(undefined));//-1
+console.log(ary1.includes(undefined))//true
+</code></pre>
+<h3 id="2求幂运算符">2.求幂运算符</h3>
+<p>加/减法我们通常都是用其中缀形式，直观易懂。在ECMAScript2016中，我们可以使用**来替代Math.pow。</p>
+<p>4 ** 3           // 64<br>
+效果等同于</p>
+<p>Math.pow(4,3)<br>
+值得一提的是，作为中缀运算符，**还支持以下操作</p>
+<pre><code class="language-csharp">let n = 4;
+n **= 3;
+// 64
+</code></pre>
+<h2 id="es8">ES8</h2>
+<p>主要新功能：</p>
+<p>1.异步函数 Async Functions（Brian Terlson）</p>
+<p>2.共享内存和Atomics（Lars T. Hansen）</p>
+<p>次要新功能：</p>
+<p>1.Object.values / Object.entries（Jordan Harband）</p>
+<p>2.String padding（Jordan Harband，Rick Waldron）</p>
+<p>3.Object.getOwnPropertyDescriptors() （Jordan Harband，Andrea Giammarchi）</p>
+<p>4.函数参数列表和调用中的尾逗号（Jeff Morrison）</p>
+<h3 id="1async-functions">1.Async Functions</h3>
+<p>Async Functions也就是我们常说的Async/Await，相信大家对于这个概念都已经不陌生了。Async/Await是一种用于处理JS异步操作的语法糖，可以帮助我们摆脱回调地狱，编写更加优雅的代码。</p>
+<p>通俗的理解，async关键字的作用是告诉编译器对于标定的函数要区别对待。当编译器遇到标定的函数中的await关键字时，要暂时停止运行，带到await标定的函数处理完毕后，再进行相应操作。如果该函数fulfiled了，则返回值是fulfillment value，否则得到的就是reject value。</p>
+<p>下面通过拿普通的promise写法来对比，就很好理解了：</p>
+<pre><code class="language-csharp">async function asyncFunc() {
+    const result = await otherAsyncFunc();
+    console.log(result);
+}
+
+// Equivalent to:
+function asyncFunc() {
+    return otherAsyncFunc()
+    .then(result =&gt; {
+        console.log(result);
+    });
+}
+</code></pre>
+<p>按顺序处理多个异步函数的时候优势更为明显：</p>
+<pre><code class="language-csharp">async function asyncFunc() {
+    const result1 = await otherAsyncFunc1();
+    console.log(result1);
+    const result2 = await otherAsyncFunc2();
+    console.log(result2);
+}
+
+// Equivalent to:
+function asyncFunc() {
+    return otherAsyncFunc1()
+    .then(result1 =&gt; {
+        console.log(result1);
+        return otherAsyncFunc2();
+    })
+    .then(result2 =&gt; {
+        console.log(result2);
+    });
+}
+</code></pre>
+<p>并行处理多个异步函数：</p>
+<pre><code class="language-csharp">async function asyncFunc() {
+    const [result1, result2] = await Promise.all([
+        otherAsyncFunc1(),
+        otherAsyncFunc2(),
+    ]);
+    console.log(result1, result2);
+}
+
+// Equivalent to:
+function asyncFunc() {
+    return Promise.all([
+        otherAsyncFunc1(),
+        otherAsyncFunc2(),
+    ])
+    .then([result1, result2] =&gt; {
+        console.log(result1, result2);
+    });
+}
+</code></pre>
+<p>处理错误：</p>
+<pre><code class="language-csharp">async function asyncFunc() {
+    try {
+        await otherAsyncFunc();
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+// Equivalent to:
+function asyncFunc() {
+    return otherAsyncFunc()
+    .catch(err =&gt; {
+        console.error(err);
+    });
+}
+</code></pre>
+<h3 id="2sharedarraybuffer和atomics">2.SharedArrayBuffer和Atomics</h3>
+<p>ECMAScript 2017 特性 SharedArrayBuffer 和 atomics”，由Lars T. Hansen设计。它引入了一个新的构造函数 SharedArrayBuffer 和 具有辅助函数的命名空间对象 Atomics。</p>
+<p>在我们开始之前，让我们澄清两个相似但截然不同的术语：并行(Parallelism) 和 并发(Concurrency) 。他们存在许多定义，我使用的定义如下</p>
+<p>并行(Parallelism) (parallel 并行 vs. serial 串行)：同时执行多个任务；</p>
+<p>并发(Concurrency) (concurrent 并发 vs. sequential 连续)：在重叠的时间段内（而不是一个接一个）执行几个任务。</p>
+<p><strong>JS并行的历史</strong></p>
+<p>JavaScript 在单线程中执行。某些任务可以异步执行：浏览器通常会在单线程中运行这些任务，然后通过回调将结果重新加入到单线程中。</p>
+<p>Web workers 将任务并行引入了 JavaScript ：这些是相对重量级的进程。每个 workers 都有自己的全局环境。默认情况下，不共享任何内容。 workers 之间的通信（或在 workers 和主线程之间的通信）发展：</p>
+<p>起初，你只能发送和接收字符串。</p>
+<p>然后，引入结构化克隆：可以发送和接收数据副本。结构化克隆适用于大多数数据（JSON 数据，TypedArray，正则表达式，Blob对象，ImageData对象等）。它甚至可以正确处理对象之间的循环引用。但是，不能克隆 error 对象，function 对象和 DOM 节点。</p>
+<p>可在 workers 之间的转移数据:当接收方获得数据时，发送方失去访问权限。</p>
+<p>通过 WebGL 使用 GPU 计算(它倾向于数据并行处理)</p>
+<p><strong>共享数组缓冲区（Shared Array Buffers）</strong></p>
+<p>共享阵列缓冲区是更高并发抽象的基本构建块。它们允许您在多个 workers 和主线程之间共享 SharedArrayBuffer 对象的字节(该缓冲区是共享的，用于访问字节，将其封装在一个 TypedArray 中)这种共享有两个好处：</p>
+<p>你可以更快地在 workers 之间共享数据。<br>
+workers 之间的协调变得更简单和更快（与 postMessage() 相比）。</p>
+<pre><code class="language-csharp">// main.js
+const worker = new Worker('worker.js');
+
+// 要分享的buffer
+const sharedBuffer = new SharedArrayBuffer( // (A)
+    10 * Int32Array.BYTES_PER_ELEMENT); // 10 elements
+
+// 使用Worker共用sharedBuffer
+worker.postMessage({sharedBuffer}); // clone
+
+// 仅限本地使用
+const sharedArray = new Int32Array(sharedBuffer); // (B)
+</code></pre>
+<p>创建一个共享数组缓冲区（Shared Array Buffers）的方法与创建普通的数组缓冲区(Array Buffer)类似：通过调用构造函数，并以字节的形式指定缓冲区的大小(行A)。你与 workers 共享的是 缓冲区（buffer） 。对于你自己的本地使用，你通常将共享数组缓冲区封装在 TypedArray 中(行B)。</p>
+<p>workers的实现如下所列。</p>
+<pre><code class="language-csharp">// worker.js
+self.addEventListener('message', function (event) {
+    const {sharedBuffer} = event.data;
+    const sharedArray = new Int32Array(sharedBuffer); // (A)
+    // ···
+});
+</code></pre>
+<p><strong>sharedArrayBuffer 的 API</strong></p>
+<p>构造函数：</p>
+<p>new SharedArrayBuffer(length)</p>
+<p>创建一个 length 字节的 buffer(缓冲区)。</p>
+<p>静态属性：</p>
+<p>get SharedArrayBuffer[Symbol.species]</p>
+<p>默认情况下返回 this。 覆盖以控制 slice() 的返回。</p>
+<p>实例属性：</p>
+<p>get SharedArrayBuffer.prototype.byteLength()</p>
+<p>返回 buffer(缓冲区) 的字节长度。</p>
+<p>SharedArrayBuffer.prototype.slice(start, end)</p>
+<p>创建一个新的 this.constructor[Symbol.species] 实例，并用字节填充从（包括）开始到（不包括）结束的索引。</p>
+<p>Atomics: 安全访问共享数据<br>
+举一个例子</p>
+<pre><code class="language-csharp">// main.js
+sharedArray[1] = 11;
+sharedArray[2] = 22;
+</code></pre>
+<p>在单线程中，您可以重新排列这些写入操作，因为在中间没有读到任何内容。 对于多线程，当你期望以特定顺序执行写入操作时，就会遇到麻烦：</p>
+<pre><code class="language-csharp">// worker.js
+while (sharedArray[2] !== 22) ;
+console.log(sharedArray[1]); // 0 or 11
+Atomics 方法可以用来与其他 workers 进行同步。例如，以下两个操作可以让你读取和写入数据，并且不会被编译器重新排列：
+
+Atomics.load(ta : TypedArray, index)
+
+Atomics.store(ta : TypedArray, index, value : T)
+</code></pre>
+<p>这个想法是使用常规操作读取和写入大多数数据，而 Atomics 操作（load ，store 和其他操作）可确保读取和写入安全。通常，您将使用自定义同步机制，例如锁，其实现基于Atomics。</p>
+<p>这是一个非常简单的例子，它总是有效的：</p>
+<pre><code class="language-csharp">// main.js
+console.log('notifying...');
+Atomics.store(sharedArray, 0, 123);
+
+// worker.js
+while (Atomics.load(sharedArray, 0) !== 123) ;
+console.log('notified');
+</code></pre>
+<p><strong>Atomics 的 API</strong></p>
+<p>Atomic 函数的主要操作数必须是 Int8Array ，Uint8Array ，Int16Array ，Uint16Array ，Int32Array 或 Uint32Array 的一个实例。它必须包裹一个 SharedArrayBuffer 。</p>
+<p>所有函数都以 atomically 方式进行操作。存储操作的顺序是固定的并且不能由编译器或 CPU 重新排序。</p>
+<p>加载和存储</p>
+<p>Atomics.load(ta : TypedArray<T>, index) : T</p>
+<p>读取和返回 ta[index] 上的元素，返回数组指定位置上的值。</p>
+<p>Atomics.store(ta : TypedArray<T>, index, value : T) : T</p>
+<p>在 ta[index] 上写入 value，并且返回 value。</p>
+<p>Atomics.exchange(ta : TypedArray<T>, index, value : T) : T</p>
+<p>将 ta[index] 上的元素设置为 value ，并且返回索引 index 原先的值。</p>
+<p>Atomics.compareExchange(ta : TypedArray<T>, index, expectedValue, replacementValue) : T</p>
+<p>如果 ta[index] 上的当前元素为 expectedValue , 那么使用 replacementValue 替换。并且返回索引 index 原先（或者未改变）的值。</p>
+<p>简单修改 TypeArray 元素</p>
+<p>以下每个函数都会在给定索引处更改 TypeArray 元素：它将一个操作符应用于元素和参数，并将结果写回元素。它返回元素的原始值。</p>
+<p>Atomics.add(ta : TypedArray<T>, index, value) : T</p>
+<p>执行 ta[index] += value 并返回 ta[index] 的原始值。</p>
+<p>Atomics.sub(ta : TypedArray<T>, index, value) : T</p>
+<p>执行 ta[index] -= value 并返回 ta[index] 的原始值。</p>
+<p>Atomics.and(ta : TypedArray<T>, index, value) : T</p>
+<p>执行 ta[index] &amp;= value 并返回 ta[index] 的原始值。</p>
+<p>Atomics.or(ta : TypedArray<T>, index, value) : T</p>
+<p>执行 ta[index] |= value 并返回 ta[index] 的原始值。</p>
+<p>Atomics.xor(ta : TypedArray<T>, index, value) : T</p>
+<p>执行 ta[index] ^= value 并返回 ta[index] 的原始值。</p>
+<p>等待和唤醒</p>
+<p>Atomics.wait(ta: Int32Array, index, value, timeout=Number.POSITIVE_INFINITY) : ('not-equal' | 'ok' | 'timed-out')</p>
+<p>如果 ta[index] 的当前值不是 value ，则返回 'not-equal'。否则继续等待，直到我们通过 Atomics.wake() 唤醒或直到等待超时。 在前一种情况下，返回 'ok'。在后一种情况下，返回'timed-out'。timeout 以毫秒为单位。记住此函数执行的操作：“如果 ta[index] 为 value，那么继续等待” 。</p>
+<p>Atomics.wake(ta : Int32Array, index, count)</p>
+<p>唤醒等待在 ta[index] 上的 count workers。</p>
+<h3 id="3objectvalues-and-objectentries">3.Object.values and Object.entries</h3>
+<p>Object.values() 方法返回一个给定对象自己的所有可枚举属性值的数组，值的顺序与使用for...in循环的顺序相同 ( 区别在于for-in循环枚举原型链中的属性 )。</p>
+<p>obj参数是需要待操作的对象。可以是一个对象，或者一个数组（是一个带有数字下标的对象，[10,20,30] -&gt; {0: 10,1: 20,2: 30})。</p>
+<pre><code class="language-csharp">const obj = { x: 'xxx', y: 1 };
+Object.values(obj); // ['xxx', 1]
+
+const obj = ['e', 's', '8']; // 相当于 { 0: 'e', 1: 's', 2: '8' };
+Object.values(obj); // ['e', 's', '8']
+
+// 当我们使用数字键值时，返回的是数字排序
+// 根据键值排序
+const obj = { 10: 'xxx', 1: 'yyy', 3: 'zzz' };
+Object.values(obj); // ['yyy', 'zzz', 'xxx']
+
+Object.values('es8'); // ['e', 's', '8']
+</code></pre>
+<p>Object.entries 方法返回一个给定对象自身可遍历属性 [key, value] 的数组， 排序规则和 Object.values 一样。这个方法的声明比较琐碎:</p>
+<pre><code class="language-csharp">const obj = { x: 'xxx', y: 1 };
+Object.entries(obj); // [['x', 'xxx'], ['y', 1]]
+
+const obj = ['e', 's', '8'];
+Object.entries(obj); // [['0', 'e'], ['1', 's'], ['2', '8']]
+
+const obj = { 10: 'xxx', 1: 'yyy', 3: 'zzz' };
+Object.entries(obj); // [['1', 'yyy'], ['3', 'zzz'], ['10': 'xxx']]
+
+Object.entries('es8'); // [['0', 'e'], ['1', 's'], ['2', '8']]
+</code></pre>
+<h3 id="4string-padding">4.String padding</h3>
+<p>为 String 对象增加了 2 个函数：padStart 和 padEnd。</p>
+<p>像它们名字那样，这几个函数的主要目的就是填补字符串的首部和尾部，为了使得到的结果字符串的长度能达到给定的长度。你可以通过特定的字符，或者字符串，或者默认的空格填充它。下面是函数的声明：</p>
+<pre><code class="language-csharp">str.padStart(targetLength [, padString])
+str.padEnd(targetLength [, padString])
+</code></pre>
+<p>这些函数的第一个参数是 targetLength（目标长度），这个是结果字符串的长度。第二个参数是可选的 padString（填充字符），一个用于填充到源字符串的字符串。默认值是空格。</p>
+<pre><code class="language-csharp">'es8'.padStart(2);          // 'es8'
+'es8'.padStart(5);          // '  es8'
+'es8'.padStart(6, 'woof');  // 'wooes8'
+'es8'.padStart(14, 'wow');  // 'wowwowwowwoes8'
+'es8'.padStart(7, '0');     // '0000es8'
+
+'es8'.padEnd(2);            // 'es8'
+'es8'.padEnd(5);            // 'es8  '
+'es8'.padEnd(6, 'woof');    // 'es8woo'
+'es8'.padEnd(14, 'wow');    // 'es8wowwowwowwo'
+'es8'.padEnd(7, '6');       // 'es86666'
+</code></pre>
+<h3 id="5objectgetownpropertydescriptors">5.Object.getOwnPropertyDescriptors</h3>
+<p>getOwnPropertyDescriptors 方法返回指定对象所有自身属性的描述对象。属性描述对象是直接在对象上定义的，而不是继承于对象的原型。ES2017加入这个函数的主要动机在于方便将一个对象深度拷贝给另一个对象，同时可以将getter/setter拷贝。声明如下：</p>
+<pre><code class="language-csharp">Object.getOwnPropertyDescriptors(obj)
+</code></pre>
+<p>obj 是待操作对象。返回的描述对象键值有：configurable, enumerable, writable, get, set and value。</p>
+<pre><code class="language-csharp">const obj = { 
+  get es7() { return 777; },
+  get es8() { return 888; }
+};
+Object.getOwnPropertyDescriptor(obj);
+// {
+//   es7: {
+//     configurable: true,
+//     enumerable: true,
+//     get: function es7(){}, //the getter function
+//     set: undefined
+//   },
+//   es8: {
+//     configurable: true,
+//     enumerable: true,
+//     get: function es8(){}, //the getter function
+//     set: undefined
+//   }
+// }
+</code></pre>
+<h3 id="6结尾逗号">6.结尾逗号</h3>
+<p>结尾逗号用代码展示非常明了：</p>
+<pre><code class="language-csharp">// 参数定义时
+function foo(
+    param1,
+    param2,
+) {}
+
+// 函数调用时
+foo(
+    'abc',
+    'def',
+);
+
+// 对象中
+let obj = {
+    first: 'Jane',
+    last: 'Doe',
+};
+
+// 数组中
+let arr = [
+    'red',
+    'green',
+    'blue',
+];
+</code></pre>
+<p>这个改动有什么好处呢？</p>
+<p>首先，重新排列项目更简单，因为如果最后一项更改其位置，则不必添加和删除逗号。</p>
+<p>其次，它可以帮助版本控制系统跟踪实际发生的变化。例如，从：</p>
+<pre><code class="language-csharp">[
+    'foo'
+]
+修改为
+
+[
+    'foo',
+    'bar'
+]
+</code></pre>
+<p>导致线条'foo'和线条'bar'被标记为已更改，即使唯一真正的变化是后一条线被添加。</p>
+<p>结尾逗号用代码展示非常明了：</p>
+<p>// 参数定义时<br>
+function foo(<br>
+param1,<br>
+param2,<br>
+) {}</p>
+<p>// 函数调用时<br>
+foo(<br>
+'abc',<br>
+'def',<br>
+);</p>
+<p>// 对象中<br>
+let obj = {<br>
+first: 'Jane',<br>
+last: 'Doe',<br>
+};</p>
+<p>// 数组中<br>
+let arr = [<br>
+'red',<br>
+'green',<br>
+'blue',<br>
+];<br>
+这个改动有什么好处呢？</p>
+<p>首先，重新排列项目更简单，因为如果最后一项更改其位置，则不必添加和删除逗号。</p>
+<p>其次，它可以帮助版本控制系统跟踪实际发生的变化。例如，从：</p>
+<p>[<br>
+'foo'<br>
+]<br>
+修改为</p>
+<p>[<br>
+'foo',<br>
+'bar'<br>
+]<br>
+导致线条'foo'和线条'bar'被标记为已更改，即使唯一真正的变化是后一条线被添加。</p>
+<h2 id="es9">ES9</h2>
+<p>ES9的新特性索引如下：</p>
+<p>主要新功能：</p>
+<p>1.异步迭代（Domenic Denicola，Kevin Smith）</p>
+<p>2.Rest/Spread 属性（SebastianMarkbåge）</p>
+<p>新的正则表达式功能：</p>
+<p>1.RegExp named capture groups（Gorkem Yakin，Daniel Ehrenberg）</p>
+<p>2.RegExp Unicode Property Escapes（Mathias Bynens）</p>
+<p>3.RegExp Lookbehind Assertions（Gorkem Yakin，NozomuKatō，Daniel Ehrenberg）</p>
+<p>4.s (dotAll) flag for regular expressions（Mathias Bynens）</p>
+<p>其他新功能：</p>
+<p>1.Promise.prototype.finally() （Jordan Harband）</p>
+<p>2.模板字符串修改（Tim Disney）</p>
+<h3 id="1异步迭代">1.异步迭代</h3>
+<p>首先来回顾一下同步迭代器：<br>
+ES6引入了同步迭代器，其工作原理如下：</p>
+<p>Iterable：一个对象，表示可以通过Symbol.iterator方法进行迭代。</p>
+<p>Iterator：通过调用iterable [Symbol.iterator] ()返回的对象。它将每个迭代元素包装在一个对象中，并通过其next()方法一次返回一个。</p>
+<p>IteratorResult：返回的对象next()。属性value包含一个迭代的元素，属性done是true 后最后一个元素。</p>
+<p>示例：</p>
+<pre><code class="language-csharp">const iterable = ['a', 'b'];
+const iterator = iterable[Symbol.iterator]();
+iterator.next()
+// { value: 'a', done: false }
+iterator.next()
+// { value: 'b', done: false }
+iterator.next()
+// { value: undefined, done: true }
+</code></pre>
+<p><strong>异步迭代器</strong></p>
+<p>先前的迭代方式是同步的，并不适用于异步数据源。例如，在以下代码中，readLinesFromFile()无法通过同步迭代传递其异步数据：</p>
+<p>for (const line of readLinesFromFile(fileName)) {<br>
+console.log(line);<br>
+}<br>
+异步迭代器和常规迭代器的工作方式非常相似，但是异步迭代器涉及promise:</p>
+<pre><code class="language-csharp">async function example() {
+  // 普通迭代器:
+  const iterator = createNumberIterator();
+  iterator.next(); // Object {value: 1, done: false}
+  iterator.next(); // Object {value: 2, done: false}
+  iterator.next(); // Object {value: 3, done: false}
+  iterator.next(); // Object {value: undefined, done: true}
+
+  // 异步迭代器:
+  const asyncIterator = createAsyncNumberIterator();
+  const p = asyncIterator.next(); // Promise
+  await p;// Object {value: 1, done: false}
+  await asyncIterator.next(); // Object {value: 2, done: false}
+  await asyncIterator.next(); // Object {value: 3, done: false}
+  await asyncIterator.next(); // Object {value: undefined, done: true}
+}
+异步迭代器对象的next()方法返回了一个Promise，解析后的值跟普通的迭代器类似。
+用法：iterator.next().then(({ value, done })=&gt; {//{value: ‘some val’, done: false}}
+
+const promises = [
+    new Promise(resolve =&gt; resolve(1)),
+    new Promise(resolve =&gt; resolve(2)),
+    new Promise(resolve =&gt; resolve(3)),
+];
+
+async function test() {
+    for await (const p of promises) {
+        console.log(p);
+    }
+}
+test(); //1 ,2 3
+</code></pre>
+<h3 id="2restspread-属性">2.Rest/Spread 属性</h3>
+<p>这个就是我们通常所说的rest参数和扩展运算符，这项特性在ES6中已经引入，但是ES6中的作用对象仅限于数组：</p>
+<pre><code class="language-csharp">restParam(1, 2, 3, 4, 5);
+
+function restParam(p1, p2, ...p3) {
+  // p1 = 1
+  // p2 = 2
+  // p3 = [3, 4, 5]
+}
+
+const values = [99, 100, -1, 48, 16];
+console.log( Math.max(...values) ); // 100
+</code></pre>
+<p>在ES9中，为对象提供了像数组一样的rest参数和扩展运算符：</p>
+<pre><code class="language-csharp">const obj = {
+  a: 1,
+  b: 2,
+  c: 3
+}
+const { a, ...param } = obj;
+  console.log(a)     //1
+  console.log(param) //{b: 2, c: 3}
+
+function foo({a, ...param}) {
+  console.log(a);    //1
+  console.log(param) //{b: 2, c: 3}
+}
+</code></pre>
+<h3 id="3正则表达式命名捕获组-编号的捕获组">3.正则表达式命名捕获组 编号的捕获组</h3>
+<pre><code class="language-csharp">//正则表达式命名捕获组
+const RE_DATE = /([0-9]{4})-([0-9]{2})-([0-9]{2})/;
+
+const matchObj = RE_DATE.exec('1999-12-31');
+const year = matchObj[1]; // 1999
+const month = matchObj[2]; // 12
+const day = matchObj[3]; // 31
+</code></pre>
+<p>通过数字引用捕获组有几个缺点：</p>
+<p>1.找到捕获组的数量是一件麻烦事：必须使用括号。</p>
+<p>2.如果要了解组的用途，则需要查看正则表达式。</p>
+<p>3.如果更改捕获组的顺序，则还必须更改匹配代码。</p>
+<p><strong>命名的捕获组</strong></p>
+<p>ES9中可以通过名称来识别捕获组：(?<year>[0-9]{4})</p>
+<p>在这里，我们用名称标记了前一个捕获组year。该名称必须是合法的JavaScript标识符（认为变量名称或属性名称）。匹配后，您可以通过访问捕获的字符串matchObj.groups.year来访问。</p>
+<p>让我们重写前面的代码：</p>
+<pre><code class="language-csharp">const RE_DATE = /(?&lt;year&gt;[0-9]{4})-(?&lt;month&gt;[0-9]{2})-(?&lt;day&gt;[0-9]{2})/;
+
+const matchObj = RE_DATE.exec('1999-12-31');
+const year = matchObj.groups.year; // 1999
+const month = matchObj.groups.month; // 12
+const day = matchObj.groups.day; // 31
+
+// 使用解构语法更为简便
+const {groups: {day, year}} = RE_DATE.exec('1999-12-31');
+console.log(year); // 1999
+console.log(day); // 31
+</code></pre>
+<p>可以发现，命名捕获组有以下优点：</p>
+<p>找到捕获组的“ID”更容易。</p>
+<p>匹配代码变为自描述性的，因为捕获组的ID描述了正在捕获的内容。</p>
+<p>如果更改捕获组的顺序，则无需更改匹配代码。</p>
+<p>捕获组的名称也使正则表达式更容易理解，因为您可以直接看到每个组的用途。</p>
+<p><strong>正则表达式 Unicode 转义</strong></p>
+<p>该特性允许您使用\p{}通过提及大括号内的Unicode字符属性来匹配字符,在正则表达式中使用标记 u (unicode) 设置。</p>
+<pre><code class="language-csharp">/^\p{White_Space}+$/u.test('\t \n\r')
+// true
+/^\p{Script=Greek}+$/u.test('μετά')
+// true
+</code></pre>
+<h2 id="es10">ES10</h2>
+<p><strong>ES10还在草案，所以这里只有介绍。</strong></p>
+<p>ES2019中的JavaScript新功能包括：</p>
+<p>1.Array#{flat,flatMap}</p>
+<p>2.Object.fromEntries</p>
+<p>3.String#{trimStart,trimEnd}</p>
+<p>4.Symbol#description</p>
+<p>5.try { } catch {} // 可选的错误参数绑定</p>
+<p>6.JSON ⊂ ECMAScript</p>
+<p>7.格式良好的 JSON.stringify</p>
+<p>8.稳定的排序 Array#sort</p>
+<p>9.新版 Function#toString</p>
+<p>10.新增 BigInt 原始类型 (stage 3).</p>
+<p>11.动态引入模块(stage 3).</p>
+<p>12.标准的 globalThis 对象 (stage 3).</p>
+<p>13.ES10 Class: private, static &amp; public (stage 3).</p>
+<h3 id="1-arrayflat-arrayflatmap">1. Array.flat() &amp; Array.flatMap()</h3>
+<p>两个新的数组方法：</p>
+<p>Array.flat() 方法创建一个新数组，所有子数组元素都以递归方式合并到该数组中，直至达到指定深度。</p>
+<p>Array.flatMap() 方法首先使用map函数转换每个元素，然后将结果展平为新数组。它与map()后再调用深度为1的flat() 效果相同，但是flatMap()将两者合并为一种方法，效率更高。</p>
+<h3 id="2objectfromentries">2.Object.fromEntries()</h3>
+<p>把键值对数组为元素的二维数组转换为一个对象。</p>
+<h3 id="3stringtrimstart-stringtrimend">3.String.trimStart() &amp; String.trimEnd()</h3>
+<p>有两种新的String方法可从字符串中删除空格：</p>
+<p>trimStart() 方法从字符串的开头删除空格。<br>
+trimEnd() 方法从字符串末尾删除空格。</p>
+<h3 id="4symboldescription">4.Symbol.Description</h3>
+<p>当创建符号时，可以提供一个字符串作为描述。在ES10中，有一个获取描述的访问器。</p>
+<h3 id="6可选的-catch-参数变量">6.可选的 Catch 参数变量</h3>
+<p>过去，try / catch语句中的catch子句需要一个变量。现在，它允许开发人员使用try / catch而不创建未使用的error变量绑定。</p>
+<h3 id="6jsonecmascript">6.JSON⊂ECMAScript</h3>
+<p>在ES10之前的版本中，不接受非转义的行分隔符U+2028和段落分隔符U+2029。</p>
+<p>U+2028是段落分隔符。<br>
+U+2029是行分隔符。</p>
+<h3 id="7格式良好的-jsonstringify">7.格式良好的 JSON.stringify()</h3>
+<p>JSON.stringify() 可能返回U+D800和U+DFFF之间的字符，来作为没有等效UTF-8字符的值。但是，JSON格式需要UTF-8编码。解决方案是，将未配对的替代代码点表示为JSON转义序列，而不是将其作为单个UTF-16代码单元返回。</p>
+<h3 id="8arrayprototypesort">8.Array.prototype.sort()</h3>
+<p>V8的先前实现，对包含10个以上项的数组使用了不稳定的快速排序算法。</p>
+<p>一种稳定的排序算法是，当两个具有相同键的对象在排序输出中出现的顺序，与未排序输入中出现的顺序相同。</p>
+<h3 id="9新版-functiontostring">9.新版 Function.toString()</h3>
+<p>toString() 方法返回一个表示函数源代码的字符串。在ES6中，当在函数上调用toString时，它将根据ECMAScript引擎返回该函数的字符串表示形式。如果可能，它将返回源代码，否则-一个标准化的占位符。</p>
+<h3 id="10bigint-任意精度的整数">10.BigInt — 任意精度的整数</h3>
+<p>BigInt是第7个原始类型，它是一个任意精度的整数。而不仅仅是在9007199254740992处的最大值。</p>
+<h3 id="11动态引入">11.动态引入</h3>
+<p>动态import()返回所请求模块的Promise。因此，可以使用async/await 将导入的模块分配给变量。</p>
+<h3 id="12标准-globalthis-对象">12.标准 globalThis 对象</h3>
+<p>全局 this 在ES10之前尚未标准化。在生产代码中，您可以通过编写下边代码来“标准化”它：</p>
+<h3 id="13es10-class-private-static-public-成员变量函数">13.ES10 Class: private, static &amp; public 成员变量，函数</h3>
+<p>现在，新的语法字符＃（哈希标签）用于直接在类中定义变量，函数，getter和setter，以及构造函数和类方法。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[JavaScript（十）：this/call/apply/bind]]></title>
+        <id>https://dark-yifeng.github.io/post/javascriptshi-thiscallapplybind/</id>
+        <link href="https://dark-yifeng.github.io/post/javascriptshi-thiscallapplybind/">
+        </link>
+        <updated>2020-05-18T03:34:09.000Z</updated>
+        <content type="html"><![CDATA[<p><ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E4%B8%80-this">一、this</a>
+<ul>
+<li><a href="#1%E4%BB%80%E4%B9%88%E6%98%AFthis">1.什么是this</a></li>
+<li><a href="#2this-%E4%BB%A3%E8%A1%A8%E4%BB%80%E4%B9%88">2.this 代表什么</a></li>
+<li><a href="#3%E7%BB%91%E5%AE%9A-this-%E7%9A%84%E6%96%B9%E6%B3%95">3.绑定 this 的方法</a></li>
+<li><a href="#4this%E7%9A%84%E6%8C%87%E5%90%91">4.this的指向</a></li>
+<li><a href="#5%E6%94%B9%E5%8F%98%E6%8C%87%E5%90%91">5.改变指向</a></li>
+</ul>
+</li>
+<li><a href="#%E4%BA%8C-functionprototypebind">二、Function.prototype.bind()</a></li>
+<li><a href="#%E4%B8%89-callapply">三、call/apply</a>
+<ul>
+<li><a href="#1%E5%AE%9A%E4%B9%89">1.定义</a></li>
+<li><a href="#2%E8%AF%AD%E6%B3%95">2.语法</a></li>
+<li><a href="#3%E5%BC%82%E5%90%8C">3.异同</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</p>
+<h2 id="一-this">一、this</h2>
+<h3 id="1什么是this">1.什么是this</h3>
+<p>this 关键字在大部分语言中都是一个重要的存在，JS中自然不例外，其表达的意义丰富多样甚至有些复杂，深刻理解this是学习JS、面向对象编程非常重要的一环。</p>
+<h3 id="2this-代表什么">2.this 代表什么</h3>
+<p>this代表函数（方法）执行的上下文环境（上下文，类似与你要了解一篇文章，了解文章的上下文你才能清晰的了解各种关系）。</p>
+<p>但在 JavaScript 中 this 不是固定不变的，它会随着执行环境的改变而改变。</p>
+<p>1.在方法中，this 表示该方法所属的对象。</p>
+<p>2.如果单独使用，this 表示全局对象。</p>
+<p>3.在函数中，this 表示全局对象。</p>
+<p>4.在函数中，在严格模式下，this 是未定义的(undefined)。</p>
+<p>5.在事件中，this 表示接收事件的元素。</p>
+<p>6.类似 call() 和 apply() 方法可以将 this 引用到任何对象。</p>
+<h3 id="3绑定-this-的方法">3.绑定 this 的方法</h3>
+<p>this的动态切换，固然为 JavaScript 创造了巨大的灵活性，但也使得编程变得困难和模糊。有时，需要把this固定下来，避免出现意想不到的情况。JavaScript 提供了call、apply、bind这三个方法，来切换/固定this的指向。</p>
+<h3 id="4this的指向">4.this的指向</h3>
+<p><strong>1.在一般函数方法中使用 this 指代全局对象</strong></p>
+<pre><code class="language-csharp">function test(){
+　　　　this.x = 1;  //这里this就是window
+　　　　console.log(this.x);
+　　}
+　　test(); // 1
+</code></pre>
+<p>JS规定，函数中的this，在函数被调用时确定，它指函数当前运行的环境。</p>
+<p><strong>2.作为对象方法调用，this 指代上级对象</strong></p>
+<pre><code class="language-csharp">var x =3;
+function test(){
+　　alert(this.x);
+}
+var o = {
+  x:1,
+  m:test 
+};
+o.m(); // 1
+</code></pre>
+<p>如果函数作为对象的方法时，方法中的 this 指向该对象。</p>
+<p><strong>3.作为构造函数调用，this 指代new 出的对象</strong></p>
+<pre><code class="language-csharp">function test(){
+　　　　console.log(this);
+　　}
+　　var o = new test();
+       test();
+//可以看出o代表的不是全局对象
+</code></pre>
+<p>new关键词的作用是调用某个函数并拿到其中的返回值，只是调用过程稍特殊。在上面的代码实例中。test函数被new关键词调用时，内部依次执行了以下步骤:</p>
+<p>（1）创建一个空对象。</p>
+<p>（2）将这个空对象的原型，指向这个构造函数的prototype。</p>
+<p>（3）将空对象的值赋给函数内部的this（this就是个空对象了）。</p>
+<p>（4）执行函数体代码，为this这个对象绑定键值对。</p>
+<p>（5）返回this，将其作为new关键词调用oop函数的返回值。</p>
+<p>所以构造函数中的this，依旧是在构造函数被new关键词调用时确定其指向，指向的是当前被实例化的那个对象。</p>
+<p><strong>4.箭头函数中的this</strong><br>
+箭头函数是ES6的新特性，最重要的特点是它会捕获其所在上下文的this作为自己的this，或者说，箭头函数本身并没有this，它会沿用外部环境的this。也就是说，箭头函数内部与其外部的this是保持一致的。</p>
+<pre><code class="language-csharp">this.a=20
+var test={
+    a:40，
+    init:()=&gt;{
+        console.log(this.a)
+        function go(){
+            this.a=60
+            console.log(this.a)
+        }
+        go.prototype.a=50
+        return go
+    }   
+}
+
+var p=test.init()
+p()
+new (test.init())()
+//输出 20 60 60 60
+</code></pre>
+<h3 id="5改变指向">5.改变指向</h3>
+<p>this的动态切换，固然为 JavaScript 创造了巨大的灵活性，但也使得编程变得困难和模糊。有时，需要把this固定下来，避免出现意想不到的情况。JavaScript 提供了call、apply、bind这三个方法，来切换/固定this的指向。</p>
+<p>bind方法和apply、call稍有不同，bind方法返回一个新函数，以后调用了才会执行，但apply、call会立即执行。</p>
+<h2 id="二-functionprototypebind">二、Function.prototype.bind()</h2>
+<p>bind()方法主要就是将函数绑定到某个对象，bind()会创建一个函数，函数体内的this对象的值会被绑定到传入bind()中的第一个参数的值，例如：f.bind(obj)，实际上可以理解为obj.f()，这时f函数体内的this自然指向的是obj；</p>
+<p><strong>示例：</strong></p>
+<pre><code class="language-csharp">function f(y, z){
+    return this.x + y + z;
+}
+var m = f.bind({x : 1}, 2);
+console.log(m(3));
+//6
+</code></pre>
+<p>这里bind方法会把它的第一个实参绑定给f函数体内的this，所以这里的this即指向{x : 1}对象，从第二个参数起，会依次传递给原始函数，这里的第二个参数2，即是f函数的y参数，最后调用m(3)的时候，这里的3便是最后一个参数z了，所以执行结果为1 + 2 + 3 = 6分步处理参数的过程其实是一个典型的函数柯里化的过程（Curry）。</p>
+<h2 id="三-callapply">三、call/apply</h2>
+<h3 id="1定义">1.定义</h3>
+<p>每个函数都包含两个非继承而来的方法：call()方法和apply()方法。</p>
+<p>call和apply可以用来重新定义函数的执行环境，也就是this的指向；call和apply都是为了改变某个函数运行时的context，即上下文而存在的，换句话说，就是为了改变函数体内部this的指向。</p>
+<h3 id="2语法">2.语法</h3>
+<p><strong>call()</strong></p>
+<p>调用一个对象的方法，用另一个对象替换当前对象，可以继承另外一个对象的属性，它的语法是：</p>
+<pre><code class="language-csharp">Function.call(obj[, param1[, param2[, [,...paramN]]]]);
+</code></pre>
+<p>obj：这个对象将代替Function类里this对象<br>
+params：一串参数列表</p>
+<p>说明：call方法可以用来代替另一个对象调用一个方法，call方法可以将一个函数的对象上下文从初始的上下文改变为obj指定的新对象，如果没有提供obj参数，那么Global对象被用于obj。</p>
+<p><strong>apply()</strong></p>
+<p>和call()方法一样，只是参数列表不同，语法：</p>
+<p><strong>Function.apply(obj[, argArray]);</strong></p>
+<p>obj：这个对象将代替Function类里this对象<br>
+argArray：这个是数组，它将作为参数传给Function</p>
+<p>说明：如果argArray不是一个有效数组或不是arguments对象，那么将导致一个TypeError，如果没有提供argArray和obj任何一个参数，那么Global对象将用作obj。</p>
+<h3 id="3异同">3.异同</h3>
+<p><strong>相同点</strong></p>
+<p>call()和apply()方法的相同点就是这两个方法的作用是一样的。都是在特定的作用域中调用函数，等于设置函数体内this对象的值，以扩充函数赖以运行的作用域。</p>
+<p>一般来说，this总是指向调用某个方法的对象，但是使用call()和apply()方法时，就会改变this的指向，看个例子：</p>
+<pre><code class="language-csharp">function add(a, b) {
+    return a + b;
+}
+
+function sub(a, b) {
+    return a - b;
+}
+
+console.log(add.call(sub, 2, 1));//3
+</code></pre>
+<p>为什么add.call(sub, 2, 1)的执行结果是3呢，因为call()方法改变了this的指向，使得sub可以调用add的方法，也就是用sub去执行add中的内容，再来看一个例子：</p>
+<pre><code class="language-csharp">function People(name, age) {
+    this.name = name;
+    this.age = age;
+}
+
+function Student(name, age, grade) {
+    People.call(this, name, age);
+    this.grade = grade;
+}
+
+var student = new Student('小明', 21, '大三');
+console.log(student.name + student.age + student.grade);//小明21大三
+</code></pre>
+<p>在这个例子中，我们并没有给Student的name和age赋值，但是存在这两个属性的值，这还是要归功于call()方法，它可以改变this的指向。<br>
+在这个例子里，People.call(this, name, age);中的this代表的是Student，这也就是之前说的，使得Student可以调用People中的方法，因为People中有this.name = name;等语句，这样就将name和age属性创建到了Student中。</p>
+<p>总结一句话就是call()可以让括号里的对象来继承括号外函数的属性。</p>
+<p>至于apply()方法作用也和call()方法一样，可以这么写：</p>
+<pre><code class="language-csharp">People.apply(this, [name, age]);
+</code></pre>
+<p>或者这么写：</p>
+<pre><code class="language-csharp">People.apply(this, arguments);
+</code></pre>
+<p>在这里arguments和[name, age]是等价的。</p>
+<p><strong>不同点</strong></p>
+<p>从定义中也可以看出来，call()和apply()的不同点就是接收参数的方式不同。</p>
+<p>1.apply()方法接收两个参数，一个是函数运行的作用域（this），另一个是参数数组。<br>
+2.call()方法不一定接受两个参数，第一个参数也是函数运行的作用域（this），但是传递给函数的参数必须列举出来。</p>
+<p>在给对象参数的情况下,如果参数的形式是数组的时候,比如之前apply()方法示例里面传递了参数arguments,这个参数是数组类型,并且在调用Person的时候参数的列表是对应一致的(也就是Person和Student的参数列表前两位是一致的)就可以采用apply()方法。</p>
+<p>但是如果Person的参数列表是这样的(age,name)，而Student的参数列表是(name,age,grade)，这样就可以用call()方法来实现了,也就是直接指定参数列表对应值的位置Person.call(this,age,name)。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[JavaScript（九）：async/await]]></title>
+        <id>https://dark-yifeng.github.io/post/javascriptjiu-asyncawait/</id>
+        <link href="https://dark-yifeng.github.io/post/javascriptjiu-asyncawait/">
+        </link>
+        <updated>2020-05-18T03:33:50.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="1-asyncawait是什么">1. async/await是什么？</h2>
+<p>async 是一个修饰符，async 定义的函数会默认的返回一个Promise对象resolve的值，因此对async函数可以直接进行then操作,返回的值即为then方法的传入函数。</p>
+<p>await 也是一个修饰符，await 关键字 只能放在 async 函数内部， await关键字的作用 就是获取 Promise中返回的内容， 获取的是Promise函数中resolve或者reject的值。</p>
+<p><strong>那么async/await到底是干嘛的呢？</strong></p>
+<p>1.async/await 是一种编写异步代码的新方法。之前异步代码的方案是回调和 promise。<br>
+2.async/await 是建立在 promise 的基础上。（如果对Promise不熟悉，我已经着手在写Promise的文章了）<br>
+3.async/await 像 promise 一样，也是非阻塞的。<br>
+4.async/await 让异步代码看起来、表现起来更像同步代码。这正是其威力所在。</p>
+<p>async/await其实是Promise的语法糖，它能实现的效果都能用then链来实现，这也和我们之前提到的一样，它是为优化then链而开发出来的。从字面上来看，async是“异步”的简写，await译为等待，所以我们很好理解async声明function是异步的，await等待某个操作完成。当然语法上强制规定await只能出现在asnyc函数中，我们先来看看async函数返回了什么：</p>
+<pre><code class="language-c">async function testAsy(){
+   return 'hello world';
+}
+let result = testAsy(); 
+console.log(result)
+</code></pre>
+<p><img src="https://img-blog.csdnimg.cn/20200310002218223.png" alt="在这里插入图片描述" loading="lazy"><br>
+这个async声明的异步函数把return后面直接量通过Promise.resolve()返回Promise对象，所以如果这个最外层没有用await调用的话，是可以用原来then链的方式来调用的：</p>
+<pre><code class="language-c">async function testAsy(){
+   return 'hello world'
+}
+let result = testAsy() 
+console.log(result)
+result.then(v=&gt;{
+    console.log(v)   //hello world
+})
+</code></pre>
+<p>联想一下Promise特点——异步无等待，所以当没有await语句执行async函数，它就会立即执行，返回一个Promise对象，非阻塞，与普通的Promise对象函数一致。</p>
+<p>以下是一个promise在1s之后resolve的例子：</p>
+<pre><code class="language-c">async function f() {
+    let promise = new Promise((resolve, reject) =&gt; {
+        setTimeout(() =&gt; resolve('done!'), 1000)
+    })
+    let result = await promise // 直到promise返回一个resolve值（*）
+    console.log(result) 
+}
+f()
+</code></pre>
+<p>函数执行到（*）行会‘暂停’，当promise处理完成后重新恢复运行， resolve的值成了最终的result，所以上面的代码会在1s后输出'done!'</p>
+<p>我们强调一下：await字面上使得JavaScript等待，直到promise处理完成，</p>
+<p>然后将结果继续下去。这并不会花费任何的cpu资源，因为引擎能够同时做其他工作：执行其他脚本，处理事件等等。</p>
+<p>这只是一个更优雅的得到promise值的语句，它比promise更加容易阅读和书写。</p>
+<p>如果去掉await，我们获得的就是一个promise对象。</p>
+<pre><code class="language-c">//加上await
+done!
+
+//没有await
+Promise {&lt;pending&gt;}
+__proto__: Promise
+[[PromiseStatus]]: &quot;resolved&quot;
+[[PromiseValue]]: &quot;done!&quot;
+</code></pre>
+<p><strong>重点就在await，它等待什么呢？</strong></p>
+<p>按照语法说明，await等待的是一个Promise对象，或者是其他值（也就是说可以等待任何值），如果等待的是Promise对象，则返回Promise的处理结果；如果是其他值，则返回该值本身。并且await会暂停当前async function的执行，等待Promise的处理完成。若Promise正常处理（fulfillded），其将回调的resolve函数参数作为await表达式的值，继续执行async function；若Promise处理异常（rejected），await表达式会把Promise异常原因抛出；另外如果await操作符后面的表达式不是一个Promise对象，则返回该值本身。</p>
+<h2 id="2-深入理解asyncawait">2. 深入理解async/await</h2>
+<p>我们来详细说明一下async/await的作用。await操作符后面可以是任意值，当是Promise对象的时候，会暂停async function执行。也就是说，必须得等待await后面的Promise处理完成才能继续：</p>
+<pre><code class="language-c"> function testAsy(x){
+   return new Promise(resolve=&gt;{setTimeout(() =&gt; {
+       resolve(x);
+     }, 3000)
+    }
+   )
+}
+async function testAwt(){    
+  let result =  await testAsy('hello world');
+  console.log(result);    // 3秒钟之后出现hello world
+}
+testAwt();
+</code></pre>
+<p>await 表达式的运算结果取决于它等的东西。</p>
+<p>如果它等到的不是一个 Promise 对象，那 await 表达式的运算结果就是它等到的东西。</p>
+<p>如果它等到的是一个 Promise 对象，await 就忙起来了，它会阻塞后面的代码，等着 Promise 对象 resolve，然后得到 resolve 的值，作为 await 表达式的运算结果。</p>
+<p>我们再把上面的代码修改一下，好好体会“阻塞”这个词</p>
+<pre><code class="language-c"> function testAsy(x){
+   return new Promise(resolve=&gt;{setTimeout(() =&gt; {
+       resolve(x);
+     }, 3000)
+    }
+   )
+}
+async function testAwt(){    
+  let result =  await testAsy('hello world');
+  console.log(result);    // 3秒钟之后出现hello world
+  console.log('Y')   // 3秒钟之后出现Y
+}
+testAwt();
+console.log('L')  //立即输出L
+</code></pre>
+<p>这就是 await 必须用在 async 函数中的原因。async 函数调用不会造成阻塞，它内部所有的阻塞都被封装在一个 Promise 对象中异步执行。await暂停当前async的执行，所以'tangSir''最先输出，hello world'和‘tangj’是3秒钟后同时出现的。</p>
+<blockquote>
+<p>为什么会立即输出L，这就涉及到了JS中的事件循环了，我写了一篇关于事件循环的博客，看了应该会明白，总的来说，异步函数会在非异步函数之后运行。</p>
+</blockquote>
+<h2 id="3-async和await简单应用">3. async和await简单应用</h2>
+<p>上面已经说明了 async 会将其后的函数（函数表达式或 Lambda）的返回值封装成一个 Promise 对象，而 await 会等待这个 Promise 完成，并将其 resolve 的结果返回出来。</p>
+<p>现在举例，用 setTimeout模拟耗时的异步操作，先来看看不用 async/await 会怎么写</p>
+<pre><code class="language-c">function takeLongTime() {
+    return new Promise(resolve =&gt; {
+        setTimeout(() =&gt; resolve(&quot;long_time_value&quot;), 1000);
+    });
+}
+
+takeLongTime().then(v =&gt; {
+    console.log(&quot;got&quot;, v); //一秒钟后输出got long_time_value
+});
+</code></pre>
+<p>如果改用 async/await 呢，会是这样</p>
+<pre><code class="language-c">function takeLongTime() {
+    return new Promise(resolve =&gt; {
+        setTimeout(() =&gt; resolve(&quot;long_time_value&quot;), 1000);
+    });
+}
+
+async function test() {
+    const v = await takeLongTime();
+    console.log(v);  // 一秒钟后输出long_time_value
+}
+
+test();
+</code></pre>
+<p>tankLongTime()本身就是返回的 Promise 对象，所以加不加 async结果都一样。</p>
+<h2 id="4-处理then链">4. 处理then链</h2>
+<p>前面我们说了，async和await是处理then链的语法糖，现在我们来看看具体是怎么实现的：</p>
+<p>假设一个业务，分多个步骤完成，每个步骤都是异步的，而且依赖于上一个步骤的结果。我们仍然用setTimeout来模拟异步操作：</p>
+<pre><code class="language-c">/**
+ * 传入参数 n，表示这个函数执行的时间（毫秒）
+ * 执行的结果是 n + 200，这个值将用于下一步骤
+ */
+function takeLongTime(n) {
+    return new Promise(resolve =&gt; {
+        setTimeout(() =&gt; resolve(n + 200), n);
+    });
+}
+
+function step1(n) {
+    console.log(`step1 with ${n}`);
+    return takeLongTime(n);
+}
+
+function step2(n) {
+    console.log(`step2 with ${n}`);
+    return takeLongTime(n);
+}
+
+function step3(n) {
+    console.log(`step3 with ${n}`);
+    return takeLongTime(n);
+}
+</code></pre>
+<p>现在用 Promise 方式来实现这三个步骤的处理。</p>
+<pre><code class="language-c">function doIt(){
+    console.time('doIt');
+    let time1 = 300;
+    step1(time1)
+        .then((time2) =&gt; step2(time2))
+        .then((time3) =&gt; step3(time3))　　
+        .then((result) =&gt; {
+            console.log(`result is ${result}`);
+            console.timeEnd(&quot;doIt&quot;);
+        })
+}
+
+doIt();
+
+//执行结果为:
+//step1 with 300
+//step2 with 500
+//step3 with 700
+//result is 900
+//doIt: 1510.2490234375ms
+</code></pre>
+<p>输出结果 result 是 step3() 的参数 700 + 200 = 900。doIt() 顺序执行了三个步骤，一共用了 300 + 500 + 700 = 1500 毫秒，和 console.time()/console.timeEnd() 计算的结果一致。</p>
+<p>如果用 async/await 来实现呢，会是这样：</p>
+<pre><code class="language-c">async function doIt() {
+    console.time('doIt');
+    let time1 = 300;
+    let time2 = await step1(time1);//将Promise对象resolve(n+200)的值赋给time2
+    let time3 = await step1(time2);
+    let result = await step1(time3);
+    console.log(`result is ${result}`);
+    console.timeEnd('doIt');
+}
+
+doIt();
+
+//执行结果为:
+//step1 with 300
+//step2 with 500
+//step3 with 700
+//result is 900
+//doIt: 1512.904296875ms
+</code></pre>
+<p>显然我们用async/await简单多了。</p>
+<h2 id="5-promise处理结果为rejected">5. Promise处理结果为rejected</h2>
+<p>await 命令后面的 Promise 对象，运行结果可能是 rejected，所以最好把 await 命令放在 try...catch 代码块中。</p>
+<pre><code class="language-c">async function myFunction() {
+    try {
+        await somethingThatReturnAPromise();
+    } catch (err){
+        console.log(err);
+    }
+}
+
+//另一种写法
+async function myFunction() {
+    await somethingThatReturnAPromise().catch(function(err) {
+        console.log(err);
+    })
+}
+</code></pre>
+<h2 id="6实例">6.实例</h2>
+<p><strong>Vue普通写法：</strong></p>
+<pre><code class="language-c">methods: {
+     getLocation(phoneNum) {
+         return axios.post('/mm接口', {
+             phoneNum
+         })
+     },    
+     getFaceList(province, city) {
+         return axios.post('/nn接口', {
+             province,
+             city
+         })
+     },  
+     getFaceResult () {
+          this.getLocation(this.phoneNum).then(res =&gt; {
+              if (res.status === 200 &amp;&amp; res.data.success) {
+              let province = res.data.obj.province;
+              let city = res.data.obj.city;
+                  this.getFaceList(province, city).then(res =&gt; {
+                        if(res.status === 200 &amp;&amp; res.data.success) {
+                             this.faceList = res.data.obj
+                        }
+                  })
+              }
+         }).catch(err =&gt; {
+             console.log(err)
+         })     
+     }
+}
+</code></pre>
+<p>这时你看到了then 的链式写法，有一点回调地域的感觉。现在我们在有async/ await 来改造一下。</p>
+<p><strong>加入async/ await：</strong></p>
+<p>首先把 getFaceResult 转化成一个async 函数，就是在其前面加async， 因为它的调用方法和普通函数的调用方法是一致，所以没有什么问题。然后就把 getLocation 和getFaceList 放到await 后面，等待执行， getFaceResult  函数修改如下：</p>
+<pre><code class="language-c">async getFaceResult () {
+                let location = await this.getLocation(this.phoneNum);
+                if (location.data.success) {
+                    let province = location.data.obj.province;
+                    let city = location.data.obj.city;
+                    let result = await this.getFaceList(province, city);
+                    if (result.data.success) {
+                        this.faceList = result.data.obj;
+                    }
+                }
+            }
+</code></pre>
+<p>现在代码的书写方式，就像写同步代码一样，没有回调的感觉，非常舒服。</p>
+<p>现在就还差一点需要说明，那就是怎么处理异常，如果请求发生异常，怎么处理？ 它用的是try/catch 来捕获异常，把await 放到 try 中进行执行，如有异常，就使用catch 进行处理。</p>
+<pre><code class="language-c">async getFaceResult () {
+                try {
+                    let location = await this.getLocation(this.phoneNum);
+                    if (location.data.success) {
+                        let province = location.data.obj.province;
+                        let city = location.data.obj.city;
+                        let result = await this.getFaceList(province, city);
+                        if (result.data.success) {
+                            this.faceList = result.data.obj;
+                        }
+                    }
+                } catch(err) {
+                    console.log(err);
+                }
+            }
+</code></pre>
+<h2 id="注">注：</h2>
+<blockquote>
+<p>ES7引入的关键字async/await是对JavaScript异步编程的改进。它可以使代码更容易阅读和调试。然而，为了正确使用它们，必须完全理解promise，因为它们只不过是语法糖，而潜在的技术仍然是promise。</p>
+</blockquote>
+<h2 id="思考">思考：</h2>
+<p>Vue中，async created()这种写法有什么用呢？</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[JavaScript（八）：解构赋值]]></title>
+        <id>https://dark-yifeng.github.io/post/javascriptba-jie-gou-fu-zhi/</id>
+        <link href="https://dark-yifeng.github.io/post/javascriptba-jie-gou-fu-zhi/">
+        </link>
+        <updated>2020-05-18T03:33:40.000Z</updated>
+        <content type="html"><![CDATA[<p>ES6解构：es6允许按照一定模式，从数组和对象中提取值，对变量进行赋值，这被称之为解构。</p>
+<p>解构赋值是对赋值运算符的扩展。</p>
+<p>他是一种针对数组或者对象进行模式匹配，然后对其中的变量进行赋值。</p>
+<p>在代码书写上简洁且易读，语义更加清晰明了；也方便了复杂对象中数据字段获取。</p>
+<h2 id="解构模型">解构模型</h2>
+<p>在解构中，有下面两部分参与：</p>
+<p>1.解构的源，解构赋值表达式的右边部分。</p>
+<p>2.解构的目标，解构赋值表达式的左边部分。</p>
+<h2 id="解构赋值">解构赋值</h2>
+<p><strong>1.数组的解构赋值</strong></p>
+<pre><code class="language-c">var [a,b,c] = [1,2,3];
+console.log(a);//1
+console.log(b);//2
+console.log(c);//3
+//本质上这种写法属于‘模式匹配‘，只要等号两边的模式相同，左边的变量就会被赋予对应的值
+let [foo,[bar]] = [&quot;111&quot;,[&quot;abc&quot;]];
+console.log(bar); //abc
+
+let [, ,third] = [&quot;foo&quot;,&quot;bar&quot;,&quot;baz&quot;];
+console.log(third); //baz
+
+let [x,y,z] = ['hah'];
+console.log(y); //undefined
+//如果解构不成功，变量的值就等于undefined
+</code></pre>
+<p>解构一般有三种情况，完全解构，不完全解构，解构不成功,在上述例子中存在完全解构和解构不成功的例子，下面来看一下不完全解构的例子</p>
+<pre><code class="language-c">let [x,y] = [1,2,3];
+console.log(x); //1
+console.log(y); //2
+let [a,[b],d] = [1,[2,3],4];
+console.log(a); //1
+console.log(b); //2
+console.log(d); //4
+//不完全解构：即等号左边的模式，只匹配一部分的等号右边的数组，这种情况下解构依然成功
+</code></pre>
+<pre><code class="language-c">//如果等号的右边不是数组，或者说不是可遍历的结构，那么将会报错
+let [a] = 1;
+let [b] = false;
+let [c] = NaN;
+let [d] = undefined;
+let [e] = null;
+let [f] = {};
+//上面的语句都会报错：Uncaught TypeError: 1 is not iterable
+</code></pre>
+<p><strong>2. 默认值</strong></p>
+<p>解构赋值允许指定默认值</p>
+<pre><code class="language-c">let [x,y='b'] = ['a'];
+console.log(y); //b
+
+let [x,y = 'b'] = ['a',undefined];
+console.log(y); //b ,数组成员为undefined时，默认值仍会生效(因为在ES6内部使用严格相等运算符‘===‘，判断一个位置是否有值，所以当一个数组成员严格等于undefined,默认值才会生效)
+
+let [x,y = 'b'] = ['a',null];
+console.log(y); //null,如果一个数组成员是null,默认值就不会生效，因为null不严格等于undefined
+</code></pre>
+<p><strong>3. 对象的解构赋值</strong></p>
+<p>对象的解构与数组有一个重要的不同，数组的元素是按次序排列的，变量的取值由它的位置决定；而对象的属性没有次序，变量必须与属性同名，才能取到正确的值</p>
+<pre><code class="language-c"> //1. 变量名与属性名一致的情况下
+ let {foo,bar} = {foo : &quot;aaa&quot;,bar : &quot;bbb&quot;}
+ console.log(foo); //aaa
+ console.log(bar); //bbb
+ //变量名与属性名不一致的情况下，必须这样写
+ let {a : name, b : age} = {a : 'zhangsan', b : 33};
+ console.log(name); //zhangsan
+ console.log(age);  //33
+</code></pre>
+<p>实际上 对象的解构赋值是以这样的形式简写的</p>
+<pre><code class="language-c"> let {foo : foo ,bar : bar} = {foo : &quot;aaa&quot;,bar : &quot;bbb&quot;}
+</code></pre>
+<p>也就是说，对象的解构赋值的内部机制，是先找到同名属性，然后再赋值给对应的变量，真正被赋值的是后者，而不是前者，第一个foo/bar 是匹配的模式，对应的foo/bar属性值才是变量，真正被赋值的是属性值（也就是第二个foo/bar), 如果不能理解再看下面这个例子</p>
+<pre><code class="language-c">const node = {
+    grand : {
+        father : {
+            line : 1,
+            column : 5
+        }
+    }
+ }
+
+ let {grand,grand : { father},grand : {father : {column}}} = node;
+ console.log(father); // {line : 1, column : 5}
+ console.log(column); // 5
+ // grand、fahter、column 分别对这三个属性解构赋值，grand、father是模式，只有column 是变量
+</code></pre>
+<p><strong>4. 字符串的解构赋值</strong></p>
+<pre><code class="language-c">const [a,b,c,d,e] = 'hello';
+console.log(a); //h
+console.log(b); //e
+console.log(c); //l
+console.log(d); //l
+console.log(e); //o
+
+let { length : len} = 'yahooa';
+console.log(len); //5,类似数组的对象都有一个length属性，还可以对这个属性解构赋值
+</code></pre>
+<ol start="5">
+<li>数值和布尔值的解构赋值<br>
+解构赋值时，如果等号右边是数值和布尔值，则会先转为对象，但是等号右边为undefined 和 null时无法转为对象，所以对他们进行解构赋值时，都会报错</li>
+</ol>
+<pre><code class="language-c">let {prop : x } = undefined;
+console.log(x); //报错：Uncaught TypeError: Cannot destructure property `prop` of 'undefined' or 'null'
+</code></pre>
+<p><strong>6.函数参数的解构赋值</strong></p>
+<p>函数的参数也可以使用解构参数</p>
+<pre><code class="language-c">function move({x = 0,y = 0} = { }){
+    return [x,y];
+ }
+console.log(move({x : 3,y : 4})); //[3,4]
+console.log(move({x : 3})); //[3,0]
+console.log(move({})); //[0,0]
+console.log(move()); //[0,0]
+//move()的参数是一个对象，通过对这个对象进行解构，得到变量x、y的值，如果解构失败，x和y 等于默认值
+function move2({x,y} = {x : 1, y : 2 }){
+    return [x,y];
+}
+console.log(move2({x : 6,y : 8})); //[6,8]
+console.log(move2({})); //[undefined,undefined]
+console.log(move2()); //[1,2]
+//move2() 是为函数move的参数指定默认值，而不是为变量x和y指定默认值，所以与前一种写法的结果不太一样，undefined 就会触发函数的默认值
+</code></pre>
+<p><strong>7.对象解构中的 Rest</strong></p>
+<pre><code class="language-c">let {a, b, ...rest} = {a: 10, b: 20, c: 30, d: 40}
+a; // 10 
+b; // 20 
+rest; // { c: 30, d: 40 }
+</code></pre>
+<p><strong>8.解构对象时会查找原型链（如果属性不在对象自身，将从原型链中查找）</strong></p>
+<pre><code class="language-c">// 声明对象 和 自身 self 属性
+var obj = {self: '123'};
+// 在原型链中定义一个属性 prot
+obj.__proto__.prot = '456';
+// test
+const {self, prot} = obj;
+// self &quot;123&quot;
+// prot &quot;456&quot;（访问到了原型链）
+</code></pre>
+<h2 id="解构用途">解构用途</h2>
+<p><strong>1.交换变量的值</strong></p>
+<pre><code class="language-c">let x = 1;
+let y = 2;
+[x,y] = [y,x];
+console.log(x); //2
+console.log(y); //1
+</code></pre>
+<p><strong>2.从函数返回多个值</strong><br>
+函数只能返回一个值，如果要返回多个值的话，只能将它们放在数组或者对象里返回</p>
+<pre><code class="language-c">function example(){
+   return {
+       foo : 'a',
+       bar : 'b'
+   }
+ }
+ let {foo,bar} = example();
+ console.log(foo); //a
+ console.log(bar); //b
+</code></pre>
+<p><strong>3. 函数参数的定义</strong></p>
+<pre><code class="language-c">//参数是一组有次序的值
+function example([x,y,z]){
+    return x + y + z;
+}
+example([1,2,3])
+console.log(example([1,2,3])); //6
+//参数是一组无次序的值
+function f({x,y,z}){
+    return x + y + z;
+}
+f({x : 'a', z : 'b', y : 'c' });
+
+console.log(f({x : 'a', z : 'b', y : 'c' })); //acb
+1
+</code></pre>
+<p><strong>4.提取 JSON 数据</strong></p>
+<p>解构赋值对提取 JSON 对象中的数据，尤其有用。</p>
+<pre><code class="language-c">let jsonData = {
+  id: 42,
+  status: &quot;OK&quot;,
+  data: [867, 5309]
+};
+
+let { id, status, data: number } = jsonData;
+
+console.log(id, status, number);
+// 42, &quot;OK&quot;, [867, 5309]
+</code></pre>
+<p><strong>5.函数参数的默认值</strong></p>
+<pre><code class="language-c">jQuery.ajax = function (url, {
+  async = true,
+  beforeSend = function () {},
+  cache = true,
+  complete = function () {},
+  crossDomain = false,
+  global = true,
+  // ... more config
+} = {}) {
+  // ... do stuff
+};
+</code></pre>
+<p>指定参数的默认值，就避免了在函数体内部再写var foo = config.foo || 'default foo';这样的语句。</p>
+<p><strong>6.遍历 Map 结构</strong></p>
+<p>任何部署了 Iterator 接口的对象，都可以用for...of循环遍历。Map 结构原生支持 Iterator 接口，配合变量的解构赋值，获取键名和键值就非常方便。</p>
+<pre><code class="language-c">const map = new Map();
+map.set('first', 'hello');
+map.set('second', 'world');
+
+for (let [key, value] of map) {
+  console.log(key + &quot; is &quot; + value);
+}
+// first is hello
+// second is world
+如果只想获取键名，或者只想获取键值，可以写成下面这样。
+
+// 获取键名
+for (let [key] of map) {
+  // ...
+}
+
+// 获取键值
+for (let [,value] of map) {
+  // ...
+}
+</code></pre>
+<p><strong>7.输入模块的指定方法</strong></p>
+<p>加载模块时，往往需要指定输入哪些方法。解构赋值使得输入语句非常清晰。</p>
+<pre><code class="language-c">const { SourceMapConsumer, SourceNode } = require(&quot;source-map&quot;);
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[JavaScript（七）：Generator]]></title>
+        <id>https://dark-yifeng.github.io/post/javascriptqi-generator/</id>
+        <link href="https://dark-yifeng.github.io/post/javascriptqi-generator/">
+        </link>
+        <updated>2020-05-18T03:33:10.000Z</updated>
+        <content type="html"><![CDATA[<p><ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#1%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%BC%95%E5%85%A5generator">1.为什么要引入Generator？</a></li>
+<li><a href="#2%E5%9F%BA%E6%9C%AC%E7%94%A8%E6%B3%95">2.基本用法</a></li>
+<li><a href="#3yield">3.yield</a></li>
+<li><a href="#4yield">4.yield*</a></li>
+<li><a href="#5next%E6%96%B9%E6%B3%95">5.next()方法</a></li>
+<li><a href="#6next%E6%96%B9%E6%B3%95%E7%9A%84%E5%8F%82%E6%95%B0">6.next()方法的参数</a></li>
+<li><a href="#7throw%E6%96%B9%E6%B3%95">7.throw方法()</a></li>
+<li><a href="#8return%E6%96%B9%E6%B3%95">8.return()方法</a></li>
+<li><a href="#9generator%E4%B8%AD%E7%9A%84this%E5%92%8C%E4%BB%96%E7%9A%84%E5%8E%9F%E5%9E%8B">9.Generator中的this和他的原型</a></li>
+<li><a href="#10%E5%AE%9E%E9%99%85%E5%BA%94%E7%94%A8">10.实际应用</a></li>
+<li><a href="#11%E6%97%B6%E9%97%B4%E5%88%87%E7%89%87">11.时间切片</a></li>
+<li><a href="#%E6%B3%A8">注：</a></li>
+</ul>
+</li>
+</ul>
+</p>
+<h2 id="1为什么要引入generator">1.为什么要引入Generator？</h2>
+<p>众所周知，传统的JavaScript异步的实现是通过回调函数来实现的，但是这种方式有两个明显的缺陷：</p>
+<p>1.缺乏可信任性。例如我们发起ajax请求的时候是把回调函数交给第三方进行处理，期待它能执行我们的回调函数，实现正确的功能<br>
+2.缺乏顺序性。众多回调函数嵌套使用，执行的顺序不符合我们大脑常规的思维逻辑，回调逻辑嵌套比较深的话调试代码时可能会难以定位。</p>
+<p>Promise恢复了异步回调的可信任性，而Generator正是以一种看似顺序、同步的方式实现了异步控制流程，增强了代码可读性。</p>
+<p>generator是ES6提供的一种异步编程解决方案，在语法上，可以把它理解为一个状态机，内部封装了多种状态。执行generator，会生成返回一个遍历器对象。返回的遍历器对象，可以依次遍历generator函数的每一个状态。同时ES6规定这个遍历器是Generator函数的实例，也继承了Genarator函数的prototype对象上的方法。</p>
+<p><strong>Generator 函数是一个普通函数，但是有两个特征。</strong></p>
+<p>一是，function关键字与函数名之间有一个星号；<br>
+二是，函数体内部使用yield表达式，定义不同的内部状态（yield在英语里的意思就是“产出”）。</p>
+<h2 id="2基本用法">2.基本用法</h2>
+<p>Generator(生成器)是一类特殊的函数，跟普通函数声明时的区别是加了一个*号。</p>
+<p>Iterator(迭代器)：当我们实例化一个生成器函数之后，这个实例就是一个迭代器。可以通过next()方法去启动生成器以及控制生成器的是否往下执行。</p>
+<p>yield/next：这是控制代码执行顺序的一对好基友。通过yield语句可以在生成器函数内部暂停代码的执行使其挂起，此时生成器函数仍然是运行并且是活跃的，其内部资源都会保留下来，只不过是处在暂停状态。在迭代器上调用next()方法可以使代码从暂停的位置开始继续往下执行。</p>
+<pre><code class="language-c">function* helloWorldGenerator() {
+  yield 'hello';
+  yield 'world';
+  return 'ending';
+}
+
+var hw = helloWorldGenerator();
+
+hw.next()
+// { value: 'hello', done: false }
+
+hw.next()
+// { value: 'world', done: false }
+
+hw.next()
+// { value: 'ending', done: true }
+
+hw.next()
+// { value: undefined, done: true }
+</code></pre>
+<p>上面的程序执行了四次next：</p>
+<p>第一次调用，Generator 函数开始执行，直到遇到第一个yield表达式为止。next方法返回一个对象，它的value属性就是当前yield表达式的值hello，done属性的值false，表示遍历还没有结束。</p>
+<p>第二次调用，Generator 函数从上次yield表达式停下的地方，一直执行到下一个yield表达式。next方法返回的对象的value属性就是当前yield表达式的值world，done属性的值false，表示遍历还没有结束。</p>
+<p>第三次调用，Generator 函数从上次yield表达式停下的地方，一直执行到return语句（如果没有return语句，就执行到函数结束）。next方法返回的对象的value属性，就是紧跟在return语句后面的表达式的值（如果没有return语句，则value属性的值为undefined），done属性的值true，表示遍历已经结束。</p>
+<p>第四次调用，此时 Generator 函数已经运行完毕，next方法返回对象的value属性为undefined，done属性为true。以后再调用next方法，返回的都是这个值。</p>
+<h2 id="3yield">3.yield</h2>
+<p>由于 Generator 函数返回的遍历器对象，只有调用next方法才会遍历下一个内部状态，所以其实提供了一种可以暂停执行的函数。yield表达式就是暂停标志。</p>
+<p>（1）遇到yield表达式，就暂停执行后面的操作，并将紧跟在yield后面的那个表达式的值，作为返回的对象的value属性值。</p>
+<p>（2）下一次调用next方法时，再继续往下执行，直到遇到下一个yield表达式。</p>
+<p>（3）如果没有再遇到新的yield表达式，就一直运行到函数结束，直到return语句为止，并将return语句后面的表达式的值，作为返回的对象的value属性值。</p>
+<p>（4）如果该函数没有return语句或者执行完return之后再运行next的时候，则返回的对象的value属性值为undefined,done为true。</p>
+<p><strong>注意：</strong><br>
+需要注意，yield表达式只能用在 Generator 函数里面，用在其他地方都会报错。<br>
+yield表达式如果用在另一个表达式之中，必须放在圆括号里面<br>
+yield表达式用作函数参数或放在赋值表达式的右边，可以不加括号。<br>
+yield放在表达式中的时候，let s =（yield 1+2），s其值将会是undefined，而1+2这个等于3的值将会作为next返回对象的value的值</p>
+<p>Generator函数返回的Iterator运行的过程中，如果碰到了yield， 就会把yield后面的值返回， 此时函数相当于停止了， 下次再执行next()方法的时候， 函数又会从上次退出去的地方重新开始执行；</p>
+<p>如果把yield和return一起使用的话， 那么return的值也会作为最后的返回值， 如果return语句后面还有yield， 那么这些yield不生效：</p>
+<pre><code class="language-c">function* gen() {
+    yield 0;
+    yield 1;
+    return 2;
+    yield 3;
+};
+let g = gen();
+console.log(g.next(),g.next(),g.next(),g.next());
+//输出：{ value: 0, done: false } { value: 1, done: false } { value: 2, done: true } { value: undefined, done: true }
+</code></pre>
+<h2 id="4yield">4.yield*</h2>
+<p>yield<em>这种语句让我们可以在Generator函数里面再套一个Generator， 当然你要在一个Generator里面调用另外的Generator需要使用: yield</em> 函数() 这种语法， 都是套路啊：</p>
+<pre><code class="language-c">function* foo() {
+    yield 0;
+    yield 1;
+}
+function* bar() {
+    yield 'x';
+    yield* foo();
+    yield 'y';
+}
+for (let v of bar()){
+    console.log(v);
+};
+//依次输出x，0，1，y
+</code></pre>
+<h2 id="5next方法">5.next()方法</h2>
+<p>yield表达式本身没有返回值，或者说总是返回undefined。next方法可以带一个参数，该参数就会被当作上一个yield表达式的返回值。</p>
+<p>这个参数就是解决了上面说的注意事项的最后一个，yield的返回值总是undefined，</p>
+<p>由于next方法的参数表示上一个yield表达式的返回值，所以在第一次使用next方法时，传递参数是无效的。V8 引擎直接忽略第一次使用next方法时的参数，只有从第二次使用next方法开始，参数才是有效的。从语义上讲，第一个next方法用来启动遍历器对象，所以不用带有参数。</p>
+<p>Generator函数返回的Iterator执行next()方法以后， 返回值的结构为：</p>
+<pre><code class="language-c">{
+    value : &quot;value&quot;, //value为返回的值
+    done : false //done的值为一个布尔值， 如果Interator未遍历完毕， 他会返回false， 否则返回true；
+}
+ 
+</code></pre>
+<p>所以我们可以模拟一个Generator生成器， 利用闭包保存变量， 每一次执行next()方法， 都模拟生成一个{value:value,done:false}的键值对：</p>
+<pre><code class="language-c">function gen(array){
+    var nextIndex = 0;
+    return {
+        next: function(){
+            return nextIndex &lt; array.length ?
+            {value: array[nextIndex++], done: false} :
+            {value: undefined, done: true};
+        }
+    };
+};
+
+var it = gen([&quot;arr0&quot;, &quot;arr1&quot;, &quot;arr2&quot;, &quot;arr3&quot;]);
+console.log( it.next() );
+console.log( it.next() );
+console.log( it.next() );
+console.log( it.next() );
+console.log( it.next() );　
+</code></pre>
+<h2 id="6next方法的参数">6.next()方法的参数</h2>
+<p>如果给next方法传参数， 那么这个参数将会作为上一次yield语句的返回值 ，这个特性在异步处理中是非常重要的， 因为在执行异步代码以后， 有时候需要上一个异步的结果， 作为下次异步的参数， 如此循环：：</p>
+<pre><code class="language-c">&lt;script&gt;
+function* foo(x) {
+    var y = 2 * (yield (x + 1));
+    var z = yield (y / 3);
+    return (x + y + z);
+}
+
+var a = foo(5);
+a.next() // Object{value:6, done:false}
+a.next() // Object{value:NaN, done:false}
+a.next() // Object{value:NaN, done:true}
+
+var b = foo(5);
+b.next() // { value:6, done:false }
+b.next(12) // { value:8, done:false }
+b.next(13) // { value:42, done:true }
+&lt;/script&gt;
+</code></pre>
+<h2 id="7throw方法">7.throw方法()</h2>
+<p>如果执行Generator生成器的throw()方法， 如果在Iterator执行到的yield语句写在try{}语句块中， 那么这个错误会被内部的try{}catch(){}捕获 ：</p>
+<pre><code class="language-c">&lt;script&gt;
+var g = function* () {
+    try {
+        yield;
+    } catch (e) {
+        console.log('内部捕获0', e);
+    }
+};
+
+var i = g();
+i.next(); //让代码执行到yield处；
+try {
+    i.throw('a');
+} catch (e) {
+    console.log('外部捕获', e);
+}
+&lt;/script&gt;
+</code></pre>
+<h2 id="8return方法">8.return()方法</h2>
+<p>如果执行Iterator的return()方法， 那么这个迭代器的返回会被强制设置为迭代完毕， 执行return()方法的参数就是这个Iterator的返回值，此时done的状态也为true：</p>
+<pre><code class="language-c">&lt;script&gt;
+function* gen() {
+    yield 0;
+    yield 1;
+    yield 2;
+    yield 3;
+};
+let g = gen();
+console.log(g.return(&quot;heheda&quot;)); //输出：{ value: 'heheda', done: true }
+&lt;/script&gt;
+</code></pre>
+<h2 id="9generator中的this和他的原型">9.Generator中的this和他的原型</h2>
+<p>Generator中的this就是谁调用它，那么this就是谁， 我们利用Reflect.apply可以改变Generator的上下文：</p>
+<pre><code class="language-c">function* gen() {
+    console.log(this);
+    yield 0;
+};
+console.log(gen().next());
+console.log(Reflect.apply(gen,&quot;heheda&quot;).next());
+</code></pre>
+<h2 id="10实际应用">10.实际应用</h2>
+<p><strong>1.比如抽奖环节，当前用户还可以抽奖5次。点击后次数减1。</strong></p>
+<p>若采用ES5的方式，不使用Generator，则需要将count存入全局变量中，但是这样非常不安全，如果别人知道变量是什么，就可以修改变量；另外存入全局变量也会影响性能。</p>
+<pre><code class="language-c">{
+    let draw=function(count){
+        //具体抽奖逻辑，跟次数的校验是分开的
+        //输出剩余次数
+        console.log(`剩余${count}次`)
+    }
+　　 //利用Generator控制次数
+    let residue=function*(count){
+        while(count&gt;0){
+            count--
+            yield draw(count)
+        }
+    }
+　　//将Generator实例化，通过按钮绑定，点击执行next，进行抽奖
+    let star=residue(5)
+    let btn=document.createElement('button')
+    btn.id='start'
+    btn.textContent='抽奖'
+    document.body.appendChild(btn)
+    document.getElementById('start').addEventListener('click',function(){
+        star.next()
+    },false)
+}
+</code></pre>
+<p><strong>2.长轮询</strong></p>
+<p>场景：服务端的某一个数据状态定期变化，前端需要定时的去服务端取这个状态</p>
+<p>对于这种场景，有两种解决方案</p>
+<p>1）长轮询（定时器，定时访问接口）</p>
+<p>2）websocket（浏览器兼容性不好）</p>
+<pre><code class="language-c">{
+	let ajax=function* (){
+		yield new Promise(function(resolve,reject){
+			setTimeout(function(){
+				resolve({code:0})
+			},200)
+		})
+	}
+ 
+	let pull=function(){
+		let generator=ajax()
+		let step=generator.next()
+		step.value.then(function(d){
+			if(d.code!=0){
+				setTimeout(function(){
+					console.log('wait')
+					pull()
+				},1000)
+			}else{
+				console.log(d)
+			}
+		})
+	}
+ 
+	pull()
+}
+</code></pre>
+<p>输出结果为</p>
+<pre><code class="language-c">{code: 0}
+</code></pre>
+<p>将resolve({code:0})中code改成1,会一直轮询，输出结果为</p>
+<pre><code class="language-c">wait
+wait
+wait
+...
+　　
+</code></pre>
+<h2 id="11时间切片">11.时间切片</h2>
+<p>时间切片的核心思想是：如果任务不能在50毫秒内执行完，那么为了不阻塞主线程，这个任务应该让出主线程的控制权，使浏览器可以处理其他任务。让出控制权意味着停止执行当前任务，让浏览器去执行其他任务，随后再回来继续执行没有执行完的任务。</p>
+<p>所以时间切片的目的是不阻塞主线程，而实现目的的技术手段是将一个长任务拆分成很多个不超过50ms的小任务分散在宏任务队列中执行。</p>
+<pre><code class="language-JavaScript">btn.onclick = ts(function* () {
+  someThing(); // 执行了50毫秒
+  yield;
+  otherThing(); // 执行了50毫秒
+});
+
+</code></pre>
+<h2 id="注">注：</h2>
+<p>ES6 诞生以前，异步编程的方法，大概有下面四种。</p>
+<p>1.回调函数。<br>
+2.事件监听。<br>
+3.发布/订阅。<br>
+4.Promise 对象。</p>
+<p>Generator 函数将 JavaScript 异步编程带入了一个全新的阶段。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[JavaScript（六）：Promise]]></title>
+        <id>https://dark-yifeng.github.io/post/javascriptliu-promise/</id>
+        <link href="https://dark-yifeng.github.io/post/javascriptliu-promise/">
+        </link>
+        <updated>2020-05-18T03:32:30.000Z</updated>
+        <content type="html"><![CDATA[<p><ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#1%E5%AE%9A%E4%B9%89">1.定义</a></li>
+<li><a href="#2%E4%BD%9C%E7%94%A8">2.作用</a></li>
+<li><a href="#3%E8%AF%AD%E6%B3%95">3.语法</a></li>
+<li><a href="#4%E7%8A%B6%E6%80%81">4.状态</a></li>
+<li><a href="#5%E6%96%B9%E6%B3%95">5.方法</a></li>
+<li><a href="#6%E5%8E%9F%E5%9E%8B%E6%96%B9%E6%B3%95">6.原型方法</a></li>
+<li><a href="#7catch%E6%96%B9%E6%B3%95">7.catch()方法</a></li>
+<li><a href="#8%E5%AE%9E%E4%BE%8B">8.实例</a></li>
+</ul>
+</li>
+</ul>
+</p>
+<h2 id="1定义">1.定义</h2>
+<p>Promise 对象是一个代理对象（代理一个值），被代理的值在Promise对象创建时可能是未知的。它允许你为异步操作的成功和失败分别绑定相应的处理方法（handlers）。 这让异步方法可以像同步方法那样返回值，但并不是立即返回最终执行结果，而是一个能代表未来出现的结果的promise对象</p>
+<h2 id="2作用">2.作用</h2>
+<p>1、主要用于异步计算。<br>
+2、可以将异步操作队列化，按照期望的顺序执行，返回符合预期的结果。<br>
+3、可以在对象之间传递和操作promise，帮助我们处理队列。</p>
+<h2 id="3语法">3.语法</h2>
+<pre><code class="language-c">new Promise( function(resolve, reject) {...} /* executor */  );
+</code></pre>
+<h2 id="4状态">4.状态</h2>
+<p>一个 Promise有以下几种状态:</p>
+<p>1.pending: 初始状态，既不是成功，也不是失败状态。<br>
+2.fulfilled: 意味着操作成功完成。<br>
+3.rejected: 意味着操作失败。</p>
+<p>Promise对象的状态改变，只有两种可能：</p>
+<p>1.从pending变为fulfilled<br>
+2.从pending变为rejected。</p>
+<p>这两种情况只要发生，状态就凝固了，不会再变了。</p>
+<pre><code class="language-c">new Promise(
+  function (resolve, reject) {
+    // 一段耗时的异步操作
+    resolve('成功') // 数据处理完成
+    // reject('失败') // 数据处理出错
+  }
+).then(
+  (res) =&gt; {console.log(res)},  // 成功
+  (err) =&gt; {console.log(err)} // 失败
+)
+</code></pre>
+<p>pending 状态的 Promise 对象可能会变为fulfilled 状态并传递一个值给相应的状态处理方法，也可能变为失败状态（rejected）并传递失败信息。当其中任一种情况出现时，Promise 对象的 then 方法绑定的处理方法（handlers ）就会被调用（then方法包含两个参数：onfulfilled 和 onrejected，它们都是 Function 类型。当Promise状态为fulfilled时，调用 then 的 onfulfilled 方法，当Promise状态为rejected时，调用 then 的 onrejected 方法， 所以在异步操作的完成和绑定处理方法之间不存在竞争）。</p>
+<p>因为 Promise.prototype.then 和  Promise.prototype.catch 方法返回promise 对象， 所以它们可以被链式调用。<br>
+<img src="https://img-blog.csdnimg.cn/2020031122192174.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdXlpZmVuZzAwMDA=,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" loading="lazy"></p>
+<p><strong>示例一：</strong></p>
+<pre><code class="language-c">new Promise(resolve =&gt; {
+  setTimeout(() =&gt; {
+    resolve('hello')
+  }, 2000)
+}).then(res =&gt; {
+  console.log(res) //hello
+})
+</code></pre>
+<p><strong>示例二：</strong></p>
+<pre><code class="language-c">new Promise(resolve =&gt; {
+    setTimeout(() =&gt; {
+      resolve('hello')
+    }, 2000)
+  }).then(val =&gt; {
+    console.log(val) //  参数val = 'hello'
+    return new Promise(resolve =&gt; {
+      setTimeout(() =&gt; {
+        resolve('world')
+      }, 2000)
+    })
+  }).then(val =&gt; {
+    console.log(val) // 参数val = 'world'
+  })
+</code></pre>
+<p><strong>示例三：</strong></p>
+<pre><code class="language-c">let pro = new Promise(resolve =&gt; {
+   setTimeout(() =&gt; {
+     resolve('hello world')
+   }, 2000)
+ })
+ setTimeout(() =&gt; {
+   pro.then(value =&gt; {
+   console.log(value) // hello world
+ })
+ }, 2000)
+</code></pre>
+<blockquote>
+<p>promise作为队列最为重要的特性，我们在任何一个地方生成了一个promise队列之后，我们可以把他作为一个变量传递到其他地方。</p>
+</blockquote>
+<h2 id="5方法">5.方法</h2>
+<p><strong>1.Promise.all(iterable)</strong><br>
+这个方法返回一个新的promise对象，该promise对象在iterable参数对象里所有的promise对象都成功的时候才会触发成功，一旦有任何一个iterable里面的promise对象失败则立即触发该promise对象的失败。这个新的promise对象在触发成功状态以后，会把一个包含iterable里所有promise返回值的数组作为成功回调的返回值，顺序跟iterable的顺序保持一致；如果这个新的promise对象触发了失败状态，它会把iterable里第一个触发失败的promise对象的错误信息作为它的失败错误信息。Promise.all方法常被用于处理多个promise对象的状态集合。</p>
+<p><strong>2.Promise.race(iterable)</strong><br>
+当iterable参数里的任意一个子promise被成功或失败后，父promise马上也会用子promise的成功返回值或失败详情作为参数调用父promise绑定的相应句柄，并返回该promise对象。</p>
+<p><strong>3.Promise.reject(reason)</strong><br>
+返回一个状态为失败的Promise对象，并将给定的失败信息传递给对应的处理方法。</p>
+<p><strong>4.Promise.resolve(value)</strong><br>
+返回一个状态由给定value决定的Promise对象。如果该值是thenable(即，带有then方法的对象)，返回的Promise对象的最终状态由then方法执行决定；否则的话(该value为空，基本类型或者不带then方法的对象),返回的Promise对象状态为fulfilled，并且将该value传递给对应的then方法。通常而言，如果你不知道一个值是否是Promise对象，使用Promise.resolve(value) 来返回一个Promise对象,这样就能将该value以Promise对象形式使用。</p>
+<h2 id="6原型方法">6.原型方法</h2>
+<p><strong>1.Promise.prototype.catch(onRejected)</strong><br>
+添加一个拒绝(rejection) 回调到当前 promise, 返回一个新的promise。当这个回调函数被调用，新 promise 将以它的返回值来resolve，否则如果当前promise 进入fulfilled状态，则以当前promise的完成结果作为新promise的完成结果。</p>
+<p><strong>2.Promise.prototype.then(onFulfilled, onRejected)</strong><br>
+添加解决(fulfillment)和拒绝(rejection)回调到当前 promise, 返回一个新的 promise, 将以回调的返回值来resolve.</p>
+<p><strong>3.Promise.prototype.finally(onFinally)</strong><br>
+添加一个事件处理回调于当前promise对象，并且在原promise对象解析完毕后，返回一个新的promise对象。回调会在当前promise运行完毕后被调用，无论当前promise的状态是完成(fulfilled)还是失败(rejected)</p>
+<h2 id="7catch方法">7.catch()方法</h2>
+<p>Promise.prototype.catch 方法是 .then(null, rejection) 或是 .then(undefined, rejection)的别名，用于指定发生错误时的回调函数。</p>
+<p>如果Promise 对象状态变为resolved，则会调用then方法指定的回调函数；如果异步操作抛出错误，状态就会变为rejected，就会调用catch方法指定的回调函数，处理这个错误。另外，then方法指定的回调函数，如果运行中抛出错误，也会被catch方法捕获。</p>
+<pre><code class="language-c">p.then((val) =&gt; console.log('fulfilled:', val))
+  .catch((err) =&gt; console.log('rejected', err));
+
+// 等同于
+p.then((val) =&gt; console.log('fulfilled:', val))
+  .then(null, (err) =&gt; console.log(&quot;rejected:&quot;, err));
+  
+</code></pre>
+<h2 id="8实例">8.实例</h2>
+<p>本例展示了 Promise 的一些机制。 testPromise() 方法在每次点击 <button> 按钮时被调用，该方法会创建一个promise 对象，使用 window.setTimeout() 让Promise等待 1-3 秒不等的时间来填充数据（通过Math.random()方法）。</p>
+<p>Promise 的值的填充过程都被日志记录（logged）下来，这些日志信息展示了方法中的同步代码和异步代码是如何通过Promise完成解耦的。</p>
+<pre><code class="language-c">&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;亦枫&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;button onclick=&quot; testPromise()&quot; id=&quot;log&quot;&gt;0.0&lt;/button&gt;
+&lt;/body&gt;
+&lt;script&gt;
+    var promiseCount = 0;
+    function testPromise() {
+        let thisPromiseCount = ++promiseCount;
+
+        let log = document.getElementById('log');
+        log.insertAdjacentHTML('beforeend', thisPromiseCount +
+            ') 开始 (&lt;small&gt;同步代码开始&lt;/small&gt;)&lt;br/&gt;');
+
+        // 新构建一个 Promise 实例：使用Promise实现每过一段时间给计数器加一的过程，每段时间间隔为1~3秒不等
+        let p1 = new Promise(
+            // resolver 函数在 Promise 成功或失败时都可能被调用
+            (resolve, reject) =&gt; {
+                log.insertAdjacentHTML('beforeend', thisPromiseCount +
+                    ') Promise 开始 (&lt;small&gt;异步代码开始&lt;/small&gt;)&lt;br/&gt;');
+                // 创建一个异步调用
+                window.setTimeout(
+                    function () {
+                        // 填充 Promise
+                        resolve(thisPromiseCount);
+                    }, Math.random() * 2000 + 1000);
+            }
+        );
+
+        // Promise 不论成功或失败都会调用 then
+        // catch() 只有当 promise 失败时才会调用
+        p1.then(
+                // 记录填充值
+                function (val) {
+                    log.insertAdjacentHTML('beforeend', val +
+                        ') Promise 已填充完毕 (&lt;small&gt;异步代码结束&lt;/small&gt;)&lt;br/&gt;');
+                })
+            .catch(
+                // 记录失败原因
+                (reason) =&gt; {
+                    console.log('处理失败的 promise (' + reason + ')');
+                });
+
+        log.insertAdjacentHTML('beforeend', thisPromiseCount +
+            ') Promise made (&lt;small&gt;同步代码结束&lt;/small&gt;)&lt;br/&gt;');
+    }
+&lt;/script&gt;
+&lt;/html&gt;
+</code></pre>
+<p><strong>效果：</strong><br>
+<img src="https://img-blog.csdnimg.cn/20200311224346441.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdXlpZmVuZzAwMDA=,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" loading="lazy"></p>
+<p>刨析promise的内部机构，这篇文章写得不错：</p>
+<p>https://github.com/xieranmaya/blog/issues/3</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[JavaScript（五）： 事件循环]]></title>
+        <id>https://dark-yifeng.github.io/post/javascriptwu-shi-jian-xun-huan/</id>
+        <link href="https://dark-yifeng.github.io/post/javascriptwu-shi-jian-xun-huan/">
+        </link>
+        <updated>2020-05-18T03:32:06.000Z</updated>
+        <content type="html"><![CDATA[<p><ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#1%E4%B8%BA%E4%BB%80%E4%B9%88js%E6%98%AF%E5%8D%95%E7%BA%BF%E7%A8%8B">1.为什么js是单线程？</a></li>
+<li><a href="#2%E5%90%8C%E6%AD%A5%E5%92%8C%E5%BC%82%E6%AD%A5">2.同步和异步</a></li>
+<li><a href="#3%E5%AE%8F%E4%BB%BB%E5%8A%A1%E4%B8%8E%E5%BE%AE%E4%BB%BB%E5%8A%A1">3.宏任务与微任务</a></li>
+<li><a href="#4event-loop%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF">4.Event Loop(事件循环)</a></li>
+<li><a href="#5%E5%AE%9E%E4%BE%8B">5.实例</a></li>
+<li><a href="#%E4%BE%8B%E9%A2%98-%E4%BE%9D%E6%AC%A1%E8%BE%93%E5%87%BA%E4%BB%80%E4%B9%88">例题： 依次输出什么？</a></li>
+</ul>
+</li>
+</ul>
+<br>
+我们面试的时候经常会问到事件循环，也就是event loop。很多时候我们都是一脸懵，我们通常会背关于事件循环的面试题，讲给面试官的时候自己都不知道自己在讲什么，可能面试官也不太了解事件循环，只是看别人都这么问。那么，仔细了解一下事件循环吧，对以后的编程真的会有帮助的。</p>
+<h2 id="1为什么js是单线程">1.为什么js是单线程？</h2>
+<p>js作为主要运行在浏览器的脚本语言，js主要用途之一是操作DOM。</p>
+<p>举一个例子，如果js同时有两个线程，同时对同一个dom进行操作，这时浏览器应该听哪个线程的，如何判断优先级？</p>
+<p>为了避免这种问题，js必须是一门单线程语言，并且在未来这个特点也不会改变。</p>
+<p>单线程就意味着，所有任务需要排队，前一个任务结束，才会执行后一个任务。如果前一个任务耗时很长，后一个任务就不得不一直等着。</p>
+<pre><code class="language-csharp">var i, t = Date.now()
+for (i = 0; i &lt; 100000000; i++) {}
+console.log(Date.now() - t) // 238
+</code></pre>
+<p>像上面这样，如果排队是因为计算量大，CPU忙不过来，但是，如果是网络请求就不合适。因为一个网络请求的资源什么时候返回是不可预知的，这种情况再排队等待就不明智了。</p>
+<p>所以出现了同步与异步。</p>
+<h2 id="2同步和异步">2.同步和异步</h2>
+<p><strong>同步</strong></p>
+<p>同步任务是指在主线程上排队执行的任务，只有前一个任务执行完毕，才能继续执行下一个任务。</p>
+<pre><code class="language-csharp">// 同步代码
+function fun1() {
+  console.log(1);
+}
+function fun2() {
+  console.log(2);
+}
+fun1();
+fun2();
+</code></pre>
+<p>输出会依次输入1,2，因为代码是从上到下依次执行，执行完fun1()，才继续执行fun2()。</p>
+<p><strong>异步</strong></p>
+<p>异步任务是指不进入主线程，而进入任务队列的任务，只有任务队列通知主线程，某个异步任务可以执行了，该任务才会进入主线程。</p>
+<pre><code class="language-csharp">function fun1() {
+  console.log(1);
+}
+function fun2() {
+  console.log(2);
+}
+function fun3() {
+  console.log(3);
+}
+fun1();
+setTimeout(function(){
+  fun2();
+},0);
+fun3();
+</code></pre>
+<p>依次输出1，3，2，因为我们会优先执行同步函数，然后在执行异步函数。</p>
+<p>正是由于JavaScript是单线程的，而异步容易实现非阻塞，所以在JavaScript中对于耗时的操作或者时间不确定的操作，使用异步就成了必然的选择。<br>
+　　<br>
+<strong>JavaScript的执行顺序：（重点）</strong></p>
+<p>1.先同步后异步。<br>
+2.异步中任务队列的执行顺序： 先微任务microtask队列，再宏任务macrotask队列。<br>
+3.调用Promise 中的resolve，reject属于微任务队列，setTimeout属于宏任务队列。</p>
+<p>那什么是微任务和宏任务？</p>
+<h2 id="3宏任务与微任务">3.宏任务与微任务</h2>
+<p>异步任务分为 宏任务（macrotask） 与 微任务 (microtask)，不同的API注册的任务会依次进入自身对应的队列中，然后等待 Event Loop 将它们依次压入执行栈中执行。</p>
+<p><strong>宏任务</strong></p>
+<p>macrotask，可以理解是每次执行栈执行的代码就是一个宏任务（包括每次从事件队列中获取一个事件回调并放到执行栈中执行）。</p>
+<p>浏览器为了能够使得JS内部(macro)task与DOM任务能够有序的执行，会在一个macrotask执行结束后，在下一个macrotask 执行开始前，对页面进行重新渲染，流程如下：</p>
+<pre><code class="language-csharp">macrotask-&gt;渲染-&gt;macrotask-&gt;...
+</code></pre>
+<p><strong>宏任务包含：</strong></p>
+<p>script(整体代码)<br>
+setTimeout<br>
+setInterval<br>
+I/O<br>
+UI交互事件<br>
+postMessage<br>
+MessageChannel<br>
+setImmediate(Node.js 环境)</p>
+<p><strong>微任务</strong></p>
+<p>microtask,可以理解是在当前 task 执行结束后立即执行的任务。也就是说，在当前task任务后，下一个task之前，在渲染之前。</p>
+<p>所以它的响应速度相比setTimeout（setTimeout是task）会更快，因为无需等渲染。也就是说，在某一个macrotask执行完后，就会将在它执行期间产生的所有microtask都执行完毕（在渲染前）。</p>
+<p><strong>微任务包含：</strong></p>
+<p>Promise.then<br>
+Object.observe<br>
+MutaionObserver<br>
+process.nextTick(Node.js 环境)</p>
+<h2 id="4event-loop事件循环">4.Event Loop(事件循环)</h2>
+<p>Event Loop(事件循环)中，每一次循环称为 tick, 每一次tick的任务如下：</p>
+<p>1.执行栈选择最先进入队列的宏任务(通常是script整体代码)，如果有则执行。<br>
+2.检查是否存在 Microtask，如果存在则不停的执行，直至清空 microtask 队列。<br>
+3.更新render(每一次事件循环，浏览器都可能会去更新渲染)。<br>
+4.重复以上步骤。</p>
+<p>宏任务 &gt; 所有微任务 &gt; 宏任务，如下图所示：</p>
+<figure data-type="image" tabindex="1"><img src="https://img-blog.csdnimg.cn/20200220214654929.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdXlpZmVuZzAwMDA=,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" loading="lazy"></figure>
+<p>从代码执行顺序的角度来看，程序最开始是按代码顺序执行代码的，遇到同步任务，立刻执行；遇到异步任务，则只是调用异步函数发起异步请求。此时，异步任务开始执行异步操作，执行完成后到消息队列中排队。程序按照代码顺序执行完毕后，查询消息队列中是否有等待的消息。如果有，则按照次序从消息队列中把消息放到执行栈中执行。执行完毕后，再从消息队列中获取消息，再执行，不断重复。</p>
+<p>由于主线程不断的重复获得消息、执行消息、再取消息、再执行。所以，这种机制被称为事件循环。<br>
+　　<br>
+　　<strong>用代码表示：</strong></p>
+<pre><code class="language-csharp">while (queue.waitForMessage()) {
+  queue.processNextMessage();
+}
+</code></pre>
+<p>如果当前没有任何消息queue.waitForMessage 会等待同步消息到达。</p>
+<h2 id="5实例">5.实例</h2>
+<p>下面以一个实例来解释事件循环机制：</p>
+<pre><code class="language-csharp">console.log(1)
+div.onclick = () =&gt; {console.log('click')}
+console.log(2)
+setTimeout(() =&gt; {console.log('timeout')},1000)
+</code></pre>
+<p>1、执行第一行代码，第一行是一个同步任务，控制台显示1</p>
+<p>2、执行第二行代码，第二行是一个异步任务，发起异步请求，可以在任意时刻执行鼠标点击的异步操作</p>
+<p>3、执行第三行代码，第三行是一个同步任务，控制台显示2</p>
+<p>4、执行第四行代码，第四行是一个异步任务，发起异步请求，1s后执行定时器任务</p>
+<p>5、假设从执行第四行代码的1s内，执行了鼠标点击，则鼠标任务在消息队列中排到首位</p>
+<p>6、从执行第四行代码1s后，定时器任务到消息队列中排到第二位</p>
+<p>7、现在同步任务已经执行完毕，则从消息队列中按照次序把异步任务放到执行栈中执行</p>
+<p>8、则控制台依次显示'click‘、'timeout'</p>
+<p>9、过了一段时间后，又执行了一次鼠标点击，由于消息队列中已经空了，则鼠标任务在消息队列中排到首位</p>
+<p>10、同步任务执行完毕后，再从消息队列中按照次序把异步任务放到执行栈中执行</p>
+<p>11、 则控制台显示'click'</p>
+<p><strong>异步过程</strong></p>
+<p>下面以一个实例来解释一次完整的异步过程：</p>
+<pre><code class="language-csharp">div.onclick = function fn(){console.log('click')}
+</code></pre>
+<p>1、主线程通过调用异步函数div.onclick发起异步请求</p>
+<p>2、在某一时刻，执行异步操作，即鼠标点击</p>
+<p>3、接着，回调函数fn到消息队列中排队</p>
+<p>4、主线程从消息队列中读取fn到执行栈中</p>
+<p>5、然后在执行栈中执行fn里面的代码console.log('click')</p>
+<p>6、于是，控制台显示'click'</p>
+<h2 id="例题-依次输出什么">例题： 依次输出什么？</h2>
+<pre><code class="language-csharp">    function fun1() {
+        console.log(&quot;1&quot;)
+    }
+
+    fun1()
+
+    setTimeout(function () {
+        console.log('2')
+    });
+
+    function fun3() {
+        console.log(&quot;3&quot;)
+    }
+    fun3()
+    var l4 = new Promise(function (resolve) {
+        for (var i = 0; i &lt; 10000; i++) {
+            i == 99 &amp;&amp; resolve();
+        }
+    }).then(function () {
+        console.log('4')
+    });
+
+    console.log('5');
+
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[JavaScript（四）：作用域链]]></title>
+        <id>https://dark-yifeng.github.io/post/javascriptsi-zuo-yong-yu-lian/</id>
+        <link href="https://dark-yifeng.github.io/post/javascriptsi-zuo-yong-yu-lian/">
+        </link>
+        <updated>2020-05-18T03:31:31.000Z</updated>
+        <content type="html"><![CDATA[<p><ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E4%BD%9C%E7%94%A8%E5%9F%9Fscope">作用域(Scope)</a>
+<ul>
+<li><a href="#1-%E4%BD%9C%E7%94%A8%E5%9F%9F">1. 作用域</a></li>
+<li><a href="#2-%E5%85%A8%E5%B1%80%E4%BD%9C%E7%94%A8%E5%9F%9F">2. 全局作用域</a></li>
+<li><a href="#3%E5%87%BD%E6%95%B0%E4%BD%9C%E7%94%A8%E5%9F%9F">3.函数作用域</a></li>
+<li><a href="#4-%E5%9D%97%E7%BA%A7%E4%BD%9C%E7%94%A8%E5%9F%9F">4. 块级作用域</a></li>
+</ul>
+</li>
+<li><a href="#%E4%BD%9C%E7%94%A8%E5%9F%9F%E9%93%BE">作用域链</a>
+<ul>
+<li><a href="#1%E8%87%AA%E7%94%B1%E5%8F%98%E9%87%8F">1.自由变量</a></li>
+<li><a href="#2-%E4%BD%9C%E7%94%A8%E5%9F%9F%E9%93%BE">2. 作用域链</a></li>
+<li><a href="#3-%E8%87%AA%E7%94%B1%E5%8F%98%E9%87%8F%E7%9A%84%E5%8F%96%E5%80%BC">3. 自由变量的取值</a></li>
+<li><a href="#4%E5%AE%9E%E4%BE%8B">4.实例</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<br>
+当你在if中创建了var了一个变量，你在if以外可以使用这个变量吗？如果使用let定义的呢？你定义的变量和函数，到底在哪里可以使用它。</p>
+<pre><code class="language-JavaScript"> for (var i = 0; i &lt; btns.length; i++) {
+    btns[i].onclick = function () {
+      console.log('第' + (i + 1) + '个')
+    }
+  }
+</code></pre>
+<p>这个函数为什么不能得到想要的效果？</p>
+<h2 id="作用域scope">作用域(Scope)</h2>
+<h3 id="1-作用域">1. 作用域</h3>
+<p>作用域是在运行时代码中的某些特定部分中变量，函数和对象的可访问性。换句话说，作用域决定了代码区块中变量和其他资源的可见性。可能这两句话并不好理解，我们先来看个例子：</p>
+<pre><code class="language-c">function outFun2() {
+    var inVariable = &quot;内层变量2&quot;;
+}
+outFun2();//要先执行这个函数，否则根本不知道里面是啥
+console.log(inVariable); // Uncaught ReferenceError: inVariable is not defined
+</code></pre>
+<p>从上面的例子可以体会到作用域的概念，变量 inVariable 在全局作用域没有声明，所以在全局作用域下取值会报错。我们可以这样理解：作用域就是一个独立的地盘，让变量不会外泄、暴露出去。也就是说作用域最大的用处就是隔离变量，不同作用域下同名变量不会有冲突。</p>
+<p>ES6 之前 JavaScript 没有块级作用域,只有全局作用域和函数作用域。ES6 的到来，为我们提供了‘块级作用域’,可通过新增命令 let 和 const 来体现。</p>
+<h3 id="2-全局作用域">2. 全局作用域</h3>
+<p>在代码中任何地方都能访问到的对象拥有全局作用域，一般来说以下几种情形拥有全局作用域：</p>
+<p><strong>最外层函数和在最外层函数外面定义的变量拥有全局作用域</strong></p>
+<pre><code class="language-c">var outVariable = &quot;我是最外层变量&quot;; //最外层变量
+function outFun() { //最外层函数
+    var inVariable = &quot;内层变量&quot;;
+    function innerFun() { //内层函数
+        console.log(inVariable);
+    }
+    innerFun();
+}
+console.log(outVariable); //我是最外层变量
+outFun(); //内层变量
+console.log(inVariable); //inVariable is not defined
+innerFun(); //innerFun is not defined
+</code></pre>
+<p><strong>所有末定义直接赋值的变量自动声明为拥有全局作用域</strong></p>
+<pre><code class="language-c">function outFun2() {
+    variable = &quot;未定义直接赋值的变量&quot;;
+    var inVariable2 = &quot;内层变量2&quot;;
+}
+outFun2();//要先执行这个函数，否则根本不知道里面是啥
+console.log(variable); //未定义直接赋值的变量
+console.log(inVariable2); //inVariable2 is not defined
+</code></pre>
+<p><strong>所有 window 对象的属性拥有全局作用域</strong></p>
+<p>一般情况下，window 对象的内置属性都拥有全局作用域，例如 window.name、window.location、window.top 等等。</p>
+<p>全局作用域有个弊端：如果我们写了很多行 JS 代码，变量定义都没有用函数包括，那么它们就全部都在全局作用域中。这样就会 污染全局命名空间, 容易引起命名冲突。</p>
+<pre><code class="language-c">// 张三写的代码中
+var data = {a: 100}
+
+// 李四写的代码中
+var data = {x: true}
+</code></pre>
+<p>这就是为何 jQuery、Zepto 等库的源码，所有的代码都会放在(function(){....})()中。因为放在里面的所有变量，都不会被外泄和暴露，不会污染到外面，不会对其他的库或者 JS 脚本造成影响。这是函数作用域的一个体现。</p>
+<h3 id="3函数作用域">3.函数作用域</h3>
+<p>函数作用域,是指声明在函数内部的变量，和全局作用域相反，局部作用域一般只在固定的代码片段内可访问到，最常见的例如函数内部。</p>
+<pre><code class="language-c">function doSomething(){
+    var blogName=&quot;浪里行舟&quot;;
+    function innerSay(){
+        alert(blogName);
+    }
+    innerSay();
+}
+alert(blogName); //脚本错误
+innerSay(); //脚本错误
+</code></pre>
+<blockquote>
+<p>作用域是分层的，内层作用域可以访问外层作用域的变量，反之则不行。</p>
+</blockquote>
+<p>值得注意的是：块语句（大括号“｛｝”中间的语句），如 if 和 switch 条件语句或 for 和 while 循环语句，不像函数，它们不会创建一个新的作用域。在块语句中定义的变量将保留在它们已经存在的作用域中。</p>
+<pre><code class="language-c">if (true) {
+    // 'if' 条件语句块不会创建一个新的作用域
+    var name = 'Hammad'; // name 依然在全局作用域中
+}
+console.log(name); // logs 'Hammad'
+</code></pre>
+<p>JS 的初学者经常需要花点时间才能习惯变量提升，而如果不理解这种特有行为，就可能导致bug 。正因为如此， ES6 引入了块级作用域，让变量的生命周期更加可控。</p>
+<h3 id="4-块级作用域">4. 块级作用域</h3>
+<p>块级作用域可通过新增命令 let 和 const 声明，所声明的变量在指定块的作用域外无法被访问。块级作用域在如下情况被创建：</p>
+<p>1.在一个函数内部。<br>
+2.在一个代码块（由一对花括号包裹）内部。</p>
+<p>let 声明的语法与 var 的语法一致。你基本上可以用 let 来代替 var 进行变量声明，但会将变量的作用域限制在当前代码块中。块级作用域有以下几个特点：</p>
+<p><strong>1.声明变量不会提升到代码块顶部。</strong><br>
+<strong>2.let/const 声明并不会被提升到当前代码块的顶部，因此你需要手动将 let/const 声明放置到顶部，以便让变量在整个代码块内部可用。</strong></p>
+<pre><code class="language-c">function getValue(condition) {
+if (condition) {
+let value = &quot;blue&quot;;
+return value;
+} else {
+// value 在此处不可用
+return null;
+}
+// value 在此处不可用
+}
+</code></pre>
+<p><strong>3.禁止重复声明。</strong><br>
+如果一个标识符已经在代码块内部被定义，那么在此代码块内使用同一个标识符进行 let 声明就会导致抛出错误。例如：</p>
+<pre><code class="language-c">var count = 30;
+let count = 40; // Uncaught SyntaxError: Identifier 'count' has already been declared
+在本例中， count 变量被声明了两次：一次使用 var ，另一次使用 let 。因为 let 不能在同一作用域内重复声明一个已有标识符，此处的 let 声明就会抛出错误。但如果在嵌套的作用域内使用 let 声明一个同名的新变量，则不会抛出错误。
+
+var count = 30;
+// 不会抛出错误
+if (condition) {
+let count = 40;
+// 其他代码
+}
+</code></pre>
+<p><strong>循环中的绑定块作用域的妙用</strong></p>
+<p>开发者可能最希望实现 for 循环的块级作用域了，因为可以把声明的计数器变量限制在循环内，例如，以下代码在 JS 经常见到：</p>
+<p><button>测试1</button><br>
+<button>测试2</button><br>
+<button>测试3</button></p>
+<script type="text/javascript">
+   var btns = document.getElementsByTagName('button')
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].onclick = function () {
+        console.log('第' + (i + 1) + '个')
+      }
+    }
+</script>
+<p>我们要实现这样的一个需求: 点击某个按钮, 提示&quot;点击的是第 n 个按钮&quot;,此处我们先不考虑事件代理,万万没想到，点击任意一个按钮，后台都是弹出“第四个”，这是因为用var定义时，会进行变量提升，当运行到for循环时，i的值已经为3。那该如何修改，最简单的是用 let 声明 i</p>
+<pre><code class="language-c"> for (let i = 0; i &lt; btns.length; i++) {
+    btns[i].onclick = function () {
+      console.log('第' + (i + 1) + '个')
+    }
+  }
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://img-blog.csdnimg.cn/20200314101817359.png" alt="在这里插入图片描述" loading="lazy"></figure>
+<h2 id="作用域链">作用域链</h2>
+<h3 id="1自由变量">1.自由变量</h3>
+<p>首先认识一下什么叫做 自由变量 。如下代码中，console.log(a)要得到 a 变量，但是在当前的作用域中没有定义 a（可对比一下 b）。当前作用域没有定义的变量，这成为 自由变量 。自由变量的值如何得到 —— 向父级作用域寻找（注意：这种说法并不严谨，下文会重点解释）。</p>
+<pre><code class="language-c">var a = 100
+function fn() {
+    var b = 200
+    console.log(a) // 这里的a在这里就是一个自由变量
+    console.log(b)
+}
+fn()
+</code></pre>
+<h3 id="2-作用域链">2. 作用域链</h3>
+<p>如果父级也没呢？再一层一层向上寻找，直到找到全局作用域还是没找到，就宣布放弃。这种一层一层的关系，就是 作用域链 。</p>
+<pre><code class="language-c">var a = 100
+function F1() {
+    var b = 200
+    function F2() {
+        var c = 300
+        console.log(a) // 自由变量，顺作用域链向父作用域找
+        console.log(b) // 自由变量，顺作用域链向父作用域找
+        console.log(c) // 本作用域的变量
+    }
+    F2()
+}
+F1()
+</code></pre>
+<h3 id="3-自由变量的取值">3. 自由变量的取值</h3>
+<p>关于自由变量的值，上文提到要到父作用域中取，其实有时候这种解释会产生歧义。</p>
+<pre><code class="language-c">var x = 10
+function fn() {
+  console.log(x)
+}
+function show(f) {
+  var x = 20
+  (function() {
+    f() //10，而不是20
+  })()
+}
+show(fn)
+</code></pre>
+<p>在 fn 函数中，取自由变量 x 的值时，要到哪个作用域中取？——要到创建 fn 函数的那个作用域中取，无论 fn 函数将在哪里调用。</p>
+<p>所以，不要在用以上说法了。相比而言，用这句话描述会更加贴切: &quot;要到创建这个函数的那个域&quot;。</p>
+<p>作用域中取值,这里强调的是“创建”，而不是“调用”**，切记切记——其实这就是所谓的&quot;静态作用域&quot;</p>
+<pre><code class="language-c">var a = 10
+function fn() {
+  var b = 20
+  function bar() {
+    console.log(a + b) //30
+  }
+  return bar
+}
+var x = fn(),
+  b = 200
+x() //bar()
+</code></pre>
+<p>fn()返回的是 bar 函数，赋值给 x。执行 x()，即执行 bar 函数代码。取 b 的值时，直接在 fn 作用域取出。取 a 的值时，试图在 fn 作用域取，但是取不到，只能转向创建 fn 的那个作用域中去查找，结果找到了,所以最后的结果是 30。</p>
+<h3 id="4实例">4.实例</h3>
+<pre><code class="language-c">var a = 1;  //全局变量
+(function () {
+    var b = 2;  //第1层局部变量
+    (function () {
+        var c = 3;  //第2层局部变量
+        (function () {
+            var d = 4;  //第3层局部变量
+            console.log(a + b + c + d);  //返回10
+        }) ()  //直接调用函数
+    }) ()  //直接调用函数
+}) ()  //直接调用函数
+</code></pre>
+<p>在上面代码中，JavaScript 引擎首先在最内层活动对象中查询属性 a、b、c 和 d，从中只找到了属性 d，并获得它的值（4）；然后沿着作用域链，在上一层活动对象中继续查找属性 a、b 和 c，从中找到了属性 c，获取它的值（3）······以此类推，直到找到所有需要的变量值为止，如图所示。<br>
+<img src="https://img-blog.csdnimg.cn/2020031411022917.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdXlpZmVuZzAwMDA=,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" loading="lazy"></p>
+<blockquote>
+<p>定义的标识符的越深，那么读写的速度也就越慢，而全局变量总是处于作用域链的最末端，所以当变量解析的时候，查找全局变量是最慢的，所以在编写代码的时候要尽可能少的使用全局变量，尽可能使用局部变量。</p>
+</blockquote>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[JavaScript（三）：闭包]]></title>
         <id>https://dark-yifeng.github.io/post/javascriptsan-bi-bao/</id>
@@ -216,197 +2414,11 @@ compareNanies = null;
 ]]></content>
     </entry>
     <entry>
-        <title type="html"><![CDATA[JavaScript（一）：类]]></title>
+        <title type="html"><![CDATA[JavaScript（二）：MV*]]></title>
         <id>https://dark-yifeng.github.io/post/javascriptyi-lei/</id>
         <link href="https://dark-yifeng.github.io/post/javascriptyi-lei/">
         </link>
         <updated>2020-05-18T03:16:24.000Z</updated>
-        <content type="html"><![CDATA[<h2 id="es5">ES5</h2>
-<p>ECMAScript 2015 中引入的 JavaScript 类实质上是 JavaScript 现有的基于原型的继承的语法糖。类语法不会为JavaScript引入新的面向对象的继承模型。</p>
-<p>类实际上是个“特殊的函数”，就像你能够定义的函数表达式和函数声明一样，类语法有两个组成部分：类表达式和类声明。</p>
-<p><strong>类声明</strong></p>
-<p>定义一个类的一种方法是使用一个类声明。要声明一个类，你可以使用带有class关键字的类名（这里是“Rectangle”）。</p>
-<pre><code class="language-csharp">class Rectangle {
-  constructor(height, width) {
-    this.height = height;
-    this.width = width;
-  }
-}
-</code></pre>
-<blockquote>
-<p>函数声明和类声明之间的一个重要区别是函数声明会提升，类声明不会。</p>
-</blockquote>
-<p><strong>类表达式</strong></p>
-<p>一个类表达式是定义一个类的另一种方式。类表达式可以是被命名的或匿名的。赋予一个命名类表达式的名称是类的主体的本地名称。</p>
-<pre><code class="language-csharp">/* 匿名类 */ 
-let Rectangle = class {
-  constructor(height, width) {
-    this.height = height;
-    this.width = width;
-  }
-};
-
-/* 命名的类 */ 
-let Rectangle = class Rectangle {
-  constructor(height, width) {
-    this.height = height;
-    this.width = width;
-  }
-};
-</code></pre>
-<blockquote>
-<p>类表达式也同样受到类声明中提到的提升问题的限制。</p>
-</blockquote>
-<h2 id="es6">ES6</h2>
-<p>在ES6中，class (类)作为对象的模板被引入，可以通过 class 关键字定义类。它可以被看作一个语法糖，让对象原型的写法更加清晰、更像面向对象编程的语法。</p>
-<h2 id="es5与es6对比">ES5与ES6对比</h2>
-<h2 id="一">一</h2>
-<p>在ES5中定义一个类：</p>
-<pre><code class="language-csharp">function Person(name) {
- 
-    this.name = name;
-}
- 
-Person.prototype.sayHello = function(){
- 
-    return 'Hi, I am ' + this.name;
-}
-</code></pre>
-<p>而用ES6的写法重写一下，检测类型发现Person本质上仍然是函数：</p>
-<pre><code class="language-csharp">class Person {
- 
-    constructor(name){
-        this.name = name;
-    }
- 
-    sayHello(){
-        return 'Hi, I am ' + this.name;
-    }
-}
- 
-typeof Person; //'function'
-</code></pre>
-<p>调用的方式都是一致的：</p>
-<pre><code class="language-csharp">var p1 = new Person('zhangsan');   
-</code></pre>
-<blockquote>
-<p>用ES6定义class中的方法，定义在原型对象上的。与ES5不同的是，这些定义在原型对象的方法是不可枚举的。</p>
-</blockquote>
-<h2 id="二">二</h2>
-<p>ES6类和模块是严格模式下的；不存在变量提升，保证子类父类的顺序；类的继承也有新的写法：</p>
-<pre><code class="language-csharp">class Female extends Person {
- 
-    constructor(name){
-        super(name); //调用父类的，调用之后，子类才有this
-        this.sex = 'boy';
-    }
- 
-    sayHello(){
-        return super.sayHello() + ', I am ' + this.sex;
-    }
- 
-}
-</code></pre>
-<p>注意，子类必须在父类的构造函数中调用super()，这样才有this对象，因为this对象是从父类继承下来的。而要在子类中调用父类的方法，用super关键词可指代父类。</p>
-<p>ES5中类继承的关系是相反的，先有子类的this，然后用父类的方法应用在this上。</p>
-<p>ES6类继承子类的this是从父类继承下来的这个特性，使得在ES6中可以构造原生数据结构的子类，这是ES5无法做到的。</p>
-<h2 id="三">三</h2>
-<p>ES6也可以定义类的静态方法和静态属性，静态的意思是这些不会被实例继承，不需要实例化类，就可以直接拿来用。ES6中class内部只能定义方法，不能定义属性。在方法名前加上static就表示这个方式是静态方法，而属性还是按照ES5的方式来实现。</p>
-<pre><code class="language-csharp">function Person(name){
- 
-    if(new.target === Person){
-        this.name = name;
-    }
-    else{
-        throw new Error('必须用new生成实例');
-    }
-}
-</code></pre>
-<h2 id="四">四</h2>
-<p>ES6中当函数用new关键词的时候，增加了new.target属性来判断当前调用的构造函数。这个有什么用处呢？可以限制函数的调用，比如一定要用new命令来调用，或者不能直接被实例化需要调用它的子类。</p>
-<pre><code class="language-csharp">function Person(name){
- 
-    if(new.target === Person){
-        this.name = name;
-    }
-    else{
-        throw new Error('必须用new生成实例');
-    }
-}
-</code></pre>
-<h2 id="五">五</h2>
-<p><strong>ES5类中的 实例方法&amp;原型方法&amp;静态方法</strong></p>
-<p>1.实例方法只有实例可以调用</p>
-<p>2.实例方法可以调用静态方法，不能调用原型方法</p>
-<p>3.原型方法可以被实例和构造函数访问到</p>
-<p>4.原型方法只可以调用静态方法</p>
-<p>5.静态方法只有构造函数可以调用</p>
-<p><strong>ES5中定义三种方法及调用关系：</strong></p>
-<pre><code class="language-csharp">let Animal = function (type) {
-  this.type = type
-  // 实例方法
-  this.drink = function () {
-    // 实例方法可调用类的静态方法
-    Animal.walk()
-    console.log('drink')
-  }
-}
-
-// 原型方法
-Animal.prototype.eat = function () {
-  // 原型方法可调用类的静态方法
-  Animal.walk()
-  console.log('eat food')
-}
-
-// 静态方法
-Animal.walk = function () {
-  console.log('walking')
-}
-
-let dog = new Animal('dog')
-dog.drink() // walking drink
-dog.eat() // walking eat food
-Animal.walk() // walking静态方法只能由&lt;类自身&amp;实例方法&amp;原型方法&gt;调用，实例对象无法调用
-// dog.walk() // dog.walk is not a function  实例对象无法调用静态方法
-</code></pre>
-<p><strong>ES6类中的 实例方法&amp;原型方法&amp;静态方法</strong></p>
-<p>1.实例方法=原型方法 类中直接定义的实例方法默认就是ES5中的原型方法（语法糖）</p>
-<p>2.静态方法用static前缀定义</p>
-<p>3.静态方法只有构造函数可以调用，原型方法是实例和构造函数都可以调用，是共享的方法。</p>
-<p><strong>ES6中定义三种方法及调用关系：</strong></p>
-<pre><code class="language-csharp">class Animal {
-  constructor (type) {
-    this.type = type
-  }
-  // 定义实例对象的方法
-  eat () {
-    // 使用静态方法，以类形式访问，而非this访问
-    Animal.walk()
-    console.log('eat food')
-    console.log(this.type) // 类的例实例对象的方法可以获取到实例对象的信息，输出dog
-  }
-  // static 定义类的静态方法
-  static walk () {
-    console.log('walking')
-    console.log(this.type) // 类的静态方法无法获取到实例对象的信息，输出undefined
-  }
-}
-let dog = new Animal('dog')
-dog.eat() // walking ； undefined ； eat food ； dog
-Animal.walk() // walking ； undefined ；
-dog.walk() // dog.walk is not a function
-// 得出结论：需要访问实例对象的信息时用实例对象的方法，否则使用static静态方法
-// 实例方法就是只有实例可以调用，静态方法只有构造函数可以调用，原型方法是实例和构造函数都可以调用，是共享的方法。
-</code></pre>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[JavaScript（二）：MV*]]></title>
-        <id>https://dark-yifeng.github.io/post/hello-gridea/</id>
-        <link href="https://dark-yifeng.github.io/post/hello-gridea/">
-        </link>
-        <updated>2018-12-11T16:00:00.000Z</updated>
         <content type="html"><![CDATA[<p>MVC,MVP,MVVM都属于MV*框架，正在一点一点的完善。我们平常用的react框架就是MVC框架，而Vue和angular则是MVVM框架。</p>
 <h2 id="发展历程">发展历程</h2>
 <figure data-type="image" tabindex="1"><img src="https://img-blog.csdnimg.cn/20200229142214807.png" alt="在这里插入图片描述" loading="lazy"></figure>
