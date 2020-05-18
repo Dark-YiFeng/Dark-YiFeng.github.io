@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://dark-yifeng.github.io</id>
     <title>Dark</title>
-    <updated>2020-05-18T09:34:13.411Z</updated>
+    <updated>2020-05-18T09:40:17.988Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://dark-yifeng.github.io"/>
     <link rel="self" href="https://dark-yifeng.github.io/atom.xml"/>
@@ -11,7 +11,313 @@
     <icon>https://dark-yifeng.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, Dark</rights>
     <entry>
-        <title type="html"><![CDATA[Vue的数据响应式原理]]></title>
+        <title type="html"><![CDATA[Vue的：模板编译原理]]></title>
+        <id>https://dark-yifeng.github.io/post/vue-de-mo-ban-bian-yi-yuan-li/</id>
+        <link href="https://dark-yifeng.github.io/post/vue-de-mo-ban-bian-yi-yuan-li/">
+        </link>
+        <updated>2020-05-18T09:37:57.000Z</updated>
+        <content type="html"><![CDATA[<p>先看下模板到真正用户看到的界面过程中经历了什么：</p>
+<p>模板———&gt;模板编译——&gt;渲染函数——&gt;vnode——&gt;用于界面</p>
+<p>vue.js提供了模板语法，允许我们声明式的描述状态和DOM之间的绑定关系。</p>
+<p>将模板编译为渲染函数，就是模板编译要做的事，模板编译可以分为三个阶段：</p>
+<p>1.将模板解析为AST（抽象语法树）—— 解析器。<br>
+2.遍历AST标记静态节点 —— 优化器。<br>
+3.使用AST生成渲染函数 —— 代码生成器）。</p>
+<blockquote>
+<p>其实 AST 和 Vnode 类似，都是使用JavaScript对象来描述节点。更准确的说，一个用对象来描述的节点树就是 AST。</p>
+</blockquote>
+<p><img src="https://img-blog.csdnimg.cn/20200316215116732.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdXlpZmVuZzAwMDA=,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" loading="lazy"><br>
+<strong>解析器</strong></p>
+<pre><code class="language-c">&lt;div&gt;
+  &lt;p&gt;{{name}}&lt;/p&gt;
+&lt;/div&gt;
+</code></pre>
+<p>上面一个简单 的模版转换成element AST树形结构后是这样的：</p>
+<pre><code class="language-c">{
+  tag: &quot;div&quot;
+  type: 1,
+  staticRoot: false,
+  static: false,
+  plain: true,
+  parent: undefined,
+  attrsList: [],
+  attrsMap: {},
+  children: [
+      {
+      tag: &quot;p&quot;
+      type: 1,
+      staticRoot: false,
+      static: false,
+      plain: true,
+      parent: {tag: &quot;div&quot;, ...},
+      attrsList: [],
+      attrsMap: {},
+      children: [{
+          type: 2,
+          text: &quot;{{name}}&quot;,
+          static: false,
+          expression: &quot;_s(name)&quot;
+      }]
+    }
+  ]
+}
+</code></pre>
+<p>解析器的原理不是特别难，主要就是两部分内容，一部分是 截取 字符串，一部分是对截取之后的字符串做解析。每截取一段标签的开头就 push 到 stack中，解析到标签的结束就 pop 出来，当所有的字符串都截没了也就解析完了。</p>
+<p><strong>优化器</strong><br>
+优化器的目的就是找出那些静态节点并打上标记，而静态节点指的是DOM不需要发生变化的节点，也就是里面都是静态标签和静态文本。</p>
+<pre><code class="language-c">&lt; p&gt;我是静态节点，我不需要发生变化&lt;/ p&gt;
+</code></pre>
+<p><strong>标记静态节点有两个好处：</strong></p>
+<p>一、每次重新渲染的时候不需要为静态节点创建新节点，也就是静态节点的解析器不需要重新创建<br>
+二、在Virtual DOM中patching的过程可以被跳过</p>
+<p><strong>优化器的实现原理主要分两步：</strong></p>
+<p>一、用递归的方式将静态节点添加static属性，用来标识是不是静态节点<br>
+二、标记所有静态根节点(子节点全是静态节点就是静态根节点)</p>
+<p>整体逻辑其实就是递归 AST 这颗树，然后将 静态节点和 静态根节点找到并打上标记。</p>
+<p><strong>代码生成器</strong><br>
+代码生成器的作用是使用element ASTs生成render函数代码字符串。<br>
+使用本文开头举的例子中的模版生成后的AST来生成render后是这样的：</p>
+<pre><code class="language-c">{
+  render: `with(this){return _c('div',[_c('p',[_v(_s(name))])])}`
+}
+</code></pre>
+<p>格式化后是这样的：</p>
+<pre><code class="language-c">with(this){
+  return _c(
+    'div',
+    [
+      _c(
+        'p',
+        [
+          _v(_s(name))
+        ]
+      )
+    ]
+  )
+}
+</code></pre>
+<p>生成后的代码字符串中看到了有几个函数调用_c、_v、_s。<br>
+_c对应的是createElement，它的作用是创建一个元素。<br>
+1.第一个参数是一个HTML标签名<br>
+2.第二个参数是元素上使用的属性所对应的数据对象，可选项<br>
+3.第三个参数是children<br>
+_v的意思是创建一个文本节点。<br>
+_s是返回参数中的字符串。<br>
+代码生成器的总体逻辑其实就是使用element ASTs去递归，然后拼出这样的_c('div',[_c('p',[_v(_s(name))])]) 字符串。</p>
+<h2 id="原理">原理</h2>
+<p>解析器（parser）的原理是一小段一小段的去截取字符串，然后维护一个 stack 用来保存DOM深度，每截取到一段标签的开始就 push 到 stack 中，当所有字符串都截取完之后也就解析出了一个完整的 AST。</p>
+<p>优化器（optimizer）的原理是用递归的方式将所有节点打标记，表示是否是一个 静态节点，然后再次递归一遍把 静态根节点 也标记出来。</p>
+<p>代码生成器（code generator）的原理也是通过递归去拼一个函数执行代码的字符串，递归的过程根据不同的节点类型调用不同的生成方法，如果发现是一颗元素节点就拼一个 _c(tagName, data, children) 的函数调用字符串，然后 data 和 children 也是使用 AST 中的属性去拼字符串。</p>
+<p>如果 children 中还有 children 则递归去拼。</p>
+<p>最后拼出一个完整的 render 函数代码。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Vue中的模板编译原理]]></title>
+        <id>https://dark-yifeng.github.io/post/vue-zhong-de-mo-ban-bian-yi-yuan-li/</id>
+        <link href="https://dark-yifeng.github.io/post/vue-zhong-de-mo-ban-bian-yi-yuan-li/">
+        </link>
+        <updated>2020-05-18T09:37:57.000Z</updated>
+        <content type="html"><![CDATA[<p>先看下模板到真正用户看到的界面过程中经历了什么：</p>
+<p>模板———&gt;模板编译——&gt;渲染函数——&gt;vnode——&gt;用于界面</p>
+<p>vue.js提供了模板语法，允许我们声明式的描述状态和DOM之间的绑定关系。</p>
+<p>将模板编译为渲染函数，就是模板编译要做的事，模板编译可以分为三个阶段：</p>
+<p>1.将模板解析为AST（抽象语法树）—— 解析器。<br>
+2.遍历AST标记静态节点 —— 优化器。<br>
+3.使用AST生成渲染函数 —— 代码生成器）。</p>
+<blockquote>
+<p>其实 AST 和 Vnode 类似，都是使用JavaScript对象来描述节点。更准确的说，一个用对象来描述的节点树就是 AST。</p>
+</blockquote>
+<p><img src="https://img-blog.csdnimg.cn/20200316215116732.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdXlpZmVuZzAwMDA=,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" loading="lazy"><br>
+<strong>解析器</strong></p>
+<pre><code class="language-c">&lt;div&gt;
+  &lt;p&gt;{{name}}&lt;/p&gt;
+&lt;/div&gt;
+</code></pre>
+<p>上面一个简单 的模版转换成element AST树形结构后是这样的：</p>
+<pre><code class="language-c">{
+  tag: &quot;div&quot;
+  type: 1,
+  staticRoot: false,
+  static: false,
+  plain: true,
+  parent: undefined,
+  attrsList: [],
+  attrsMap: {},
+  children: [
+      {
+      tag: &quot;p&quot;
+      type: 1,
+      staticRoot: false,
+      static: false,
+      plain: true,
+      parent: {tag: &quot;div&quot;, ...},
+      attrsList: [],
+      attrsMap: {},
+      children: [{
+          type: 2,
+          text: &quot;{{name}}&quot;,
+          static: false,
+          expression: &quot;_s(name)&quot;
+      }]
+    }
+  ]
+}
+</code></pre>
+<p>解析器的原理不是特别难，主要就是两部分内容，一部分是 截取 字符串，一部分是对截取之后的字符串做解析。每截取一段标签的开头就 push 到 stack中，解析到标签的结束就 pop 出来，当所有的字符串都截没了也就解析完了。</p>
+<p><strong>优化器</strong><br>
+优化器的目的就是找出那些静态节点并打上标记，而静态节点指的是DOM不需要发生变化的节点，也就是里面都是静态标签和静态文本。</p>
+<pre><code class="language-c">&lt; p&gt;我是静态节点，我不需要发生变化&lt;/ p&gt;
+</code></pre>
+<p><strong>标记静态节点有两个好处：</strong></p>
+<p>一、每次重新渲染的时候不需要为静态节点创建新节点，也就是静态节点的解析器不需要重新创建<br>
+二、在Virtual DOM中patching的过程可以被跳过</p>
+<p><strong>优化器的实现原理主要分两步：</strong></p>
+<p>一、用递归的方式将静态节点添加static属性，用来标识是不是静态节点<br>
+二、标记所有静态根节点(子节点全是静态节点就是静态根节点)</p>
+<p>整体逻辑其实就是递归 AST 这颗树，然后将 静态节点和 静态根节点找到并打上标记。</p>
+<p><strong>代码生成器</strong><br>
+代码生成器的作用是使用element ASTs生成render函数代码字符串。<br>
+使用本文开头举的例子中的模版生成后的AST来生成render后是这样的：</p>
+<pre><code class="language-c">{
+  render: `with(this){return _c('div',[_c('p',[_v(_s(name))])])}`
+}
+</code></pre>
+<p>格式化后是这样的：</p>
+<pre><code class="language-c">with(this){
+  return _c(
+    'div',
+    [
+      _c(
+        'p',
+        [
+          _v(_s(name))
+        ]
+      )
+    ]
+  )
+}
+</code></pre>
+<p>生成后的代码字符串中看到了有几个函数调用_c、_v、_s。<br>
+_c对应的是createElement，它的作用是创建一个元素。<br>
+1.第一个参数是一个HTML标签名<br>
+2.第二个参数是元素上使用的属性所对应的数据对象，可选项<br>
+3.第三个参数是children<br>
+_v的意思是创建一个文本节点。<br>
+_s是返回参数中的字符串。<br>
+代码生成器的总体逻辑其实就是使用element ASTs去递归，然后拼出这样的_c('div',[_c('p',[_v(_s(name))])]) 字符串。</p>
+<h2 id="原理">原理</h2>
+<p>解析器（parser）的原理是一小段一小段的去截取字符串，然后维护一个 stack 用来保存DOM深度，每截取到一段标签的开始就 push 到 stack 中，当所有字符串都截取完之后也就解析出了一个完整的 AST。</p>
+<p>优化器（optimizer）的原理是用递归的方式将所有节点打标记，表示是否是一个 静态节点，然后再次递归一遍把 静态根节点 也标记出来。</p>
+<p>代码生成器（code generator）的原理也是通过递归去拼一个函数执行代码的字符串，递归的过程根据不同的节点类型调用不同的生成方法，如果发现是一颗元素节点就拼一个 _c(tagName, data, children) 的函数调用字符串，然后 data 和 children 也是使用 AST 中的属性去拼字符串。</p>
+<p>如果 children 中还有 children 则递归去拼。</p>
+<p>最后拼出一个完整的 render 函数代码。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Vue：模板编译原理]]></title>
+        <id>https://dark-yifeng.github.io/post/vuemo-ban-bian-yi-yuan-li/</id>
+        <link href="https://dark-yifeng.github.io/post/vuemo-ban-bian-yi-yuan-li/">
+        </link>
+        <updated>2020-05-18T09:37:57.000Z</updated>
+        <content type="html"><![CDATA[<p>先看下模板到真正用户看到的界面过程中经历了什么：</p>
+<p>模板———&gt;模板编译——&gt;渲染函数——&gt;vnode——&gt;用于界面</p>
+<p>vue.js提供了模板语法，允许我们声明式的描述状态和DOM之间的绑定关系。</p>
+<p>将模板编译为渲染函数，就是模板编译要做的事，模板编译可以分为三个阶段：</p>
+<p>1.将模板解析为AST（抽象语法树）—— 解析器。<br>
+2.遍历AST标记静态节点 —— 优化器。<br>
+3.使用AST生成渲染函数 —— 代码生成器）。</p>
+<blockquote>
+<p>其实 AST 和 Vnode 类似，都是使用JavaScript对象来描述节点。更准确的说，一个用对象来描述的节点树就是 AST。</p>
+</blockquote>
+<p><img src="https://img-blog.csdnimg.cn/20200316215116732.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdXlpZmVuZzAwMDA=,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" loading="lazy"><br>
+<strong>解析器</strong></p>
+<pre><code class="language-c">&lt;div&gt;
+  &lt;p&gt;{{name}}&lt;/p&gt;
+&lt;/div&gt;
+</code></pre>
+<p>上面一个简单 的模版转换成element AST树形结构后是这样的：</p>
+<pre><code class="language-c">{
+  tag: &quot;div&quot;
+  type: 1,
+  staticRoot: false,
+  static: false,
+  plain: true,
+  parent: undefined,
+  attrsList: [],
+  attrsMap: {},
+  children: [
+      {
+      tag: &quot;p&quot;
+      type: 1,
+      staticRoot: false,
+      static: false,
+      plain: true,
+      parent: {tag: &quot;div&quot;, ...},
+      attrsList: [],
+      attrsMap: {},
+      children: [{
+          type: 2,
+          text: &quot;{{name}}&quot;,
+          static: false,
+          expression: &quot;_s(name)&quot;
+      }]
+    }
+  ]
+}
+</code></pre>
+<p>解析器的原理不是特别难，主要就是两部分内容，一部分是 截取 字符串，一部分是对截取之后的字符串做解析。每截取一段标签的开头就 push 到 stack中，解析到标签的结束就 pop 出来，当所有的字符串都截没了也就解析完了。</p>
+<p><strong>优化器</strong><br>
+优化器的目的就是找出那些静态节点并打上标记，而静态节点指的是DOM不需要发生变化的节点，也就是里面都是静态标签和静态文本。</p>
+<pre><code class="language-c">&lt; p&gt;我是静态节点，我不需要发生变化&lt;/ p&gt;
+</code></pre>
+<p><strong>标记静态节点有两个好处：</strong></p>
+<p>一、每次重新渲染的时候不需要为静态节点创建新节点，也就是静态节点的解析器不需要重新创建<br>
+二、在Virtual DOM中patching的过程可以被跳过</p>
+<p><strong>优化器的实现原理主要分两步：</strong></p>
+<p>一、用递归的方式将静态节点添加static属性，用来标识是不是静态节点<br>
+二、标记所有静态根节点(子节点全是静态节点就是静态根节点)</p>
+<p>整体逻辑其实就是递归 AST 这颗树，然后将 静态节点和 静态根节点找到并打上标记。</p>
+<p><strong>代码生成器</strong><br>
+代码生成器的作用是使用element ASTs生成render函数代码字符串。<br>
+使用本文开头举的例子中的模版生成后的AST来生成render后是这样的：</p>
+<pre><code class="language-c">{
+  render: `with(this){return _c('div',[_c('p',[_v(_s(name))])])}`
+}
+</code></pre>
+<p>格式化后是这样的：</p>
+<pre><code class="language-c">with(this){
+  return _c(
+    'div',
+    [
+      _c(
+        'p',
+        [
+          _v(_s(name))
+        ]
+      )
+    ]
+  )
+}
+</code></pre>
+<p>生成后的代码字符串中看到了有几个函数调用_c、_v、_s。<br>
+_c对应的是createElement，它的作用是创建一个元素。<br>
+1.第一个参数是一个HTML标签名<br>
+2.第二个参数是元素上使用的属性所对应的数据对象，可选项<br>
+3.第三个参数是children<br>
+_v的意思是创建一个文本节点。<br>
+_s是返回参数中的字符串。<br>
+代码生成器的总体逻辑其实就是使用element ASTs去递归，然后拼出这样的_c('div',[_c('p',[_v(_s(name))])]) 字符串。</p>
+<h2 id="原理">原理</h2>
+<p>解析器（parser）的原理是一小段一小段的去截取字符串，然后维护一个 stack 用来保存DOM深度，每截取到一段标签的开始就 push 到 stack 中，当所有字符串都截取完之后也就解析出了一个完整的 AST。</p>
+<p>优化器（optimizer）的原理是用递归的方式将所有节点打标记，表示是否是一个 静态节点，然后再次递归一遍把 静态根节点 也标记出来。</p>
+<p>代码生成器（code generator）的原理也是通过递归去拼一个函数执行代码的字符串，递归的过程根据不同的节点类型调用不同的生成方法，如果发现是一颗元素节点就拼一个 _c(tagName, data, children) 的函数调用字符串，然后 data 和 children 也是使用 AST 中的属性去拼字符串。</p>
+<p>如果 children 中还有 children 则递归去拼。</p>
+<p>最后拼出一个完整的 render 函数代码。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Vue：数据响应式原理]]></title>
         <id>https://dark-yifeng.github.io/post/vue-de-shu-ju-xiang-ying-shi-yuan-li/</id>
         <link href="https://dark-yifeng.github.io/post/vue-de-shu-ju-xiang-ying-shi-yuan-li/">
         </link>
@@ -1906,612 +2212,6 @@ p.then((val) =&gt; console.log('fulfilled:', val))
 <img src="https://img-blog.csdnimg.cn/20200311224346441.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdXlpZmVuZzAwMDA=,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" loading="lazy"></p>
 <p>刨析promise的内部机构，这篇文章写得不错：</p>
 <p>https://github.com/xieranmaya/blog/issues/3</p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[JavaScript（五）： 事件循环]]></title>
-        <id>https://dark-yifeng.github.io/post/javascriptwu-shi-jian-xun-huan/</id>
-        <link href="https://dark-yifeng.github.io/post/javascriptwu-shi-jian-xun-huan/">
-        </link>
-        <updated>2020-05-18T03:32:06.000Z</updated>
-        <content type="html"><![CDATA[<p><ul class="markdownIt-TOC">
-<li>
-<ul>
-<li><a href="#1%E4%B8%BA%E4%BB%80%E4%B9%88js%E6%98%AF%E5%8D%95%E7%BA%BF%E7%A8%8B">1.为什么js是单线程？</a></li>
-<li><a href="#2%E5%90%8C%E6%AD%A5%E5%92%8C%E5%BC%82%E6%AD%A5">2.同步和异步</a></li>
-<li><a href="#3%E5%AE%8F%E4%BB%BB%E5%8A%A1%E4%B8%8E%E5%BE%AE%E4%BB%BB%E5%8A%A1">3.宏任务与微任务</a></li>
-<li><a href="#4event-loop%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF">4.Event Loop(事件循环)</a></li>
-<li><a href="#5%E5%AE%9E%E4%BE%8B">5.实例</a></li>
-<li><a href="#%E4%BE%8B%E9%A2%98-%E4%BE%9D%E6%AC%A1%E8%BE%93%E5%87%BA%E4%BB%80%E4%B9%88">例题： 依次输出什么？</a></li>
-</ul>
-</li>
-</ul>
-<br>
-我们面试的时候经常会问到事件循环，也就是event loop。很多时候我们都是一脸懵，我们通常会背关于事件循环的面试题，讲给面试官的时候自己都不知道自己在讲什么，可能面试官也不太了解事件循环，只是看别人都这么问。那么，仔细了解一下事件循环吧，对以后的编程真的会有帮助的。</p>
-<h2 id="1为什么js是单线程">1.为什么js是单线程？</h2>
-<p>js作为主要运行在浏览器的脚本语言，js主要用途之一是操作DOM。</p>
-<p>举一个例子，如果js同时有两个线程，同时对同一个dom进行操作，这时浏览器应该听哪个线程的，如何判断优先级？</p>
-<p>为了避免这种问题，js必须是一门单线程语言，并且在未来这个特点也不会改变。</p>
-<p>单线程就意味着，所有任务需要排队，前一个任务结束，才会执行后一个任务。如果前一个任务耗时很长，后一个任务就不得不一直等着。</p>
-<pre><code class="language-csharp">var i, t = Date.now()
-for (i = 0; i &lt; 100000000; i++) {}
-console.log(Date.now() - t) // 238
-</code></pre>
-<p>像上面这样，如果排队是因为计算量大，CPU忙不过来，但是，如果是网络请求就不合适。因为一个网络请求的资源什么时候返回是不可预知的，这种情况再排队等待就不明智了。</p>
-<p>所以出现了同步与异步。</p>
-<h2 id="2同步和异步">2.同步和异步</h2>
-<p><strong>同步</strong></p>
-<p>同步任务是指在主线程上排队执行的任务，只有前一个任务执行完毕，才能继续执行下一个任务。</p>
-<pre><code class="language-csharp">// 同步代码
-function fun1() {
-  console.log(1);
-}
-function fun2() {
-  console.log(2);
-}
-fun1();
-fun2();
-</code></pre>
-<p>输出会依次输入1,2，因为代码是从上到下依次执行，执行完fun1()，才继续执行fun2()。</p>
-<p><strong>异步</strong></p>
-<p>异步任务是指不进入主线程，而进入任务队列的任务，只有任务队列通知主线程，某个异步任务可以执行了，该任务才会进入主线程。</p>
-<pre><code class="language-csharp">function fun1() {
-  console.log(1);
-}
-function fun2() {
-  console.log(2);
-}
-function fun3() {
-  console.log(3);
-}
-fun1();
-setTimeout(function(){
-  fun2();
-},0);
-fun3();
-</code></pre>
-<p>依次输出1，3，2，因为我们会优先执行同步函数，然后在执行异步函数。</p>
-<p>正是由于JavaScript是单线程的，而异步容易实现非阻塞，所以在JavaScript中对于耗时的操作或者时间不确定的操作，使用异步就成了必然的选择。<br>
-　　<br>
-<strong>JavaScript的执行顺序：（重点）</strong></p>
-<p>1.先同步后异步。<br>
-2.异步中任务队列的执行顺序： 先微任务microtask队列，再宏任务macrotask队列。<br>
-3.调用Promise 中的resolve，reject属于微任务队列，setTimeout属于宏任务队列。</p>
-<p>那什么是微任务和宏任务？</p>
-<h2 id="3宏任务与微任务">3.宏任务与微任务</h2>
-<p>异步任务分为 宏任务（macrotask） 与 微任务 (microtask)，不同的API注册的任务会依次进入自身对应的队列中，然后等待 Event Loop 将它们依次压入执行栈中执行。</p>
-<p><strong>宏任务</strong></p>
-<p>macrotask，可以理解是每次执行栈执行的代码就是一个宏任务（包括每次从事件队列中获取一个事件回调并放到执行栈中执行）。</p>
-<p>浏览器为了能够使得JS内部(macro)task与DOM任务能够有序的执行，会在一个macrotask执行结束后，在下一个macrotask 执行开始前，对页面进行重新渲染，流程如下：</p>
-<pre><code class="language-csharp">macrotask-&gt;渲染-&gt;macrotask-&gt;...
-</code></pre>
-<p><strong>宏任务包含：</strong></p>
-<p>script(整体代码)<br>
-setTimeout<br>
-setInterval<br>
-I/O<br>
-UI交互事件<br>
-postMessage<br>
-MessageChannel<br>
-setImmediate(Node.js 环境)</p>
-<p><strong>微任务</strong></p>
-<p>microtask,可以理解是在当前 task 执行结束后立即执行的任务。也就是说，在当前task任务后，下一个task之前，在渲染之前。</p>
-<p>所以它的响应速度相比setTimeout（setTimeout是task）会更快，因为无需等渲染。也就是说，在某一个macrotask执行完后，就会将在它执行期间产生的所有microtask都执行完毕（在渲染前）。</p>
-<p><strong>微任务包含：</strong></p>
-<p>Promise.then<br>
-Object.observe<br>
-MutaionObserver<br>
-process.nextTick(Node.js 环境)</p>
-<h2 id="4event-loop事件循环">4.Event Loop(事件循环)</h2>
-<p>Event Loop(事件循环)中，每一次循环称为 tick, 每一次tick的任务如下：</p>
-<p>1.执行栈选择最先进入队列的宏任务(通常是script整体代码)，如果有则执行。<br>
-2.检查是否存在 Microtask，如果存在则不停的执行，直至清空 microtask 队列。<br>
-3.更新render(每一次事件循环，浏览器都可能会去更新渲染)。<br>
-4.重复以上步骤。</p>
-<p>宏任务 &gt; 所有微任务 &gt; 宏任务，如下图所示：</p>
-<figure data-type="image" tabindex="1"><img src="https://img-blog.csdnimg.cn/20200220214654929.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdXlpZmVuZzAwMDA=,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" loading="lazy"></figure>
-<p>从代码执行顺序的角度来看，程序最开始是按代码顺序执行代码的，遇到同步任务，立刻执行；遇到异步任务，则只是调用异步函数发起异步请求。此时，异步任务开始执行异步操作，执行完成后到消息队列中排队。程序按照代码顺序执行完毕后，查询消息队列中是否有等待的消息。如果有，则按照次序从消息队列中把消息放到执行栈中执行。执行完毕后，再从消息队列中获取消息，再执行，不断重复。</p>
-<p>由于主线程不断的重复获得消息、执行消息、再取消息、再执行。所以，这种机制被称为事件循环。<br>
-　　<br>
-　　<strong>用代码表示：</strong></p>
-<pre><code class="language-csharp">while (queue.waitForMessage()) {
-  queue.processNextMessage();
-}
-</code></pre>
-<p>如果当前没有任何消息queue.waitForMessage 会等待同步消息到达。</p>
-<h2 id="5实例">5.实例</h2>
-<p>下面以一个实例来解释事件循环机制：</p>
-<pre><code class="language-csharp">console.log(1)
-div.onclick = () =&gt; {console.log('click')}
-console.log(2)
-setTimeout(() =&gt; {console.log('timeout')},1000)
-</code></pre>
-<p>1、执行第一行代码，第一行是一个同步任务，控制台显示1</p>
-<p>2、执行第二行代码，第二行是一个异步任务，发起异步请求，可以在任意时刻执行鼠标点击的异步操作</p>
-<p>3、执行第三行代码，第三行是一个同步任务，控制台显示2</p>
-<p>4、执行第四行代码，第四行是一个异步任务，发起异步请求，1s后执行定时器任务</p>
-<p>5、假设从执行第四行代码的1s内，执行了鼠标点击，则鼠标任务在消息队列中排到首位</p>
-<p>6、从执行第四行代码1s后，定时器任务到消息队列中排到第二位</p>
-<p>7、现在同步任务已经执行完毕，则从消息队列中按照次序把异步任务放到执行栈中执行</p>
-<p>8、则控制台依次显示'click‘、'timeout'</p>
-<p>9、过了一段时间后，又执行了一次鼠标点击，由于消息队列中已经空了，则鼠标任务在消息队列中排到首位</p>
-<p>10、同步任务执行完毕后，再从消息队列中按照次序把异步任务放到执行栈中执行</p>
-<p>11、 则控制台显示'click'</p>
-<p><strong>异步过程</strong></p>
-<p>下面以一个实例来解释一次完整的异步过程：</p>
-<pre><code class="language-csharp">div.onclick = function fn(){console.log('click')}
-</code></pre>
-<p>1、主线程通过调用异步函数div.onclick发起异步请求</p>
-<p>2、在某一时刻，执行异步操作，即鼠标点击</p>
-<p>3、接着，回调函数fn到消息队列中排队</p>
-<p>4、主线程从消息队列中读取fn到执行栈中</p>
-<p>5、然后在执行栈中执行fn里面的代码console.log('click')</p>
-<p>6、于是，控制台显示'click'</p>
-<h2 id="例题-依次输出什么">例题： 依次输出什么？</h2>
-<pre><code class="language-csharp">    function fun1() {
-        console.log(&quot;1&quot;)
-    }
-
-    fun1()
-
-    setTimeout(function () {
-        console.log('2')
-    });
-
-    function fun3() {
-        console.log(&quot;3&quot;)
-    }
-    fun3()
-    var l4 = new Promise(function (resolve) {
-        for (var i = 0; i &lt; 10000; i++) {
-            i == 99 &amp;&amp; resolve();
-        }
-    }).then(function () {
-        console.log('4')
-    });
-
-    console.log('5');
-
-</code></pre>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[JavaScript（四）：作用域链]]></title>
-        <id>https://dark-yifeng.github.io/post/javascriptsi-zuo-yong-yu-lian/</id>
-        <link href="https://dark-yifeng.github.io/post/javascriptsi-zuo-yong-yu-lian/">
-        </link>
-        <updated>2020-05-18T03:31:31.000Z</updated>
-        <content type="html"><![CDATA[<p><ul class="markdownIt-TOC">
-<li>
-<ul>
-<li><a href="#%E4%BD%9C%E7%94%A8%E5%9F%9Fscope">作用域(Scope)</a>
-<ul>
-<li><a href="#1-%E4%BD%9C%E7%94%A8%E5%9F%9F">1. 作用域</a></li>
-<li><a href="#2-%E5%85%A8%E5%B1%80%E4%BD%9C%E7%94%A8%E5%9F%9F">2. 全局作用域</a></li>
-<li><a href="#3%E5%87%BD%E6%95%B0%E4%BD%9C%E7%94%A8%E5%9F%9F">3.函数作用域</a></li>
-<li><a href="#4-%E5%9D%97%E7%BA%A7%E4%BD%9C%E7%94%A8%E5%9F%9F">4. 块级作用域</a></li>
-</ul>
-</li>
-<li><a href="#%E4%BD%9C%E7%94%A8%E5%9F%9F%E9%93%BE">作用域链</a>
-<ul>
-<li><a href="#1%E8%87%AA%E7%94%B1%E5%8F%98%E9%87%8F">1.自由变量</a></li>
-<li><a href="#2-%E4%BD%9C%E7%94%A8%E5%9F%9F%E9%93%BE">2. 作用域链</a></li>
-<li><a href="#3-%E8%87%AA%E7%94%B1%E5%8F%98%E9%87%8F%E7%9A%84%E5%8F%96%E5%80%BC">3. 自由变量的取值</a></li>
-<li><a href="#4%E5%AE%9E%E4%BE%8B">4.实例</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<br>
-当你在if中创建了var了一个变量，你在if以外可以使用这个变量吗？如果使用let定义的呢？你定义的变量和函数，到底在哪里可以使用它。</p>
-<pre><code class="language-JavaScript"> for (var i = 0; i &lt; btns.length; i++) {
-    btns[i].onclick = function () {
-      console.log('第' + (i + 1) + '个')
-    }
-  }
-</code></pre>
-<p>这个函数为什么不能得到想要的效果？</p>
-<h2 id="作用域scope">作用域(Scope)</h2>
-<h3 id="1-作用域">1. 作用域</h3>
-<p>作用域是在运行时代码中的某些特定部分中变量，函数和对象的可访问性。换句话说，作用域决定了代码区块中变量和其他资源的可见性。可能这两句话并不好理解，我们先来看个例子：</p>
-<pre><code class="language-c">function outFun2() {
-    var inVariable = &quot;内层变量2&quot;;
-}
-outFun2();//要先执行这个函数，否则根本不知道里面是啥
-console.log(inVariable); // Uncaught ReferenceError: inVariable is not defined
-</code></pre>
-<p>从上面的例子可以体会到作用域的概念，变量 inVariable 在全局作用域没有声明，所以在全局作用域下取值会报错。我们可以这样理解：作用域就是一个独立的地盘，让变量不会外泄、暴露出去。也就是说作用域最大的用处就是隔离变量，不同作用域下同名变量不会有冲突。</p>
-<p>ES6 之前 JavaScript 没有块级作用域,只有全局作用域和函数作用域。ES6 的到来，为我们提供了‘块级作用域’,可通过新增命令 let 和 const 来体现。</p>
-<h3 id="2-全局作用域">2. 全局作用域</h3>
-<p>在代码中任何地方都能访问到的对象拥有全局作用域，一般来说以下几种情形拥有全局作用域：</p>
-<p><strong>最外层函数和在最外层函数外面定义的变量拥有全局作用域</strong></p>
-<pre><code class="language-c">var outVariable = &quot;我是最外层变量&quot;; //最外层变量
-function outFun() { //最外层函数
-    var inVariable = &quot;内层变量&quot;;
-    function innerFun() { //内层函数
-        console.log(inVariable);
-    }
-    innerFun();
-}
-console.log(outVariable); //我是最外层变量
-outFun(); //内层变量
-console.log(inVariable); //inVariable is not defined
-innerFun(); //innerFun is not defined
-</code></pre>
-<p><strong>所有末定义直接赋值的变量自动声明为拥有全局作用域</strong></p>
-<pre><code class="language-c">function outFun2() {
-    variable = &quot;未定义直接赋值的变量&quot;;
-    var inVariable2 = &quot;内层变量2&quot;;
-}
-outFun2();//要先执行这个函数，否则根本不知道里面是啥
-console.log(variable); //未定义直接赋值的变量
-console.log(inVariable2); //inVariable2 is not defined
-</code></pre>
-<p><strong>所有 window 对象的属性拥有全局作用域</strong></p>
-<p>一般情况下，window 对象的内置属性都拥有全局作用域，例如 window.name、window.location、window.top 等等。</p>
-<p>全局作用域有个弊端：如果我们写了很多行 JS 代码，变量定义都没有用函数包括，那么它们就全部都在全局作用域中。这样就会 污染全局命名空间, 容易引起命名冲突。</p>
-<pre><code class="language-c">// 张三写的代码中
-var data = {a: 100}
-
-// 李四写的代码中
-var data = {x: true}
-</code></pre>
-<p>这就是为何 jQuery、Zepto 等库的源码，所有的代码都会放在(function(){....})()中。因为放在里面的所有变量，都不会被外泄和暴露，不会污染到外面，不会对其他的库或者 JS 脚本造成影响。这是函数作用域的一个体现。</p>
-<h3 id="3函数作用域">3.函数作用域</h3>
-<p>函数作用域,是指声明在函数内部的变量，和全局作用域相反，局部作用域一般只在固定的代码片段内可访问到，最常见的例如函数内部。</p>
-<pre><code class="language-c">function doSomething(){
-    var blogName=&quot;浪里行舟&quot;;
-    function innerSay(){
-        alert(blogName);
-    }
-    innerSay();
-}
-alert(blogName); //脚本错误
-innerSay(); //脚本错误
-</code></pre>
-<blockquote>
-<p>作用域是分层的，内层作用域可以访问外层作用域的变量，反之则不行。</p>
-</blockquote>
-<p>值得注意的是：块语句（大括号“｛｝”中间的语句），如 if 和 switch 条件语句或 for 和 while 循环语句，不像函数，它们不会创建一个新的作用域。在块语句中定义的变量将保留在它们已经存在的作用域中。</p>
-<pre><code class="language-c">if (true) {
-    // 'if' 条件语句块不会创建一个新的作用域
-    var name = 'Hammad'; // name 依然在全局作用域中
-}
-console.log(name); // logs 'Hammad'
-</code></pre>
-<p>JS 的初学者经常需要花点时间才能习惯变量提升，而如果不理解这种特有行为，就可能导致bug 。正因为如此， ES6 引入了块级作用域，让变量的生命周期更加可控。</p>
-<h3 id="4-块级作用域">4. 块级作用域</h3>
-<p>块级作用域可通过新增命令 let 和 const 声明，所声明的变量在指定块的作用域外无法被访问。块级作用域在如下情况被创建：</p>
-<p>1.在一个函数内部。<br>
-2.在一个代码块（由一对花括号包裹）内部。</p>
-<p>let 声明的语法与 var 的语法一致。你基本上可以用 let 来代替 var 进行变量声明，但会将变量的作用域限制在当前代码块中。块级作用域有以下几个特点：</p>
-<p><strong>1.声明变量不会提升到代码块顶部。</strong><br>
-<strong>2.let/const 声明并不会被提升到当前代码块的顶部，因此你需要手动将 let/const 声明放置到顶部，以便让变量在整个代码块内部可用。</strong></p>
-<pre><code class="language-c">function getValue(condition) {
-if (condition) {
-let value = &quot;blue&quot;;
-return value;
-} else {
-// value 在此处不可用
-return null;
-}
-// value 在此处不可用
-}
-</code></pre>
-<p><strong>3.禁止重复声明。</strong><br>
-如果一个标识符已经在代码块内部被定义，那么在此代码块内使用同一个标识符进行 let 声明就会导致抛出错误。例如：</p>
-<pre><code class="language-c">var count = 30;
-let count = 40; // Uncaught SyntaxError: Identifier 'count' has already been declared
-在本例中， count 变量被声明了两次：一次使用 var ，另一次使用 let 。因为 let 不能在同一作用域内重复声明一个已有标识符，此处的 let 声明就会抛出错误。但如果在嵌套的作用域内使用 let 声明一个同名的新变量，则不会抛出错误。
-
-var count = 30;
-// 不会抛出错误
-if (condition) {
-let count = 40;
-// 其他代码
-}
-</code></pre>
-<p><strong>循环中的绑定块作用域的妙用</strong></p>
-<p>开发者可能最希望实现 for 循环的块级作用域了，因为可以把声明的计数器变量限制在循环内，例如，以下代码在 JS 经常见到：</p>
-<p><button>测试1</button><br>
-<button>测试2</button><br>
-<button>测试3</button></p>
-<script type="text/javascript">
-   var btns = document.getElementsByTagName('button')
-    for (var i = 0; i < btns.length; i++) {
-      btns[i].onclick = function () {
-        console.log('第' + (i + 1) + '个')
-      }
-    }
-</script>
-<p>我们要实现这样的一个需求: 点击某个按钮, 提示&quot;点击的是第 n 个按钮&quot;,此处我们先不考虑事件代理,万万没想到，点击任意一个按钮，后台都是弹出“第四个”，这是因为用var定义时，会进行变量提升，当运行到for循环时，i的值已经为3。那该如何修改，最简单的是用 let 声明 i</p>
-<pre><code class="language-c"> for (let i = 0; i &lt; btns.length; i++) {
-    btns[i].onclick = function () {
-      console.log('第' + (i + 1) + '个')
-    }
-  }
-</code></pre>
-<figure data-type="image" tabindex="1"><img src="https://img-blog.csdnimg.cn/20200314101817359.png" alt="在这里插入图片描述" loading="lazy"></figure>
-<h2 id="作用域链">作用域链</h2>
-<h3 id="1自由变量">1.自由变量</h3>
-<p>首先认识一下什么叫做 自由变量 。如下代码中，console.log(a)要得到 a 变量，但是在当前的作用域中没有定义 a（可对比一下 b）。当前作用域没有定义的变量，这成为 自由变量 。自由变量的值如何得到 —— 向父级作用域寻找（注意：这种说法并不严谨，下文会重点解释）。</p>
-<pre><code class="language-c">var a = 100
-function fn() {
-    var b = 200
-    console.log(a) // 这里的a在这里就是一个自由变量
-    console.log(b)
-}
-fn()
-</code></pre>
-<h3 id="2-作用域链">2. 作用域链</h3>
-<p>如果父级也没呢？再一层一层向上寻找，直到找到全局作用域还是没找到，就宣布放弃。这种一层一层的关系，就是 作用域链 。</p>
-<pre><code class="language-c">var a = 100
-function F1() {
-    var b = 200
-    function F2() {
-        var c = 300
-        console.log(a) // 自由变量，顺作用域链向父作用域找
-        console.log(b) // 自由变量，顺作用域链向父作用域找
-        console.log(c) // 本作用域的变量
-    }
-    F2()
-}
-F1()
-</code></pre>
-<h3 id="3-自由变量的取值">3. 自由变量的取值</h3>
-<p>关于自由变量的值，上文提到要到父作用域中取，其实有时候这种解释会产生歧义。</p>
-<pre><code class="language-c">var x = 10
-function fn() {
-  console.log(x)
-}
-function show(f) {
-  var x = 20
-  (function() {
-    f() //10，而不是20
-  })()
-}
-show(fn)
-</code></pre>
-<p>在 fn 函数中，取自由变量 x 的值时，要到哪个作用域中取？——要到创建 fn 函数的那个作用域中取，无论 fn 函数将在哪里调用。</p>
-<p>所以，不要在用以上说法了。相比而言，用这句话描述会更加贴切: &quot;要到创建这个函数的那个域&quot;。</p>
-<p>作用域中取值,这里强调的是“创建”，而不是“调用”**，切记切记——其实这就是所谓的&quot;静态作用域&quot;</p>
-<pre><code class="language-c">var a = 10
-function fn() {
-  var b = 20
-  function bar() {
-    console.log(a + b) //30
-  }
-  return bar
-}
-var x = fn(),
-  b = 200
-x() //bar()
-</code></pre>
-<p>fn()返回的是 bar 函数，赋值给 x。执行 x()，即执行 bar 函数代码。取 b 的值时，直接在 fn 作用域取出。取 a 的值时，试图在 fn 作用域取，但是取不到，只能转向创建 fn 的那个作用域中去查找，结果找到了,所以最后的结果是 30。</p>
-<h3 id="4实例">4.实例</h3>
-<pre><code class="language-c">var a = 1;  //全局变量
-(function () {
-    var b = 2;  //第1层局部变量
-    (function () {
-        var c = 3;  //第2层局部变量
-        (function () {
-            var d = 4;  //第3层局部变量
-            console.log(a + b + c + d);  //返回10
-        }) ()  //直接调用函数
-    }) ()  //直接调用函数
-}) ()  //直接调用函数
-</code></pre>
-<p>在上面代码中，JavaScript 引擎首先在最内层活动对象中查询属性 a、b、c 和 d，从中只找到了属性 d，并获得它的值（4）；然后沿着作用域链，在上一层活动对象中继续查找属性 a、b 和 c，从中找到了属性 c，获取它的值（3）······以此类推，直到找到所有需要的变量值为止，如图所示。<br>
-<img src="https://img-blog.csdnimg.cn/2020031411022917.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdXlpZmVuZzAwMDA=,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" loading="lazy"></p>
-<blockquote>
-<p>定义的标识符的越深，那么读写的速度也就越慢，而全局变量总是处于作用域链的最末端，所以当变量解析的时候，查找全局变量是最慢的，所以在编写代码的时候要尽可能少的使用全局变量，尽可能使用局部变量。</p>
-</blockquote>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[JavaScript（三）：闭包]]></title>
-        <id>https://dark-yifeng.github.io/post/javascriptsan-bi-bao/</id>
-        <link href="https://dark-yifeng.github.io/post/javascriptsan-bi-bao/">
-        </link>
-        <updated>2020-05-18T03:28:40.000Z</updated>
-        <content type="html"><![CDATA[<h2 id="概念">概念</h2>
-<p>在JavaScript中，当一个内部函数被其外部函数之外的变量引用时，就形成了一个闭包。简单说，闭包就是能够读取其他函数内部变量的函数。</p>
-<p>由于在Javascript语言中，只有函数内部的子函数才能读取局部变量，因此可以把闭包简单理解成&quot;定义在一个函数内部的函数&quot;。所以，在本质上，闭包就是将函数内部和函数外部连接起来的一座桥梁。</p>
-<p>闭包是一种保护私有变量的机制，在函数执行时形成私有的作用域，保护里面的私有变量不受外界干扰。</p>
-<p>直观的说就是形成一个不销毁的栈环境。</p>
-<h2 id="作用">作用</h2>
-<p>1 可以读取函数内部的变量。</p>
-<p>2 让这些变量始终保持在内存中。</p>
-<h2 id="实例一">实例一</h2>
-<pre><code class="language-csharp">function init() {
-    var name = &quot;Mozilla&quot;; // name 是一个被 init 创建的局部变量
-    function displayName() { // displayName() 是内部函数,一个闭包
-        alert(name); // 使用了父函数中声明的变量
-    }
-    displayName();
-}
-init();
-</code></pre>
-<p>这是一个简单的闭包函数，displayName函数内嵌在init函数里面，name变量是init函数内部的全局变量，因此displayName函数可以访问到那么变量。</p>
-<p>最后结果会alert出Mozilla。</p>
-<h2 id="实例二">实例二</h2>
-<pre><code class="language-csharp">function makeAdder(x) {
-  return function(y) {
-    return x + y;
-  };
-}
-
-var add5 = makeAdder(5);
-var add10 = makeAdder(10);
-
-console.log(add5(2));  // 7
-console.log(add10(2)); // 12
-</code></pre>
-<p>在这个实例中，我们定义了 makeAdder(x) 函数，它接受一个参数 x ，并返回一个新的函数。返回的函数接受一个参数 y，并返回x+y的值。</p>
-<p>从本质上讲，makeAdder 是一个函数工厂 — 他创建了将指定的值和它的参数相加求和的函数。在上面的实例中，我们使用函数工厂创建了两个新函数 — 一个将其参数和 5 求和，另一个和 10 求和。</p>
-<p>add5 和 add10 都是闭包。它们共享相同的函数定义，但是保存了不同的词法环境。在 add5 的环境中，x 为 5。而在 add10 中，x 则为 10。</p>
-<h2 id="实例三">实例三</h2>
-<p>闭包很有用，因为它允许将函数与其所操作的某些数据（环境）关联起来。这显然类似于面向对象编程。在面向对象编程中，对象允许我们将某些数据（对象的属性）与一个或者多个方法相关联。</p>
-<p>因此，通常你使用只有一个方法的对象的地方，都可以使用闭包。</p>
-<p>在 Web 中，你想要这样做的情况特别常见。大部分我们所写的 JavaScript 代码都是基于事件的 — 定义某种行为，然后将其添加到用户触发的事件之上（比如点击或者按键）。我们的代码通常作为回调：为响应事件而执行的函数。</p>
-<p>假如，我们想在页面上添加一些可以调整字号的按钮。一种方法是以像素为单位指定 body 元素的 font-size，然后通过相对的 em 单位设置页面中其它元素（例如header）的字号：</p>
-<pre><code class="language-csharp">body {
-  font-family: Helvetica, Arial, sans-serif;
-  font-size: 12px;
-}
-
-h1 {
-  font-size: 1.5em;
-}
-
-h2 {
-  font-size: 1.2em;
-}
-</code></pre>
-<p>我们的文本尺寸调整按钮可以修改 body 元素的 font-size 属性，由于我们使用相对单位，页面中的其它元素也会相应地调整。</p>
-<p>以下是 JavaScript：</p>
-<pre><code class="language-csharp">function makeSizer(size) {
-  return function() {
-    document.body.style.fontSize = size + 'px';
-  };
-}
-
-var size12 = makeSizer(12);
-var size14 = makeSizer(14);
-var size16 = makeSizer(16);
-</code></pre>
-<p>size12，size14 和 size16 三个函数将分别把 body 文本调整为 12，14，16 像素。我们可以将它们分别添加到按钮的点击事件上。如下所示：</p>
-<pre><code class="language-csharp">document.getElementById('size-12').onclick = size12;
-document.getElementById('size-14').onclick = size14;
-document.getElementById('size-16').onclick = size16;
-</code></pre>
-<pre><code class="language-csharp">&lt;a href=&quot;#&quot; id=&quot;size-12&quot;&gt;12&lt;/a&gt;
-&lt;a href=&quot;#&quot; id=&quot;size-14&quot;&gt;14&lt;/a&gt;
-&lt;a href=&quot;#&quot; id=&quot;size-16&quot;&gt;16&lt;/a&gt; 
-</code></pre>
-<h2 id="实例四用闭包模拟私有方法">实例四（用闭包模拟私有方法）</h2>
-<p>编程语言中，比如 Java，是支持将方法声明为私有的，即它们只能被同一个类中的其它方法所调用。</p>
-<p>而 JavaScript 没有这种原生支持，但我们可以使用闭包来模拟私有方法。私有方法不仅仅有利于限制对代码的访问：还提供了管理全局命名空间的强大能力，避免非核心的方法弄乱了代码的公共接口部分。</p>
-<p>下面的示例展现了如何使用闭包来定义公共函数，并令其可以访问私有函数和变量。这个方式也称为 模块模式（module pattern）：</p>
-<pre><code class="language-csharp">var Counter = (function() {
-  var privateCounter = 0;
-  function changeBy(val) {
-    privateCounter += val;
-  }
-  return {
-    increment: function() {
-      changeBy(1);
-    },
-    decrement: function() {
-      changeBy(-1);
-    },
-    value: function() {
-      return privateCounter;
-    }
-  }   
-})();
-
-console.log(Counter.value()); /* logs 0 */
-Counter.increment();
-Counter.increment();
-console.log(Counter.value()); /* logs 2 */
-Counter.decrement();
-console.log(Counter.value()); /* logs 1 */
-</code></pre>
-<p>在之前的示例中，每个闭包都有它自己的词法环境；而这次我们只创建了一个词法环境，为三个函数所共享：Counter.increment，Counter.decrement 和 Counter.value。</p>
-<p>该共享环境创建于一个立即执行的匿名函数体内。这个环境中包含两个私有项：名为 privateCounter 的变量和名为 changeBy 的函数。这两项都无法在这个匿名函数外部直接访问。必须通过匿名函数返回的三个公共函数访问。</p>
-<p>这三个公共函数是共享同一个环境的闭包。多亏 JavaScript 的词法作用域，它们都可以访问 privateCounter 变量和 changeBy 函数。</p>
-<pre><code class="language-csharp">var makeCounter = function() {
-  var privateCounter = 0;
-  function changeBy(val) {
-    privateCounter += val;
-  }
-  return {
-    increment: function() {
-      changeBy(1);
-    },
-    decrement: function() {
-      changeBy(-1);
-    },
-    value: function() {
-      return privateCounter;
-    }
-  }  
-};
-
-var Counter1 = makeCounter();
-var Counter2 = makeCounter();
-console.log(Counter1.value()); /* logs 0 */
-Counter1.increment();
-Counter1.increment();
-console.log(Counter1.value()); /* logs 2 */
-Counter1.decrement();
-console.log(Counter1.value()); /* logs 1 */
-console.log(Counter2.value()); /* logs 0 */
-</code></pre>
-<p>请注意两个计数器 Counter1 和 Counter2 是如何维护它们各自的独立性的。每个闭包都是引用自己词法作用域内的变量 privateCounter 。</p>
-<p>每次调用其中一个计数器时，通过改变这个变量的值，会改变这个闭包的词法环境。然而在一个闭包内对变量的修改，不会影响到另外一个闭包中的变量。</p>
-<h2 id="原理">原理</h2>
-<p>当某个函数第一次被调用时，会创建一个执行环境（execution context)及相应的作用域链，并把作用域链赋值给一个特殊的内部属性（即[[Scope]]）。然后，使用this、arguncmts 和其他命名参数的值来初始化函数的活动对象（activation object)。但在作用域链中，外部函数的活动对象始终处于第二位，外部函数的外部函数的活动对象处于第三位，……直至作为作用域链终点的全局执行环境。</p>
-<p>在函数执行过程中，为读取和写入变量的值，就需要在作用域链中查找变量。来看下面的例子:</p>
-<pre><code class="language-csharp">function compare(valael, value2){ 
-    if (valuel &lt; value2){ 
-       return -1;
-    } else if (vaiuel &gt; value2){ 
-       return 1；
-     } else {
-       return 0;
-    }
-}
-
-var result = compare(5, 10);
-</code></pre>
-<p>以上代码先定义了compare()函数，然后又在全局作用域中调用了它。当第一次调用compare()时，会创建一个包含this、arguments、valuel和value2的活动对象。全局执行环境的变量对象 (包含this、result和compare)在compare()执行环境的作用域链中则处于第二位。图展示了包含上述关系的compare()函数执行时的作用域链。<br>
-<img src="https://img-blog.csdnimg.cn/2020022311071310.png" alt="在这里插入图片描述" loading="lazy"><br>
-后台的每个执行环境都有一个表示变量的对象——变量对象。全局环境的变量对象始终存在，而像compare()函数这样的局部环境的变量对象，则只在函数执行的过程中存在。在创建compare()函数时，会创建一个预先包含全局变童对象的作用域链，这个作用域链被保存在内部的[[Scope]]属性中。当调用compare()函数时，会为函数创建一个执行环境，然后通过复制函数的[[Scope]]属性中的对象构建起执行环境的作用域链。此后，又有一个活动对象（在此作为变量对象使用）被创建并被推入执行环境作用域链的前端。对于这个例子中compare()函数的执行环境而言，其作用域链中包含两个变量对象：本地活动对象和全局变量对象。显然，作用域链本质上是一个指向变量对象的指针列表，它只引用但不实际包含变量对象。</p>
-<p>无论什么时候在函数中访问一个变量时，就会从作用域链中搜索具有相应名字的变量。一般来讲，当函数执行完毕后，局部活动对象就会被销毁，内存中仅保存全局作用域（全局执行环境的变量对象)。 但是，闭包的情况又有所不同。</p>
-<pre><code class="language-csharp">
-function createComparisonFunction(propertyName) {
-  return function(object1, object2){
-    var valuel = objectl[propertyName]; 
-    var value2 = object2[propertyName]; 
-    if (valuel &lt; value2){ 
-       return -1;
-    } else if (valuel &gt; value2){ 
-       return 1;
-    } else {
-       return 0；
-     }
-  }；
-}
-</code></pre>
-<p>在另一个函数内部定义的函数会将包含函数（即外部函数）的活动对象添加到它的作用域链中。因此，在createComparisonFunction()涵数内部定义的匿名函数的作用域链中，实际上将会包含外部函数createComparisonFunction()的活动对象。图展示了当下列代码执行时，包含函数与内部匿名函数的作用域链。</p>
-<pre><code class="language-csharp">var compare = createComparisonFunction(&quot;name&quot;);
-
-var result = compare({ name: &quot;Nicholas&quot; }, { naine： BGreg&quot; })；
-</code></pre>
-<p>在匿名函数从createComparisonFunction()中被返冋后，它的作用域链被初始化为包含createComparisonFunction()函数的活动对象和全局变量对象。这样，匿名函数就可以访问在createComparisonFunction()中定义的所有变量。更重要的是，createCoir.parisonFunction() 函数在执行完毕后，其活动对象也不会被销毁，因为匿名函数的作用域链仍然在引用这个活动对象。换句话说，当createComparisonFunction()函数返回后，其执行环境的作用域链会被销毁，但它的活动对象仍然会留在内存中；直到匿名函数被销毁后，createComparisonFunction()的活动对象才会被销毁，例如：</p>
-<pre><code class="language-csharp">var compareNames = createComparisonFunction(&quot;name&quot;);
-
-//调用函数
-var result = compareNames({ name: &quot;Nicholas&quot; ), { name：&quot;Greg&quot; });
-
-//解除对匿名函数的引用（以便释放内存)
-compareNanies = null;
-</code></pre>
-<p>首先，创建的比较函数被保存在变量coinpareNames中。而通过将compareNames设置为等于null解除该函数的引用，就等于通知垃圾问收例程将其清除。随着匿名函数的作用域链被销毁，其他作用域 (除r全局作用域）也都可以安全地销毁了。图 展示了调用conpareNamesO的过程中产生的作用域链之间的关系。<br>
-<img src="https://img-blog.csdnimg.cn/20200223110856171.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdXlpZmVuZzAwMDA=,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" loading="lazy"></p>
-<h2 id="缺点">缺点</h2>
-<p>1.由于闭包会使得函数中的变量都被保存在内存中，内存消耗很大，所以不能滥用闭包，否则会造成网页的性能问题，在IE中可能导致内存泄露。解决方法是，在退出函数之前，将不使用的局部变量全部删除。</p>
-<p>2.闭包会在父函数外部，改变父函数内部变量的值。所以，如果把父函数当作对象（object）使用，把闭包当作它的公用方法（Public Method），把内部变量当作它的私有属性（private value），这时一定要小心，不要随便改变父函数内部变量的值。</p>
-<h2 id="扩展">扩展</h2>
-<p><strong>作用域规则</strong></p>
-<p>1.{}不产生一个作用域，定义函数才会产生一个函数作用域。</p>
-<p>2.函数在执行的过程中，先从自己内部找变量。</p>
-<p>3.如果找不到，再从创建当前函数所在的作用域去找, 以此往上。</p>
-<p>具体可以看：</p>
-<p>JavaScript进阶之路系列（四）：作用域链</p>
 ]]></content>
     </entry>
 </feed>

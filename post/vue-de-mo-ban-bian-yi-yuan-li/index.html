@@ -1,0 +1,270 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Vue的：模板编译原理 | Dark</title>
+<link rel="shortcut icon" href="https://dark-yifeng.github.io/favicon.ico?v=1589794795292">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://dark-yifeng.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Vue的：模板编译原理 | Dark - Atom Feed" href="https://dark-yifeng.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="先看下模板到真正用户看到的界面过程中经历了什么：
+模板———&gt;模板编译——&gt;渲染函数——&gt;vnode——&gt;用于界面
+vue.js提供了模板语法，允许我们声明式的描述状态和DOM之间的绑定关系。
+将模板编译为渲染函数，..." />
+    <meta name="keywords" content="Vue" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://dark-yifeng.github.io">
+  <img class="avatar" src="https://dark-yifeng.github.io/images/avatar.png?v=1589794795292" alt="">
+  </a>
+  <h1 class="site-title">
+    Dark
+  </h1>
+  <p class="site-description">
+    克己，执着，努力，疯狂，谦卑
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://dark-yifeng.github.io" class="menu">
+          主页
+        </a>
+      
+    
+      
+        <a href="https://dark-yifeng.github.io/tags" class="menu">
+          分类
+        </a>
+      
+    
+      
+        <a href="https://dark-yifeng.github.io/archives" class="menu">
+          日期
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+        <a href="https://github.com/Dark-YiFeng" target="_blank">
+          <i class="ri-github-line"></i>
+        </a>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Vue的：模板编译原理
+            </h2>
+            <div class="post-info">
+              <span>
+                2020-05-18
+              </span>
+              <span>
+                5 min read
+              </span>
+              
+                <a href="https://dark-yifeng.github.io/tag/74z3KqTAN/" class="post-tag">
+                  # Vue
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <p>先看下模板到真正用户看到的界面过程中经历了什么：</p>
+<p>模板———&gt;模板编译——&gt;渲染函数——&gt;vnode——&gt;用于界面</p>
+<p>vue.js提供了模板语法，允许我们声明式的描述状态和DOM之间的绑定关系。</p>
+<p>将模板编译为渲染函数，就是模板编译要做的事，模板编译可以分为三个阶段：</p>
+<p>1.将模板解析为AST（抽象语法树）—— 解析器。<br>
+2.遍历AST标记静态节点 —— 优化器。<br>
+3.使用AST生成渲染函数 —— 代码生成器）。</p>
+<blockquote>
+<p>其实 AST 和 Vnode 类似，都是使用JavaScript对象来描述节点。更准确的说，一个用对象来描述的节点树就是 AST。</p>
+</blockquote>
+<p><img src="https://img-blog.csdnimg.cn/20200316215116732.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdXlpZmVuZzAwMDA=,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" loading="lazy"><br>
+<strong>解析器</strong></p>
+<pre><code class="language-c">&lt;div&gt;
+  &lt;p&gt;{{name}}&lt;/p&gt;
+&lt;/div&gt;
+</code></pre>
+<p>上面一个简单 的模版转换成element AST树形结构后是这样的：</p>
+<pre><code class="language-c">{
+  tag: &quot;div&quot;
+  type: 1,
+  staticRoot: false,
+  static: false,
+  plain: true,
+  parent: undefined,
+  attrsList: [],
+  attrsMap: {},
+  children: [
+      {
+      tag: &quot;p&quot;
+      type: 1,
+      staticRoot: false,
+      static: false,
+      plain: true,
+      parent: {tag: &quot;div&quot;, ...},
+      attrsList: [],
+      attrsMap: {},
+      children: [{
+          type: 2,
+          text: &quot;{{name}}&quot;,
+          static: false,
+          expression: &quot;_s(name)&quot;
+      }]
+    }
+  ]
+}
+</code></pre>
+<p>解析器的原理不是特别难，主要就是两部分内容，一部分是 截取 字符串，一部分是对截取之后的字符串做解析。每截取一段标签的开头就 push 到 stack中，解析到标签的结束就 pop 出来，当所有的字符串都截没了也就解析完了。</p>
+<p><strong>优化器</strong><br>
+优化器的目的就是找出那些静态节点并打上标记，而静态节点指的是DOM不需要发生变化的节点，也就是里面都是静态标签和静态文本。</p>
+<pre><code class="language-c">&lt; p&gt;我是静态节点，我不需要发生变化&lt;/ p&gt;
+</code></pre>
+<p><strong>标记静态节点有两个好处：</strong></p>
+<p>一、每次重新渲染的时候不需要为静态节点创建新节点，也就是静态节点的解析器不需要重新创建<br>
+二、在Virtual DOM中patching的过程可以被跳过</p>
+<p><strong>优化器的实现原理主要分两步：</strong></p>
+<p>一、用递归的方式将静态节点添加static属性，用来标识是不是静态节点<br>
+二、标记所有静态根节点(子节点全是静态节点就是静态根节点)</p>
+<p>整体逻辑其实就是递归 AST 这颗树，然后将 静态节点和 静态根节点找到并打上标记。</p>
+<p><strong>代码生成器</strong><br>
+代码生成器的作用是使用element ASTs生成render函数代码字符串。<br>
+使用本文开头举的例子中的模版生成后的AST来生成render后是这样的：</p>
+<pre><code class="language-c">{
+  render: `with(this){return _c('div',[_c('p',[_v(_s(name))])])}`
+}
+</code></pre>
+<p>格式化后是这样的：</p>
+<pre><code class="language-c">with(this){
+  return _c(
+    'div',
+    [
+      _c(
+        'p',
+        [
+          _v(_s(name))
+        ]
+      )
+    ]
+  )
+}
+</code></pre>
+<p>生成后的代码字符串中看到了有几个函数调用_c、_v、_s。<br>
+_c对应的是createElement，它的作用是创建一个元素。<br>
+1.第一个参数是一个HTML标签名<br>
+2.第二个参数是元素上使用的属性所对应的数据对象，可选项<br>
+3.第三个参数是children<br>
+_v的意思是创建一个文本节点。<br>
+_s是返回参数中的字符串。<br>
+代码生成器的总体逻辑其实就是使用element ASTs去递归，然后拼出这样的_c('div',[_c('p',[_v(_s(name))])]) 字符串。</p>
+<h2 id="原理">原理</h2>
+<p>解析器（parser）的原理是一小段一小段的去截取字符串，然后维护一个 stack 用来保存DOM深度，每截取到一段标签的开始就 push 到 stack 中，当所有字符串都截取完之后也就解析出了一个完整的 AST。</p>
+<p>优化器（optimizer）的原理是用递归的方式将所有节点打标记，表示是否是一个 静态节点，然后再次递归一遍把 静态根节点 也标记出来。</p>
+<p>代码生成器（code generator）的原理也是通过递归去拼一个函数执行代码的字符串，递归的过程根据不同的节点类型调用不同的生成方法，如果发现是一颗元素节点就拼一个 _c(tagName, data, children) 的函数调用字符串，然后 data 和 children 也是使用 AST 中的属性去拼字符串。</p>
+<p>如果 children 中还有 children 则递归去拼。</p>
+<p>最后拼出一个完整的 render 函数代码。</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E5%8E%9F%E7%90%86">原理</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://dark-yifeng.github.io/post/vue-zhong-de-mo-ban-bian-yi-yuan-li/">
+              <h3 class="post-title">
+                Vue中的模板编译原理
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  QQ:<a href="https://github.com/getgridea/gridea" target="_blank">1306045416</a>
+  <a class="rss" href="https://dark-yifeng.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>
