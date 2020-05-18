@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://dark-yifeng.github.io</id>
     <title>Dark</title>
-    <updated>2020-05-18T09:40:17.988Z</updated>
+    <updated>2020-05-18T09:45:38.882Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://dark-yifeng.github.io"/>
     <link rel="self" href="https://dark-yifeng.github.io/atom.xml"/>
@@ -11,207 +11,546 @@
     <icon>https://dark-yifeng.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, Dark</rights>
     <entry>
-        <title type="html"><![CDATA[Vue的：模板编译原理]]></title>
+        <title type="html"><![CDATA[Vue：15个最佳做法]]></title>
         <id>https://dark-yifeng.github.io/post/vue-de-mo-ban-bian-yi-yuan-li/</id>
         <link href="https://dark-yifeng.github.io/post/vue-de-mo-ban-bian-yi-yuan-li/">
         </link>
         <updated>2020-05-18T09:37:57.000Z</updated>
-        <content type="html"><![CDATA[<p>先看下模板到真正用户看到的界面过程中经历了什么：</p>
-<p>模板———&gt;模板编译——&gt;渲染函数——&gt;vnode——&gt;用于界面</p>
-<p>vue.js提供了模板语法，允许我们声明式的描述状态和DOM之间的绑定关系。</p>
-<p>将模板编译为渲染函数，就是模板编译要做的事，模板编译可以分为三个阶段：</p>
-<p>1.将模板解析为AST（抽象语法树）—— 解析器。<br>
-2.遍历AST标记静态节点 —— 优化器。<br>
-3.使用AST生成渲染函数 —— 代码生成器）。</p>
-<blockquote>
-<p>其实 AST 和 Vnode 类似，都是使用JavaScript对象来描述节点。更准确的说，一个用对象来描述的节点树就是 AST。</p>
-</blockquote>
-<p><img src="https://img-blog.csdnimg.cn/20200316215116732.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdXlpZmVuZzAwMDA=,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" loading="lazy"><br>
-<strong>解析器</strong></p>
-<pre><code class="language-c">&lt;div&gt;
-  &lt;p&gt;{{name}}&lt;/p&gt;
-&lt;/div&gt;
+        <content type="html"><![CDATA[<p><ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#1%E5%A7%8B%E7%BB%88%E5%9C%A8-v-for-%E4%B8%AD%E4%BD%BF%E7%94%A8-key">1.始终在 v-for 中使用 :key</a></li>
+<li><a href="#2%E5%9C%A8%E4%BA%8B%E4%BB%B6%E4%B8%AD%E4%BD%BF%E7%94%A8%E7%9F%AD%E6%A8%AA%E7%BA%BF%E5%91%BD%E5%90%8D">2.在事件中使用短横线命名</a></li>
+<li><a href="#3%E4%BD%BF%E7%94%A8%E9%A9%BC%E5%B3%B0%E5%BC%8F%E5%A3%B0%E6%98%8E-props%E5%B9%B6%E5%9C%A8%E6%A8%A1%E6%9D%BF%E4%B8%AD%E4%BD%BF%E7%94%A8%E7%9F%AD%E6%A8%AA%E7%BA%BF%E5%91%BD%E5%90%8D%E6%9D%A5%E8%AE%BF%E9%97%AE-props">3.使用驼峰式声明 props，并在模板中使用短横线命名来访问 props</a></li>
+<li><a href="#4data-%E5%BA%94%E5%A7%8B%E7%BB%88%E8%BF%94%E5%9B%9E%E4%B8%80%E4%B8%AA%E5%87%BD%E6%95%B0">4.data 应始终返回一个函数</a></li>
+<li><a href="#5-%E4%B8%8D%E8%A6%81%E5%9C%A8%E5%90%8C%E4%B8%AA%E5%85%83%E7%B4%A0%E4%B8%8A%E5%90%8C%E6%97%B6%E4%BD%BF%E7%94%A8v-if%E5%92%8Cv-for%E6%8C%87%E4%BB%A4">5. 不要在同个元素上同时使用v-if和v-for指令</a></li>
+<li><a href="#6%E7%94%A8%E6%AD%A3%E7%A1%AE%E7%9A%84%E5%AE%9A%E4%B9%89%E9%AA%8C%E8%AF%81%E6%88%91%E4%BB%AC%E7%9A%84-props">6.用正确的定义验证我们的 props</a></li>
+<li><a href="#7%E7%BB%84%E4%BB%B6%E5%85%A8%E5%90%8D%E4%BD%BF%E7%94%A8%E9%A9%BC%E5%B3%B0%E6%88%96%E6%88%96%E8%80%85%E7%9F%AD%E6%A8%AA%E7%BA%BF">7.组件全名使用驼峰或或者短横线</a></li>
+<li><a href="#8-%E5%9F%BA%E6%9C%AC%E7%BB%84%E4%BB%B6%E5%BA%94%E8%AF%A5%E7%9B%B8%E5%BA%94%E5%9C%B0%E5%8A%A0%E4%B8%8A%E5%89%8D%E7%BC%80">8. 基本组件应该相应地加上前缀</a></li>
+<li><a href="#9%E5%8D%95%E5%AE%9E%E4%BE%8B%E7%BB%84%E4%BB%B6%E5%91%BD%E5%90%8D%E5%BA%94%E8%AF%A5%E5%B8%A6%E6%9C%89%E5%89%8D%E7%BC%80-the">9.单实例组件命名应该带有前缀 The</a></li>
+<li><a href="#10%E4%BF%9D%E6%8C%81%E6%8C%87%E4%BB%A4%E7%AE%80%E5%86%99%E7%9A%84%E4%B8%80%E8%87%B4%E6%80%A7">10.保持指令简写的一致性</a></li>
+<li><a href="#11%E4%B8%8D%E8%A6%81%E5%9C%A8created%E5%92%8Cwatch%E4%B8%AD%E8%B0%83%E7%94%A8%E6%96%B9%E6%B3%95">11.不要在“created”和“watch”中调用方法</a></li>
+<li><a href="#12-%E6%A8%A1%E6%9D%BF%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%BA%94%E8%AF%A5%E5%8F%AA%E6%9C%89%E5%9F%BA%E6%9C%AC%E7%9A%84-js-%E8%A1%A8%E8%BE%BE%E5%BC%8F">12. 模板表达式应该只有基本的 JS 表达式</a></li>
+<li><a href="#13%E8%B7%AF%E7%94%B1%E5%8F%82%E6%95%B0%E5%8F%98%E5%8C%96%E7%BB%84%E4%BB%B6%E4%B8%8D%E6%9B%B4%E6%96%B0">13.路由参数变化组件不更新</a></li>
+<li><a href="#14%E8%B7%AF%E7%94%B1%E6%87%92%E5%8A%A0%E8%BD%BD">14.路由懒加载</a></li>
+<li><a href="#15%E8%87%AA%E5%AE%9A%E4%B9%89%E8%B7%AF%E5%BE%84%E5%88%AB%E5%90%8D">15.自定义路径别名</a></li>
+</ul>
+</li>
+</ul>
+</p>
+<h2 id="1始终在-v-for-中使用-key">1.始终在 v-for 中使用 :key</h2>
+<p>在需要操纵数据时，将key属性与v-for指令一起使用可以让程序保持恒定且可预测。</p>
+<p>这是很有必要的，这样Vue就可以跟踪组件状态，并对不同的元素有一个常量引用。在使用动画或Vue转换时，key 非常有用。</p>
+<p>如果没有key ，Vue只会尝试使DOM尽可能高效。 这可能意味着v-for中的元素可能会出现乱序，或者它们的行为难以预测。 如果我们对每个元素都有唯一的键引用，那么我们可以更好地预测Vue应用程序将如何精确地处理DOM操作。</p>
+<h2 id="2在事件中使用短横线命名">2.在事件中使用短横线命名</h2>
+<p>在发出定制事件时，最好使用短横线命名，这是因为在父组件中，我们使用相同的语法来侦听该事件。</p>
+<p>因此，为了确保我们各组件之间的一致性，并使您的代码更具可读性，请在两个地方都坚持使用短横线命名。</p>
+<pre><code class="language-c">this.$emit('close-window')
+// 在父组件中
+&lt;popup-window @close-window='handleEvent()' /&gt;
 </code></pre>
-<p>上面一个简单 的模版转换成element AST树形结构后是这样的：</p>
-<pre><code class="language-c">{
-  tag: &quot;div&quot;
-  type: 1,
-  staticRoot: false,
-  static: false,
-  plain: true,
-  parent: undefined,
-  attrsList: [],
-  attrsMap: {},
-  children: [
-      {
-      tag: &quot;p&quot;
-      type: 1,
-      staticRoot: false,
-      static: false,
-      plain: true,
-      parent: {tag: &quot;div&quot;, ...},
-      attrsList: [],
-      attrsMap: {},
-      children: [{
-          type: 2,
-          text: &quot;{{name}}&quot;,
-          static: false,
-          expression: &quot;_s(name)&quot;
-      }]
+<h2 id="3使用驼峰式声明-props并在模板中使用短横线命名来访问-props">3.使用驼峰式声明 props，并在模板中使用短横线命名来访问 props</h2>
+<p>最佳做法只是遵循每种语言的约定。 在 JS 中，驼峰式声明是标准，在HTML中，是短横线命名。 因此，我们相应地使用它们。</p>
+<p>幸运的是，Vue 已经提供了驼峰式声明和短横线命名之间转换，因此除了实际声明它们之外，我们不必担心任何事情。</p>
+<pre><code class="language-c">// 不好的做法
+&lt;PopupWindow titleText='hello world' /&gt; 
+props: { 'title-text': String }
+// 好的做法
+&lt;PopupWindow title-text='hello world' /&gt; 
+props: { titleText: String }
+</code></pre>
+<h2 id="4data-应始终返回一个函数">4.data 应始终返回一个函数</h2>
+<p>声明组件data时，data选项应始终返回一个函数。 如果返回的是一个对象，那么该data将在组件的所有实例之间共享。</p>
+<pre><code class="language-c">// 不好的做法
+data: {
+  name: 'My Window',
+  articles: []
+}
+</code></pre>
+<p>但是，大多数情况下，我们的目标是构建可重用的组件，因此我们希望每个组件返回一个惟一的对象。我们通过在函数中返回数据对象来实现这一点。</p>
+<pre><code class="language-c">// 好的做法
+data () {
+  return {
+    name: 'My Window',
+    articles: []
+  }
+}
+</code></pre>
+<h2 id="5-不要在同个元素上同时使用v-if和v-for指令">5. 不要在同个元素上同时使用v-if和v-for指令</h2>
+<p>为了过滤数组中的元素，我们很容易将v-if与v-for在同个元素同时使用。</p>
+<pre><code class="language-c">// 不好的做法
+&lt;div v-for='product in products' v-if='product.price &lt; 500'&gt;
+问题是在 Vue 优先使用v-for指令，而不是v-if指令。它循环遍历每个元素，然后检查v-if条件。
+
+this.products.map(function (product) {
+  if (product.price &lt; 500) {
+    return product
+  }
+})
+</code></pre>
+<p>这意味着，即使我们只想渲染列表中的几个元素，也必须遍历整个数组。</p>
+<p>这对我们来当然没有任何好处。</p>
+<p>一个更聪明的解决方案是遍历一个计算属性，可以把上面的例子重构成下面这样的：</p>
+<pre><code class="language-c">&lt;div v-for='product in cheapProducts'&gt;
+ 
+computed: {
+  cheapProducts: () =&gt; {
+    return this.products.filter(function (product) {
+      return product.price &lt; 100
+    })
+  }
+}
+</code></pre>
+<p>这么做有几个好处：</p>
+<p>1.渲染效率更高，因为我们不会遍历所有元素。</p>
+<p>2.仅当依赖项更改时，才会重使用过滤后的列表。</p>
+<p>3.这写法有助于将组件逻辑从模板中分离出来，使组件更具可读性。</p>
+<h2 id="6用正确的定义验证我们的-props">6.用正确的定义验证我们的 props</h2>
+<p>这条是很重要，为什么？</p>
+<p>在设计大型项目时，很容易忘记用于props的确切格式、类型和其他约定。如果你在一个更大的开发团队中，你的同事不会读心术，所以你要清楚地告诉他们如何使用你的组件。</p>
+<p>因此，我们只需编写props验证即可，不必费力地跟踪组件来确定props的格式。</p>
+<p>从Vue文档中查看此示例。</p>
+<pre><code class="language-c">props: {
+  status: {
+    type: String,
+    required: true,
+    validator: function (value) {
+      return [
+        'syncing',
+        'synced',
+        'version-conflict',
+        'error'
+      ].indexOf(value) !== -1
     }
-  ]
+  }
 }
 </code></pre>
-<p>解析器的原理不是特别难，主要就是两部分内容，一部分是 截取 字符串，一部分是对截取之后的字符串做解析。每截取一段标签的开头就 push 到 stack中，解析到标签的结束就 pop 出来，当所有的字符串都截没了也就解析完了。</p>
-<p><strong>优化器</strong><br>
-优化器的目的就是找出那些静态节点并打上标记，而静态节点指的是DOM不需要发生变化的节点，也就是里面都是静态标签和静态文本。</p>
-<pre><code class="language-c">&lt; p&gt;我是静态节点，我不需要发生变化&lt;/ p&gt;
+<h2 id="7组件全名使用驼峰或或者短横线">7.组件全名使用驼峰或或者短横线</h2>
+<p>组件的通用命名约定是使用驼峰或短横线。无论我们使用哪个，最重要的是始终保持一致。我认为驼峰方式 效果最好，因为大多数IDE自动完成功能都支持它。</p>
+<pre><code class="language-c"># 不好的做法
+mycomponent.vue
+myComponent.vue
+Mycomponent.vue
+# 好做法
+MyComponent.vue
 </code></pre>
-<p><strong>标记静态节点有两个好处：</strong></p>
-<p>一、每次重新渲染的时候不需要为静态节点创建新节点，也就是静态节点的解析器不需要重新创建<br>
-二、在Virtual DOM中patching的过程可以被跳过</p>
-<p><strong>优化器的实现原理主要分两步：</strong></p>
-<p>一、用递归的方式将静态节点添加static属性，用来标识是不是静态节点<br>
-二、标记所有静态根节点(子节点全是静态节点就是静态根节点)</p>
-<p>整体逻辑其实就是递归 AST 这颗树，然后将 静态节点和 静态根节点找到并打上标记。</p>
-<p><strong>代码生成器</strong><br>
-代码生成器的作用是使用element ASTs生成render函数代码字符串。<br>
-使用本文开头举的例子中的模版生成后的AST来生成render后是这样的：</p>
-<pre><code class="language-c">{
-  render: `with(this){return _c('div',[_c('p',[_v(_s(name))])])}`
+<h2 id="8-基本组件应该相应地加上前缀">8. 基本组件应该相应地加上前缀</h2>
+<p>根据Vue样式指南，基本组件是仅包含以下内容的组件：</p>
+<p>1.HTML 元素。<br>
+2.额外的基础组件。<br>
+3.第三方的UI组件。</p>
+<p>为这些组件命名的最佳实践是为它们提供前缀Base、V或App。同样，只要我们在整个项目中保持一致，可以使用其中任何一种。</p>
+<p>BaseButton.vue<br>
+BaseIcon.vue<br>
+BaseHeading.vue</p>
+<p>该命名约定的目的是使基本组件按字母顺序分组在文件系统中。 另外，通过使用webpack导入功能，我们可以搜索与命名约定模式匹配的组件，并将所有组件自动导入为Vue项目中的全局变量。</p>
+<h2 id="9单实例组件命名应该带有前缀-the">9.单实例组件命名应该带有前缀 The</h2>
+<p>与基本组件类似，单实例组件(每个页面使用一次，不接受任何prop)应该有自己的命名约定。这些组件特定于我们的应用，通常是 footer，header或sider。</p>
+<p>该组件只能有一个激活实例。</p>
+<p>TheHeader.vue<br>
+TheFooter.vue<br>
+TheSidebar.vue<br>
+ThePopup.vue</p>
+<h2 id="10保持指令简写的一致性">10.保持指令简写的一致性</h2>
+<p>在Vue开发人员中，一种常见的技术是使用指令的简写。例如：<br>
+<br>
+@是v-on的简写<br>
+: 是 v-bind 的简写<br>
+# 是 v-slot 的简写</p>
+<p>在vue项目中使用这些缩写是很好的。但是要在整个项目中创建某种约定，总是使用它们或从不使用它们,会使我们的项目更具内聚性和可读性。</p>
+<h2 id="11不要在created和watch中调用方法">11.不要在“created”和“watch”中调用方法</h2>
+<p>Vue开发人员经常犯的一个错误是他们不必要地在created和watch中调用方法。 其背后的想法是，我们希望在组件初始化后立即运行watch。</p>
+<pre><code class="language-c">// 不好的做法
+created: () {
+this.handleChange()
+},
+methods: {
+handleChange() {
+// stuff happens
+}
+},
+watch () {
+property() {
+this.handleChange()
+}
 }
 </code></pre>
-<p>格式化后是这样的：</p>
-<pre><code class="language-c">with(this){
-  return _c(
-    'div',
-    [
-      _c(
-        'p',
-        [
-          _v(_s(name))
-        ]
-      )
-    ]
-  )
+<p>但是，Vue为此提供了内置的解决方案，这是我们经常忘记的Vue watch属性。</p>
+<p>我们要做的就是稍微重组watch并声明两个属性：</p>
+<p>1.handler (newVal, oldVal)-这是我们的watch方法本身。<br>
+2. immediate: true– 代表如果在 wacth 里声明了之后，就会立即先去执行里面的handler方法，如果为 false就跟我们以前的效果一样，不会在绑定的时候就执行</p>
+<pre><code class="language-c">// 好的做法
+methods: {
+  handleChange() {
+    // stuff happens
+  }
+},
+watch () {
+  property {
+    immediate: true
+    handler() {
+      this.handleChange()
+    }
+  }
 }
 </code></pre>
-<p>生成后的代码字符串中看到了有几个函数调用_c、_v、_s。<br>
-_c对应的是createElement，它的作用是创建一个元素。<br>
-1.第一个参数是一个HTML标签名<br>
-2.第二个参数是元素上使用的属性所对应的数据对象，可选项<br>
-3.第三个参数是children<br>
-_v的意思是创建一个文本节点。<br>
-_s是返回参数中的字符串。<br>
-代码生成器的总体逻辑其实就是使用element ASTs去递归，然后拼出这样的_c('div',[_c('p',[_v(_s(name))])]) 字符串。</p>
-<h2 id="原理">原理</h2>
-<p>解析器（parser）的原理是一小段一小段的去截取字符串，然后维护一个 stack 用来保存DOM深度，每截取到一段标签的开始就 push 到 stack 中，当所有字符串都截取完之后也就解析出了一个完整的 AST。</p>
-<p>优化器（optimizer）的原理是用递归的方式将所有节点打标记，表示是否是一个 静态节点，然后再次递归一遍把 静态根节点 也标记出来。</p>
-<p>代码生成器（code generator）的原理也是通过递归去拼一个函数执行代码的字符串，递归的过程根据不同的节点类型调用不同的生成方法，如果发现是一颗元素节点就拼一个 _c(tagName, data, children) 的函数调用字符串，然后 data 和 children 也是使用 AST 中的属性去拼字符串。</p>
-<p>如果 children 中还有 children 则递归去拼。</p>
-<p>最后拼出一个完整的 render 函数代码。</p>
+<h2 id="12-模板表达式应该只有基本的-js-表达式">12. 模板表达式应该只有基本的 JS 表达式</h2>
+<p>在模板中添加尽可能多的内联功能是很自然的。但是这使得我们的模板不那么具有声明性，而且更加复杂，也让模板会变得非常混乱。</p>
+<p>为此，让我们看看Vue样式指南中另一个规范化字符串的示例，看看它有多混乱。</p>
+<pre><code class="language-c">//不好的做法
+{{
+  fullName.split(' ').map(function (word) {
+    return word[0].toUpperCase() + word.slice(1)
+  }).join(' ')
+}}
+</code></pre>
+<p>基本上，我们希望模板中的所有内容都直观明了。 为了保持这一点，我们应该将复杂的表达式重构为适当命名的组件选项。</p>
+<p>分离复杂表达式的另一个好处是可以重用这些值。</p>
+<pre><code class="language-c">// 好的做法
+{{ normalizedFullName }}
+// The complex expression has been moved to a computed property
+computed: {
+  normalizedFullName: function () {
+    return this.fullName.split(' ').map(function (word) {
+      return word[0].toUpperCase() + word.slice(1)
+    }).join(' ')
+  }
+}
+</code></pre>
+<h2 id="13路由参数变化组件不更新">13.路由参数变化组件不更新</h2>
+<p>同一 path 的页面跳转时路由参数变化，但是组件没有对应的更新。</p>
+<p>原因：主要是因为获取参数写在了created 或者 mounted 路由钩子函数中，路由参数变化的时候，这个生命周期不会重新执行。</p>
+<p>我们可以用watch 监听路由。</p>
+<pre><code class="language-c">watch: {
+ // 方法1  监听路由是否变化
+  '$route' (to, from) { 
+    if(to.query.id !== from.query.id){
+    　　this.id = to.query.id;
+    　　this.init();//重新加载数据
+    }
+  }
+}
+//方法2  设置路径变化时的处理函数
+watch: {
+'$route': {
+    handler: 'init',
+    immediate: true
+  }
+}
+</code></pre>
+<h2 id="14路由懒加载">14.路由懒加载</h2>
+<p>Vue 项目中实现路由按需加载（路由懒加载）的 3 中方式：</p>
+<pre><code class="language-c">// 1、Vue异步组件技术：
+    {
+        path: '/home',
+        name: 'Home',
+        component: resolve =&gt; reqire(['path路径'], resolve)
+  }
+
+// 2、es6提案的import()
+  const Home = () =&gt; import('path路径')
+
+// 3、webpack提供的require.ensure()
+    {
+        path: '/home',
+        name: 'Home',
+        component: r =&gt; require.ensure([],() =&gt;  r(require('path路径')), 'demo')
+    }
+</code></pre>
+<h2 id="15自定义路径别名">15.自定义路径别名</h2>
+<p>我们也可以在基础配置文件中添加自己的路径别名</p>
+<pre><code class="language-c">resolve: {
+    extensions: ['.js', '.vue', '.json'],
+    alias: {
+      'vue$': 'vue/dist/vue.esm.js',
+      '@': resolve('src'),
+      'assets': resolve('src/assets')
+    }
+  }
+</code></pre>
+<p>然后我们导入组件的时候就可以这样写：</p>
+<pre><code class="language-c">// import YourComponent from '/src/assets/YourComponent'
+import YourComponent from 'assets/YourComponent'
+</code></pre>
+<p>这样既解决了路径过长的麻烦，又解决了相对路径的烦恼。</p>
 ]]></content>
     </entry>
     <entry>
-        <title type="html"><![CDATA[Vue中的模板编译原理]]></title>
+        <title type="html"><![CDATA[Vue：内部运行机制]]></title>
         <id>https://dark-yifeng.github.io/post/vue-zhong-de-mo-ban-bian-yi-yuan-li/</id>
         <link href="https://dark-yifeng.github.io/post/vue-zhong-de-mo-ban-bian-yi-yuan-li/">
         </link>
         <updated>2020-05-18T09:37:57.000Z</updated>
-        <content type="html"><![CDATA[<p>先看下模板到真正用户看到的界面过程中经历了什么：</p>
-<p>模板———&gt;模板编译——&gt;渲染函数——&gt;vnode——&gt;用于界面</p>
-<p>vue.js提供了模板语法，允许我们声明式的描述状态和DOM之间的绑定关系。</p>
-<p>将模板编译为渲染函数，就是模板编译要做的事，模板编译可以分为三个阶段：</p>
-<p>1.将模板解析为AST（抽象语法树）—— 解析器。<br>
-2.遍历AST标记静态节点 —— 优化器。<br>
-3.使用AST生成渲染函数 —— 代码生成器）。</p>
-<blockquote>
-<p>其实 AST 和 Vnode 类似，都是使用JavaScript对象来描述节点。更准确的说，一个用对象来描述的节点树就是 AST。</p>
-</blockquote>
-<p><img src="https://img-blog.csdnimg.cn/20200316215116732.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2xpdXlpZmVuZzAwMDA=,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述" loading="lazy"><br>
-<strong>解析器</strong></p>
-<pre><code class="language-c">&lt;div&gt;
-  &lt;p&gt;{{name}}&lt;/p&gt;
-&lt;/div&gt;
+        <content type="html"><![CDATA[<p>转载于  https://blog.csdn.net/RedLoVE0908/article/details/99749359</p>
+<h3><a name="t1"></a><a name="t1"></a><a id="_2"></a>序</h3>
+<p>最近遇到了Vue的瓶颈，不知道怎么样才能得到提升，所以准备从源码和机理入手。</p>
+<h3><a name="t2"></a><a name="t2"></a><a id="_5"></a>目录大纲</h3>
+<ul>
+<li>概述</li>
+<li>初始化及挂载</li>
+<li>响应式的实现</li>
+<li>编译</li>
+<li>Virtual DOM和数据更新时的patch()</li>
+</ul>
+<h3><a name="t3"></a><a name="t3"></a><a id="_13"></a>概述</h3>
+<p><img src="https://img-blog.csdnimg.cn/20190819185138874.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1JlZExvVkUwOTA4,size_16,color_FFFFFF,t_70" alt="Vue.js的内部运行机制"></p>
+<ul>
+<li><strong>初始化</strong>
+<ul>
+<li>初始化生命周期、事件、render、state</li>
+<li>Object.definePrototy() 响应式的定义</li>
+</ul>
+</li>
+<li><strong>挂载</strong> （运行时 + 编译器）
+<ul>
+<li>template到render Function的编译</li>
+<li>注册watcher</li>
+<li>响应式的触发</li>
+</ul>
+</li>
+<li><strong>patch的diff算法更新机制</strong></li>
+<li><strong>nextTick的异步更新策略</strong></li>
+</ul>
+<h3><a name="t4"></a><a name="t4"></a><a id="_26"></a>初始化及挂载</h3>
+<p><img src="https://img-blog.csdnimg.cn/2019081918534046.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1JlZExvVkUwOTA4,size_16,color_FFFFFF,t_70" alt="初始化及挂载"><br>
+<strong>Vue</strong>的实现首先是通过<strong>Vue</strong>类里面构造函数中所执行的<strong>init()</strong>。<br>
+<strong>_init</strong>的函数里面<strong>主要包括</strong>：</p>
+<ol>
+<li>主要包括初始化<strong>生命周期</strong>、初始化<strong>事件</strong>、初始化<strong>render</strong>，初始化state(包括<code>props、data，method、computed、watchers</code>)。</li>
+<li>执行<code>vm.$mount()</code>挂载组件</li>
+</ol>
+<p><strong>初始化以及挂载</strong>包括了Vue实例的整个前半的生命周期，在这个过程中，Vue完成了模板到真实DOM的显示，以及data与View的响应式绑定监控。</p>
+<h3><a name="t5"></a><a name="t5"></a><a id="_35"></a>响应式的实现</h3>
+<h4><a id="ObjectdefinePrototy_37"></a>关于Object.definePrototy()</h4>
+<ul>
+<li><strong>Object.definePrototy()</strong> :
+<ul>
+<li><strong>概念</strong>：直接在一个对象上定义一个新属性，或者修改一个对象的现有属性，并返回这个对象。</li>
+<li><strong>参数</strong>：<code>obj</code>、<code>prop</code>、<code>descriptor</code></li>
+<li><strong>类型</strong>：数据描述符、存取描述符</li>
+<li><strong>descriptor</strong> ：
+<ul>
+<li><code>configureable</code> （数据描述符 &amp; 存取描述符）<br>
+当且仅当该属性的 configurable 为 true 时，该属性描述符才能够被改变，同时该属性也能从对应的对象上被删除。默	认为 false。</li>
+<li><code>emunerable</code>（数据描述符 &amp; 存取描述符）<br>
+当且仅当该属性的enumerable为true时，该属性才能够出现在对象的枚举属性中。默认为 false。</li>
+<li><code>writable</code> （数据描述符）<br>
+当且仅当该属性的writable为true时，value才能被赋值运算符改变。默认为 false。</li>
+<li><code>value</code> （数据描述符）<br>
+该属性对应的值。可以是任何有效的 JavaScript 值（数值，对象，函数等）。默认为 undefined。</li>
+<li><code>set</code> （存取描述符）<br>
+一个给属性提供 setter 的方法，如果没有 setter 则为 undefined。当属性值修改时，触发执行该方法。该方法将接受唯一参数，即该属性新的参数值。默认undefined。</li>
+<li><code>get</code>（存取描述符）<br>
+一个给属性提供 getter 的方法，如果没有 getter 则为 undefined。当访问该属性时，该方法会被执行，方法执行时没有参数传入，但是会传入this对象（由于继承关系，这里的this并不一定是定义该属性的对象）。默认undefined。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4><a id="_56"></a>依赖注入和更新视图</h4>
+<p><img src="https://img-blog.csdnimg.cn/20190819190253771.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1JlZExvVkUwOTA4,size_16,color_FFFFFF,t_70" alt="依赖注入和更新视图"></p>
+<ul>
+<li><strong>一个Vue类的构造函数中绑定data</strong></li>
+<li><strong>为data注册 Observer</strong>
+<ul>
+<li>对data中的每个key值调用<code>Object.definePrototype</code></li>
+<li>在<code>get</code>中执行<code>dep.depend()</code>进行依赖绑定</li>
+<li>在<code>set</code>中执行<code>dep.notify()</code>通知观察者进行视图更新</li>
+</ul>
+</li>
+<li><strong>在$mouted执行挂载(运行中+编译器版本)</strong>
+<ul>
+<li>编译模板将data对象和vue语法声明的模板编译成浏览器可读的html</li>
+<li>注册一个观察者<code>Watcher</code>，并将它的getter绑定为<code>vm._update(vm._render())</code></li>
+<li>在将<code>Dep.target</code>设置为自生观察者实例，执行getter操作，即为执行了<code>vm._update()</code></li>
+<li>在<code>vm._update()</code>中如果需要渲染某个数据就会触发本身的<code>getter</code>，完成依赖收集</li>
+</ul>
+</li>
+<li><strong>当某个值被改变的时候</strong><br>
+* 触发<code>set</code>中的<code>dep.notify()</code>通知观察者进行视图更新<br>
+* <code>notify</code>调用<code>dep.subs</code>中的每一个<code>watcher</code>的<code>run()</code>进而触发<code>watcher</code>的<code>getter()</code><br>
+* 进而触发<code>vm._update(vm._render())</code>进行重新渲染VNode与patch<br>
+* 在patch中将新老的VNode进行diff算法分析，找到最小结构，进而更新到真实的DOM上</li>
+</ul>
+<h5><a id="_73"></a>简单代码示例</h5>
+<pre><code class="language-c">		let uid=0
+		class Dep {
+		    constructor(){
+		        this.id = uid++
+		        this.subs=[]
+		    }
+		    addSubs(){
+		        this.subs.push(Dep.target)
+		    }
+		    depend(){
+		        if(Dep.target){
+		            this.addSubs()
+		        }
+		    }
+		    /*通知所有订阅者*/
+		    notify () {    
+		        const subs = this.subs.slice()
+		        for (let i = 0, l = subs.length; i &lt; l; i++) {
+		            subs[i].update()
+		        }
+		    }
+		}
+		
+		 /*
+		    一个解析表达式，进行依赖收集的观察者，同时在表达式数据变更时触发回调函数。它被用于$watch api以及指令
+		 */
+		class Watcher{
+		    constructor(expns){
+		        Dep.target=this
+		        this.getter = expns
+		        this.value = this.get() 
+		    }
+		    run () {
+		        this.get()
+		    }
+		    update(){
+		        this.run()
+		    }
+		    get(){
+		        return this.getter.call(vm)
+		    }
+		
+		}
+		
+		// 存取描述符（数据描述符）
+		function defineReactive(obj,key,val){
+		    let dep = new Dep()
+		    Object.defineProperty(obj,key,{
+		        enumerable:true,//可以修改
+		        configurable:true,//可以出现在对象枚举属性
+		        get:()=&gt;{
+		            //依赖收集
+		            if (Dep.target) {
+		                /*进行依赖收集*/
+		                dep.depend()
+		            }
+		            return val
+		        },
+		        set:newVal=&gt;{
+		            val=newVal
+		            dep.notify()
+		        }
+		    })
+		}
+		
+		function observe (value){
+		    Object.keys(value).forEach(key =&gt; {
+		        defineReactive(value,key,value[key])
+		    });
+		}
+		
+		
+		/*代理*/
+		function _proxy (data) {
+		    const that = this;
+		    Object.keys(data).forEach(key =&gt; {
+		        Object.defineProperty(that, key, {
+		            configurable: true,
+		            enumerable: true,
+		            get: function proxyGetter () {
+		                return that._data[key];
+		            },
+		            set: function proxySetter (val) {
+		                that._data[key] = val;
+		            }
+		        })
+		    });
+		}
+		
+		let vm 
+		class Vue{
+		    constructor(options){
+		        vm = this
+		        //在源码中是通过代理的方式会将_data代理成vm.data
+		        this._data=options.data
+		        _proxy.call(this, options.data);/*构造函数中*/
+		
+		        observe(this._data)     
+		        // 挂载
+		        this._mount()   
+		    }
+		    _update(){
+		        for (const key in this._data) {
+		            if (this._data.hasOwnProperty(key)) {
+		                console.log('_update渲染更新视图~',this._data[key]);                
+		            }
+		        }        
+		    }
+		    _mount(){
+		        let updateComponent
+		        updateComponent = () =&gt; {
+		            vm._update()
+		        }   
+		       //注册一个观察者     
+		        vm._Watcher=new Watcher(updateComponent)
+		    }
+		}
+		
+		let app = new Vue({
+		    el:'#app',
+		    data:{
+		        text:'text1',
+		        text1:'text2'
+		    }
+		})
+		//修改
+		app.text1='0'
+
 </code></pre>
-<p>上面一个简单 的模版转换成element AST树形结构后是这样的：</p>
-<pre><code class="language-c">{
-  tag: &quot;div&quot;
-  type: 1,
-  staticRoot: false,
-  static: false,
-  plain: true,
-  parent: undefined,
-  attrsList: [],
-  attrsMap: {},
-  children: [
-      {
-      tag: &quot;p&quot;
-      type: 1,
-      staticRoot: false,
-      static: false,
-      plain: true,
-      parent: {tag: &quot;div&quot;, ...},
-      attrsList: [],
-      attrsMap: {},
-      children: [{
-          type: 2,
-          text: &quot;{{name}}&quot;,
-          static: false,
-          expression: &quot;_s(name)&quot;
-      }]
-    }
-  ]
-}
-</code></pre>
-<p>解析器的原理不是特别难，主要就是两部分内容，一部分是 截取 字符串，一部分是对截取之后的字符串做解析。每截取一段标签的开头就 push 到 stack中，解析到标签的结束就 pop 出来，当所有的字符串都截没了也就解析完了。</p>
-<p><strong>优化器</strong><br>
-优化器的目的就是找出那些静态节点并打上标记，而静态节点指的是DOM不需要发生变化的节点，也就是里面都是静态标签和静态文本。</p>
-<pre><code class="language-c">&lt; p&gt;我是静态节点，我不需要发生变化&lt;/ p&gt;
-</code></pre>
-<p><strong>标记静态节点有两个好处：</strong></p>
-<p>一、每次重新渲染的时候不需要为静态节点创建新节点，也就是静态节点的解析器不需要重新创建<br>
-二、在Virtual DOM中patching的过程可以被跳过</p>
-<p><strong>优化器的实现原理主要分两步：</strong></p>
-<p>一、用递归的方式将静态节点添加static属性，用来标识是不是静态节点<br>
-二、标记所有静态根节点(子节点全是静态节点就是静态根节点)</p>
-<p>整体逻辑其实就是递归 AST 这颗树，然后将 静态节点和 静态根节点找到并打上标记。</p>
-<p><strong>代码生成器</strong><br>
-代码生成器的作用是使用element ASTs生成render函数代码字符串。<br>
-使用本文开头举的例子中的模版生成后的AST来生成render后是这样的：</p>
-<pre><code class="language-c">{
-  render: `with(this){return _c('div',[_c('p',[_v(_s(name))])])}`
-}
-</code></pre>
-<p>格式化后是这样的：</p>
-<pre><code class="language-c">with(this){
-  return _c(
-    'div',
-    [
-      _c(
-        'p',
-        [
-          _v(_s(name))
-        ]
-      )
-    ]
-  )
-}
-</code></pre>
-<p>生成后的代码字符串中看到了有几个函数调用_c、_v、_s。<br>
-_c对应的是createElement，它的作用是创建一个元素。<br>
-1.第一个参数是一个HTML标签名<br>
-2.第二个参数是元素上使用的属性所对应的数据对象，可选项<br>
-3.第三个参数是children<br>
-_v的意思是创建一个文本节点。<br>
-_s是返回参数中的字符串。<br>
-代码生成器的总体逻辑其实就是使用element ASTs去递归，然后拼出这样的_c('div',[_c('p',[_v(_s(name))])]) 字符串。</p>
-<h2 id="原理">原理</h2>
-<p>解析器（parser）的原理是一小段一小段的去截取字符串，然后维护一个 stack 用来保存DOM深度，每截取到一段标签的开始就 push 到 stack 中，当所有字符串都截取完之后也就解析出了一个完整的 AST。</p>
-<p>优化器（optimizer）的原理是用递归的方式将所有节点打标记，表示是否是一个 静态节点，然后再次递归一遍把 静态根节点 也标记出来。</p>
-<p>代码生成器（code generator）的原理也是通过递归去拼一个函数执行代码的字符串，递归的过程根据不同的节点类型调用不同的生成方法，如果发现是一颗元素节点就拼一个 _c(tagName, data, children) 的函数调用字符串，然后 data 和 children 也是使用 AST 中的属性去拼字符串。</p>
-<p>如果 children 中还有 children 则递归去拼。</p>
-<p>最后拼出一个完整的 render 函数代码。</p>
+<p>在响应式更新数据的过程中，如果一个数据的值在一段时间内频繁更新了很多次，会依次触发响应式<strong>setter-&gt;Dep-&gt;Watcher-&gt;update-&gt;patch</strong>,所以引入<strong>nextTick</strong>的异步更新策略，实现一个<strong>queue</strong>队列，会在下一个<strong>tick</strong>去执行一次上面的响应式更新操作，大大优化了性能。</p>
+<h3><a name="t6"></a><a name="t6"></a><a id="_206"></a>编译</h3>
+<p><img src="https://img-blog.csdnimg.cn/20190819190738822.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1JlZExvVkUwOTA4,size_16,color_FFFFFF,t_70" alt="编译"></p>
+<ul>
+<li><strong>baseCompile</strong>
+<ul>
+<li><code>parse</code>——分析</li>
+<li><code>optimize</code>——优化</li>
+<li><code>generate</code>——生成</li>
+</ul>
+</li>
+<li><strong>createCompileToFunctionFn</strong>
+<ul>
+<li>将编译结果放入缓存</li>
+<li>同时<code>staticRenderFns</code>以及<code>render</code>函数会被转换成Funtion对象</li>
+</ul>
+</li>
+</ul>
+<h3><a name="t7"></a><a name="t7"></a><a id="Virtual_DOMpatch_216"></a>Virtual DOM和数据更新时的patch()</h3>
+<p><img src="https://img-blog.csdnimg.cn/20190819190954787.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1JlZExvVkUwOTA4,size_16,color_FFFFFF,t_70" alt="VNode"></p>
+<h4><a id="VNode_218"></a>VNode</h4>
+<ul>
+<li>
+<p><strong>产生原因</strong>，对于大应用来说直接操作DOM来修改视图是一个很大的花销。</p>
+</li>
+<li>
+<p><strong>Vue.js</strong>将DOM抽象成一个以JavaScript对象为节点的虚拟DOM树，对这棵抽象树进行节点的增删查改。</p>
+</li>
+<li>
+<p><strong>优点</strong>：</p>
+</li>
+</ul>
+<ol>
+<li>不需要操作真实的DOM，只操作JavaScript对象</li>
+<li>修改以后经过diff算法得出需修改的最小单位，更新映射到真实的DOM上面去，提高性能。</li>
+<li>真实DOM的一层抽象，而不依赖某个平台，可在weex、浏览器平台、甚至是node平台使用<br>
+<img src="https://img-blog.csdnimg.cn/20190819191013309.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L1JlZExvVkUwOTA4,size_16,color_FFFFFF,t_70" alt="patch"></li>
+</ol>
+<h4><a id="patch_228"></a>数据更新时的patch()</h4>
+<ul>
+<li>数据发生修改会触发<code>vm._update(vm._render())</code></li>
+<li><code>vm._render()</code>返回最新的template的Vnode模板</li>
+<li><code>vm._update()</code>中获取到新旧VNode节点进行<code>vm._patch__()</code>函数对比
+<ul>
+<li>对比过程主要包括对数同层叶子节点的比较</li>
+</ul>
+</li>
+<li>进而对真实DOM进行一系列的<strong>增删查改</strong></li>
+</ul>
 ]]></content>
     </entry>
     <entry>
